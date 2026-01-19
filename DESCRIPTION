@@ -1,0 +1,31 @@
+Package: pep725
+Title: PEP725 Pan-European Phenological Data Analysis
+Version: 0.0.0.901
+Authors@R: 
+    c(person("Matthias", "Templ", , "matthias.templ@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-8638-5276")),
+      person("Barbara", "Templ", , "barbara.a.templ@gmail.com", role = c("aut"),
+           comment = c(ORCID = "0000-0002-9391-5888"))
+           )
+Description: Provides comprehensive tools for analyzing phenological data from
+    the PEP725 Pan-European Phenology Database (Templ et al. 2018)
+    <doi:10.1007/s00484-018-1512-8> and other European sources. Core analytical
+    functions include calculation of phenological normals (climate baselines),
+    anomaly detection, elevation and latitude gradient analysis, and spatial
+    synchrony assessment. The package supports data import from PEP725 files,
+    synthetic data generation for testing and teaching, and downloadable example
+    datasets. Visualization capabilities include interactive 'leaflet' maps for
+    station selection, static maps via 'ggmap', and trend plots with robust
+    regression. Integration with climate data (NASA GISS temperature anomalies,
+    MeteoSwiss) enables climate-phenology relationship analysis. Quality
+    assessment tools help identify reliable observation series.
+License: GPL-3
+Encoding: UTF-8
+Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr, patchwork
+Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, purrr, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Suggests: knitr, rmarkdown, devtools, rnaturalearthdata
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+BugReports: https://github.com/matthias-da/pep725/issues
+URL: https://github.com/matthias-da/pep725

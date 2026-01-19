@@ -1,2 +1,174 @@
 # pep725
-pep725 R package
+
+PEP725 Pan-European Phenological Data Analysis
+
+**pep725** is an R package for analyzing phenological data from the [PEP725 Pan-European Phenology Database](http://www.pep725.eu/) and other European observational sources. It provides tools for data exploration, quality assessment, climatological baseline calculation, trend analysis, and visualization of phenology-climate relationships.
+
+## Features
+
+**Data Access:**
+- Import PEP725 data files with automatic cleaning and formatting
+- Download pre-generated synthetic datasets for learning and testing
+- Generate synthetic data from your own datasets for teaching and sharing
+
+**Core Analysis:**
+- `pheno_normals()` - Calculate climatological baselines (WMO-style reference periods)
+- `pheno_anomaly()` - Detect deviations from normal phenology
+- `pep_quality()` - Assess data quality and assign reliability grades
+- `pheno_gradient()` - Quantify elevation and latitude gradients
+- `pheno_synchrony()` - Measure spatial coherence of phenological events
+
+**Visualization:**
+- `pheno_plot_timeseries()` - DOY trend plots over time
+- `plot_phenological_trends()` - Robust regression trend analysis
+- `pheno_plot()` - Climate sensitivity visualizations
+- `leaflet_pep()` - Interactive maps for station exploration and selection
+- `map_pep()` - Static maps of station networks
+
+**Climate Integration:**
+- Link phenology with NASA GISS global temperature anomalies
+- Regional climate-phenology sensitivity analysis
+
+## Installation
+
+```r
+# Install from GitHub
+# install.packages("devtools")
+devtools::install_github("matthias-da/pep725")
+```
+
+## Quick Start
+
+```r
+library(pep725)
+
+# Download synthetic data (cached locally after first download)
+pep <- pep_download()
+
+# Explore the data
+print(pep)
+summary(pep)
+coverage(pep)
+
+# Filter to a species
+wheat <- pep[species == "Triticum aestivum"]
+
+# Calculate phenological normals
+normals <- pheno_normals(
+  wheat,
+  period = 1990:2015,
+  by = c("country", "phase_id"),
+  min_years = 10
+)
+print(normals)
+
+# Detect anomalies
+anomalies <- pheno_anomaly(
+  wheat,
+  baseline_period = 1990:2010,
+  by = c("country", "phase_id")
+)
+summary(anomalies)
+
+# Assess data quality
+quality <- pep_quality(wheat, by = c("s_id", "phase_id"))
+summary(quality)
+```
+
+## Data Options
+
+| Option | Best For | Requires Internet |
+|--------|----------|-------------------|
+| `pep_download()` | Learning, tutorials, reproducible examples | First use only |
+| `data(pep_seed)` | Quick offline tests, minimal examples | No |
+| `simulate_pep()` | Creating shareable datasets from your own data | No |
+| `pep_import()` | Research with actual PEP725 observations | For download |
+
+**Why synthetic data?** The original PEP725 database requires registration and has usage restrictions. Synthetic data preserves statistical properties while being freely shareable for tutorials and reproducible workflows.
+
+## Spatial Analysis
+
+```r
+# Elevation gradient analysis
+gradient <- pheno_gradient(
+  pep,
+  variable = "alt",
+  species = "Triticum aestivum",
+  phase_id = 60,
+  method = "robust"
+)
+print(gradient)
+plot(gradient)
+
+# Spatial synchrony
+synchrony <- pheno_synchrony(
+  pep,
+  species = "Triticum aestivum",
+  phase_id = 60,
+  by = c("country", "year"),
+  min_stations = 3
+)
+summary(synchrony)
+```
+
+## Interactive Mapping
+
+```r
+# Launch interactive map for station selection
+selected <- leaflet_pep(pep, label_col = "species")
+
+# Use selected stations for analysis
+pep_subset <- pep[s_id %in% selected$s_id]
+```
+
+## Built-in Datasets
+
+| Dataset | Description |
+|---------|-------------|
+| `pep_seed` | Small seed dataset for quick tests |
+| `giss` | NASA GISS global temperature anomalies (1880-2024) |
+
+## Vignettes
+
+The package includes detailed vignettes:
+
+- **Getting Started with pep725** - Data loading, exploration, and basic usage
+- **Phenological Analysis** - Normals, anomalies, quality assessment, and visualization
+- **Spatial Phenological Patterns** - Gradients, synchrony, and mapping
+
+```r
+vignette("getting-started", package = "pep725")
+vignette("phenological-analysis", package = "pep725")
+vignette("spatial-patterns", package = "pep725")
+```
+
+## Requirements
+
+- R >= 4.1
+- Google Maps API key required for `map_pep()` static maps:
+  ```r
+  ggmap::register_google(key = "your_api_key")
+  ```
+
+## Citation
+
+If you use this package, please cite:
+
+Templ et al. (2018). Phenological patterns of flowering across biogeographical
+regions of Europe. *International Journal of Biometeorology*, 62, 1347-1358.
+doi:10.1007/s00484-018-1512-8
+
+## License
+
+GPL-3
+
+## Authors
+
+- Matthias Templ (maintainer)
+- Barbara Templ
+
+## Links
+
+- [GitHub Repository](https://github.com/matthias-da/pep725)
+- [Report Issues](https://github.com/matthias-da/pep725/issues)
+- [PEP725 Database](http://www.pep725.eu/)

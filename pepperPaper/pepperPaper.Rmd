@@ -1,0 +1,84 @@
+---
+title: 'pepper: An R package for synthetic and climate-sensitive phenology analysis based on the PEP725 network'
+tags:
+  - R
+  - phenology
+  - climate change
+  - open research data
+  - sensitivity analysis
+authors:
+  - name: Matthias Templ
+    orcid: 0000-0002-2468-2445
+    affiliation: 1
+  - name: Barbara Templ
+    orcid: 0000-0002-6425-0861
+    affiliation: 2
+affiliations:
+  - name: Center for Data Quality and Anonymization, FHNW University of Applied Sciences and Arts Northwestern Switzerland
+    index: 1
+  - name: Agroscope, Switzerland
+    index: 2
+date: 2025-10-15
+bibliography: paper.bib
+---
+
+# Summary
+
+**pepper** is an R package providing a workflow for analyzing and simulating phenological observations from the Pan-European Phenology Database (PEP725, @templ2018pep725).  
+It bridges three key challenges in large-scale phenology research: (1) limited data accessibility, (2) the need for standardized analytical workflows, and (3) the quantification of climate warming impacts across species and phenophases.  
+
+The package includes:
+- a **synthetic phenology data generator** preserving the structure of the PEP725 database (station–year–species–phase);
+- tools for **data cleaning, transformation, and visualization** specific to PEP725;
+- functions for **phenological trend and sensitivity analysis**, including automatic simulation of +3 °C global warming scenarios.
+
+These features make *pepper* a practical, open-science-oriented alternative to closed or domain-specific tools.  
+The package is released under the GPL-3 license and fully documented at [https://github.com/matthias-da/pepper](https://github.com/matthias-da/pepper).
+
+# Statement of Need
+
+Although phenological research has produced several R packages—such as `chillR`, `DyMEP`, `phenex`, and `phenology`—none provide a **standardized or FAIR-compliant workflow** for *network-based phenology datasets*.  
+Existing tools typically:
+- model specific crops or ecosystems,
+- rely on regionally trained models (e.g. DWD data in `DyMEP`),
+- or focus on remote-sensing NDVI time series rather than in-situ observations.
+
+**pepper** occupies a complementary niche by:
+1. supporting *direct compatibility* with the PEP725 format, the largest open phenological database in Europe;
+2. providing *synthetic, privacy-safe datasets* to enable reproducible analysis without violating redistribution policies;
+3. introducing *phase-specific climate sensitivity routines*, allowing cross-species comparison under standardized +ΔT experiments.
+
+By embedding these capabilities in a unified R environment, *pepper* facilitates research, teaching, and open-data practices in phenology and agro-climatology.
+
+# Features
+
+The current version (v0.2.0) implements five functional domains:
+
+| Domain | Example Functions | Description |
+|---------|------------------|--------------|
+| **Data access & structure** | `read_pep()`, `summarize_pep()`, `filter_pep()` | Read, validate, and subset PEP725-style data tables |
+| **Synthetic data generation** | `simulate_pep()` | Generate synthetic DOY values preserving station–species–phase dependencies |
+| **Climate linkage** | `link_meteo()` | Merge phenological records with temperature and precipitation data |
+| **Sensitivity analysis** | `estimate_sensitivity()`, `simulate_warming()` | Compute per-phase slopes (ΔDOY / ΔT) and simulate warming responses |
+| **Visualization & reporting** | `pheno_plot()`, `regional_box_ts()` | Plot spatial, temporal, and aggregated phenological trends |
+
+All functions are designed to work seamlessly with `data.table` and `ggplot2`, promoting tidy workflows and interoperability with existing R ecosystem tools.
+
+# Example
+
+```r
+library(pepper)
+
+# Load synthetic phenology data (PEP725-like)
+data("pep_synth")
+
+# Example: analyze Triticum aestivum heading phase
+out <- regional_box_ts(pep_synth, species_name = "Triticum aestivum", phase = 10)
+pheno_plot(out, type = "giss_smooth", smooth = "gam")
+
+# Estimate warming sensitivity (+3 °C scenario)
+sens <- estimate_sensitivity(pep_synth, deltaT = 3)
+plot_sensitivity_map(sens)
+
+The example demonstrates how pepper streamlines the process from data import to sensitivity assessment, using reproducible open workflows.
+
