@@ -77,6 +77,38 @@ phenophases (e.g. BBCH 65 and 87) for each country, using either a simple
 warming-shift model or a GDD-based model. Output is suitable for use in
 both \code{integral_hail()} and \code{plot_hail_overlap()}.
 }
+\examples{
+\dontrun{
+pep <- pep_download()
+data(giss)
+
+regions <- c("Austria", "Germany-North", "Germany-South", "Switzerland")
+
+# Simple shift method
+d1 <- get_phenology_doys(
+  pep = pep,
+  phase1 = 65,
+  phase2 = 87,
+  genus_name = "Malus",
+  regions = regions,
+  phenology_method = 'simple_shift',
+)
+d1
+
+# robust shift
+d2 <- get_phenology_doys(
+  pep = pep,
+  phase1 = 65,
+  phase2 = 87,
+  genus_name = "Malus",
+  phenology_method = "robust_shift",
+  giss_data = giss,
+  regions = regions
+)
+d2
+}
+
+}
 \author{
 Matthias Templ
 }

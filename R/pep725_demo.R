@@ -9,7 +9,7 @@
 #'     \item \code{"class"} - Demonstrate the pep class (print, summary)
 #'     \item \code{"filter"} - Show data filtering and selection
 #'     \item \code{"plot"} - Display visualization capabilities
-#'     \item \code{"analysis"} - Show analysis functions
+#'     \item \code{"analysis"} - Show analysis functions (normals, anomalies)
 #'     \item \code{"all"} - Run all demonstrations (default)
 #'   }
 #' @param pause Logical. If \code{TRUE} (default), pauses between demos
@@ -18,18 +18,18 @@
 #' @return Invisibly returns a list containing example outputs from each demo.
 #'
 #' @details
-#' The demonstration uses the built-in \code{pep} dataset and walks through
-#' typical workflows for phenological data analysis:
+#' The demonstration downloads synthetic PEP725 data using \code{pep_download()}
+#' and walks through typical workflows for phenological data analysis:
 #'
 #' \enumerate{
 #'   \item \strong{Class demo}: Shows the enhanced print and summary methods
 #'     for the pep class, demonstrating how to quickly understand the data.
 #'   \item \strong{Filter demo}: Demonstrates selecting specific species,
-#'     phases, and time periods using \code{select_phase()}.
+#'     phases, and time periods using data.table syntax.
 #'   \item \strong{Plot demo}: Creates visualizations including station maps,
 #'     time series, and DOY distributions.
-#'   \item \strong{Analysis demo}: Shows climate sensitivity analysis and
-#'     regional time series extraction.
+#'   \item \strong{Analysis demo}: Shows phenological normals calculation,
+#'     anomaly detection, and data quality assessment.
 #' }
 #'
 #' @examples
@@ -46,20 +46,18 @@
 #' }
 #'
 #' @seealso
-#' \code{\link{pep}} for the main dataset,
-#' \code{\link{select_phase}} for data filtering,
-#' \code{\link{pheno_plot}} for visualization,
-#' \code{\link{regional_box_ts}} for regional analysis
+#' \code{\link{pep_download}} for downloading synthetic data,
+#' \code{\link{pheno_normals}} for calculating normals,
+#' \code{\link{pheno_anomaly}} for anomaly detection,
+#' \code{\link{pep_quality}} for quality assessment
 #'
 #' @author Matthias Templ
 #' @export
 pep725_demo <- function(which = "all", pause = interactive()) {
 
-
   # Validate input
-
   valid_demos <- c("all", "class", "filter", "plot", "analysis")
- if (!all(which %in% valid_demos)) {
+  if (!all(which %in% valid_demos)) {
     stop("Invalid demo selection. Choose from: ",
          paste(valid_demos, collapse = ", "))
   }
@@ -71,7 +69,7 @@ pep725_demo <- function(which = "all", pause = interactive()) {
   results <- list()
 
   # Helper function for pausing
- wait <- function(msg = "Press [Enter] to continue...") {
+  wait <- function(msg = "Press [Enter] to continue...") {
     if (pause) {
       readline(prompt = msg)
     }
@@ -84,10 +82,23 @@ pep725_demo <- function(which = "all", pause = interactive()) {
   cat("       Pan-European Phenological Data Analysis\n")
   cat(strrep("=", 60), "\n\n")
 
+  # Download synthetic data
+  cat("Downloading synthetic PEP725 data...\n\n")
+  pep <- pep_download()
+
+  cat("Data loaded successfully!\n")
+  cat(sprintf("  - %s observations\n", format(nrow(pep), big.mark = ",")))
+  cat(sprintf("  - %d stations\n", length(unique(pep$s_id))))
+  cat(sprintf("  - %d species\n", length(unique(pep$species))))
+  cat(sprintf("  - Years: %d - %d\n\n", min(pep$year), max(pep$year)))
+
+  wait("Press [Enter] to start the demonstration...")
+
   # =========================================================================
- # DEMO 1: Class features
+  # DEMO 1: Class features
   # =========================================================================
   if ("class" %in% which) {
+    cat("\n")
     cat(strrep("-", 60), "\n")
     cat("DEMO 1: The pep Class - Smart Data Display\n")
     cat(strrep("-", 60), "\n\n")
@@ -95,7 +106,7 @@ pep725_demo <- function(which = "all", pause = interactive()) {
     cat("The pep object has enhanced print/summary methods.\n")
     cat("Instead of dumping millions of rows, you get a useful overview:\n\n")
 
-    cat(">>> pep\n\n")
+    cat(">>> print(pep)\n\n")
     print(pep)
 
     wait("\nPress [Enter] to see summary by species...")
@@ -108,7 +119,12 @@ pep725_demo <- function(which = "all", pause = interactive()) {
     cat("\n>>> summary(pep, by = 'phase')\n\n")
     s2 <- summary(pep, by = "phase")
 
-    results$class <- list(summary_species = s1, summary_phase = s2)
+    wait("\nPress [Enter] to see data coverage...")
+
+    cat("\n>>> coverage(pep)\n\n")
+    cov <- coverage(pep)
+
+    results$class <- list(summary_species = s1, summary_phase = s2, coverage = cov)
 
     wait("\nPress [Enter] to continue to filtering demo...")
   }
@@ -126,10 +142,10 @@ pep725_demo <- function(which = "all", pause = interactive()) {
     cat("all data.table operations directly:\n\n")
 
     cat(">>> # Filter wheat observations from 1990 onwards\n")
-    cat(">>> wheat <- pep[genus == 'Triticum' & year >= 1990]\n")
+    cat(">>> wheat <- pep[species == 'Triticum aestivum' & year >= 1990]\n")
     cat(">>> wheat\n\n")
 
-    wheat <- pep[genus == "Triticum" & year >= 1990]
+    wheat <- pep[species == "Triticum aestivum" & year >= 1990]
     print(wheat)
 
     wait("\nPress [Enter] to see subsetting preserves class...")
@@ -204,39 +220,74 @@ pep725_demo <- function(which = "all", pause = interactive()) {
   if ("analysis" %in% which) {
     cat("\n")
     cat(strrep("-", 60), "\n")
-    cat("DEMO 4: Regional Analysis with regional_box_ts()\n")
+    cat("DEMO 4: Phenological Analysis Functions\n")
     cat(strrep("-", 60), "\n\n")
 
-    cat("Extract regional time series and merge with climate data:\n\n")
+    # Get wheat data for analysis
+    wheat <- pep[species == "Triticum aestivum"]
 
-    cat(">>> # Get wheat phenology for Switzerland region\n")
-    cat(">>> regional_data <- regional_box_ts(\n")
-    cat(">>>   pep = pep,\n")
-    cat(">>>   giss = giss,\n")
-    cat(">>>   lon_min = 5.5, lon_max = 10.5,\n")
-    cat(">>>   lat_min = 45.5, lat_max = 48,\n")
-    cat(">>>   species_name = 'Triticum',\n")
-    cat(">>>   year_min = 1960,\n")
-    cat(">>>   phase = 60\n")
+    cat(">>> # Calculate phenological normals for wheat\n")
+    cat(">>> normals <- pheno_normals(\n")
+    cat(">>>   pep = wheat,\n")
+    cat(">>>   period = 1990:2015,\n")
+    cat(">>>   by = c('country', 'phase_id'),\n")
+    cat(">>>   min_years = 10\n")
     cat(">>> )\n\n")
 
-    regional_data <- regional_box_ts(
-      pep = pep,
-      giss = giss,
-      lon_min = 5.5, lon_max = 10.5,
-      lat_min = 45.5, lat_max = 48,
-      species_name = "Triticum",
-      year_min = 1960,
-      phase = 60
+    normals <- pheno_normals(
+      pep = wheat,
+      period = 1990:2015,
+      by = c("country", "phase_id"),
+      min_years = 10
     )
 
-    cat("Aggregated time series:\n")
-    print(head(regional_data$agg, 10))
+    cat("Phenological normals:\n")
+    print(normals)
 
-    cat("\nMerged with GISS temperature anomalies:\n")
-    print(head(regional_data$pep_giss, 10))
+    wait("\nPress [Enter] to see anomaly detection...")
 
-    results$analysis <- regional_data
+    cat("\n>>> # Detect phenological anomalies\n")
+    cat(">>> anomalies <- pheno_anomaly(\n")
+    cat(">>>   pep = wheat,\n")
+    cat(">>>   baseline_period = 1990:2010,\n")
+    cat(">>>   by = c('country', 'phase_id'),\n")
+    cat(">>>   min_years = 5\n")
+    cat(">>> )\n\n")
+
+    anomalies <- pheno_anomaly(
+      pep = wheat,
+      baseline_period = 1990:2010,
+      by = c("country", "phase_id"),
+      min_years = 5
+    )
+
+    cat("Anomaly detection results:\n")
+    print(anomalies)
+
+    wait("\nPress [Enter] to see quality assessment...")
+
+    cat("\n>>> # Assess data quality\n")
+    cat(">>> quality <- pep_quality(\n")
+    cat(">>>   pep = wheat,\n")
+    cat(">>>   by = c('s_id', 'phase_id')\n")
+    cat(">>> )\n\n")
+
+    quality <- pep_quality(
+      pep = wheat,
+      by = c("s_id", "phase_id")
+    )
+
+    cat("Quality assessment:\n")
+    print(quality)
+
+    cat("\n>>> summary(quality)\n\n")
+    summary(quality)
+
+    results$analysis <- list(
+      normals = normals,
+      anomalies = anomalies,
+      quality = quality
+    )
 
     cat("\n")
   }
@@ -250,17 +301,22 @@ pep725_demo <- function(which = "all", pause = interactive()) {
 
   cat("Key functions demonstrated:\n")
   cat("
+* pep_download()     - Download synthetic PEP725 data
 * print(pep)         - Smart data overview
-* summary(pep)        - Detailed summaries by species/phase/country
-* plot(pep)           - Quick visualizations (map, histogram, timeseries)
-* select_phase()      - Filter by species, phase, and time
-* regional_box_ts()   - Extract regional time series with climate data
-* bbch_description()  - Look up BBCH phase codes
+* summary(pep)       - Detailed summaries by species/phase/country
+* coverage(pep)      - Assess data coverage
+* plot(pep)          - Quick visualizations (map, histogram, timeseries)
+* pheno_normals()    - Calculate climatological baselines
+* pheno_anomaly()    - Detect deviations from normal
+* pep_quality()      - Assess data quality
+* bbch_description() - Look up BBCH phase codes
 ")
 
   cat("\nFor more information, see:\n")
-  cat("* help(package = 'pep725')
-* vignette('pep725')  (if available)\n\n")
+  cat("* help(package = 'pep725')\n")
+  cat("* vignette('getting-started', package = 'pep725')\n")
+  cat("* vignette('phenological-analysis', package = 'pep725')\n")
+  cat("* vignette('spatial-patterns', package = 'pep725')\n\n")
 
   invisible(results)
 }

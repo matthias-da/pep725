@@ -12,7 +12,7 @@ pep725_demo(which = "all", pause = interactive())
 \item \code{"class"} - Demonstrate the pep class (print, summary)
 \item \code{"filter"} - Show data filtering and selection
 \item \code{"plot"} - Display visualization capabilities
-\item \code{"analysis"} - Show analysis functions
+\item \code{"analysis"} - Show analysis functions (normals, anomalies)
 \item \code{"all"} - Run all demonstrations (default)
 }}
 
@@ -28,18 +28,18 @@ of the pep725 package for PEP725 phenological data analysis. It showcases
 data exploration, filtering, summarization, and visualization capabilities.
 }
 \details{
-The demonstration uses the built-in \code{pep} dataset and walks through
-typical workflows for phenological data analysis:
+The demonstration downloads synthetic PEP725 data using \code{pep_download()}
+and walks through typical workflows for phenological data analysis:
 
 \enumerate{
 \item \strong{Class demo}: Shows the enhanced print and summary methods
 for the pep class, demonstrating how to quickly understand the data.
 \item \strong{Filter demo}: Demonstrates selecting specific species,
-phases, and time periods using \code{select_phase()}.
+phases, and time periods using data.table syntax.
 \item \strong{Plot demo}: Creates visualizations including station maps,
 time series, and DOY distributions.
-\item \strong{Analysis demo}: Shows climate sensitivity analysis and
-regional time series extraction.
+\item \strong{Analysis demo}: Shows phenological normals calculation,
+anomaly detection, and data quality assessment.
 }
 }
 \examples{
@@ -57,10 +57,10 @@ pep725_demo(pause = FALSE)
 
 }
 \seealso{
-\code{\link{pep}} for the main dataset,
-\code{\link{select_phase}} for data filtering,
-\code{\link{pheno_plot}} for visualization,
-\code{\link{regional_box_ts}} for regional analysis
+\code{\link{pep_download}} for downloading synthetic data,
+\code{\link{pheno_normals}} for calculating normals,
+\code{\link{pheno_anomaly}} for anomaly detection,
+\code{\link{pep_quality}} for quality assessment
 }
 \author{
 Matthias Templ
