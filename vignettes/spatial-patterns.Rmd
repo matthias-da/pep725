@@ -172,6 +172,7 @@ Typical gradient values from the literature:
 | Latitude | 2-5 days/degree | Europe |
 
 Values outside these ranges may indicate:
+
 - Local adaptation effects
 - Data quality issues
 - Complex terrain interactions
