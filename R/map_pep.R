@@ -1,6 +1,7 @@
 # Prevent R CMD check notes
 utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
-                         "species_cv", "year", "day", "species", "s_id"))
+                         "species_cv", "year", "day", "species", "s_id",
+                         "annual_mean", "species_mean"))
 
 #' Plot Phenology Station Maps
 #'

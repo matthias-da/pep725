@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- White background -->
+  <rect width="400" height="400" fill="white"/>
+
+  <!-- Main triangle -->
+  <polygon points="200,45 355,335 45,335" fill="url(#greenGrad)"/>
+
+  <!-- Lighter inner triangle for depth -->
+  <polygon points="200,85 310,295 90,295" fill="#2ecc71" opacity="0.4"/>
+
+  <!-- Leaf/bud at top (phenology symbol) -->
+  <circle cx="200" cy="100" r="14" fill="#1e8449"/>
+  <circle cx="186" cy="88" r="9" fill="#1e8449" opacity="0.7"/>
+  <circle cx="214" cy="88" r="9" fill="#1e8449" opacity="0.7"/>
+
+  <!-- PEP725 text -->
+  <text x="200" y="280" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="bold" fill="white" text-anchor="middle">PEP725</text>
+
+  <!-- R badge -->
+  <circle cx="320" cy="320" r="40" fill="#2c3e50"/>
+  <circle cx="320" cy="320" r="40" fill="none" stroke="#1abc9c" stroke-width="4"/>
+  <text x="320" y="335" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="bold" fill="white" text-anchor="middle">R</text>
+</svg>

@@ -4,7 +4,9 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
                          "doy_1", "doy_2", "gap_days", "is_second_event",
                          "median_doy", "mad_doy", "z_score", "month",
                          "expected_window_start", "expected_window_end",
-                         "..cols_keep"))
+                         "..cols_keep", "n_total", "proportion",
+                         "q05", "q95", "doy_max", "doy_min", "month_name",
+                         "month_label"))
 
 #' Detect Second Flowering and Other Repeated Phenological Events
 #'
@@ -42,8 +44,8 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #'     \item{summary}{Summary statistics by species, phase, and event type}
 #'     \item{by_year}{Annual counts of detected events}
 #'     \item{by_month}{Monthly distribution of events}
-#'     \item{method}{Detection method used
-#'     }
+#'     \item{total_by_year}{Total observations per year (for relative scaling in plots)}
+#'     \item{method}{Detection method used}
 #'     \item{params}{Parameters used for detection}
 #'   }
 #'
@@ -187,12 +189,16 @@ detect_second_events <- function(pep,
   # Create summary statistics
   summary_stats <- create_event_summary(all_events)
 
+  # Calculate total observations per year for relative scaling
+  total_by_year <- dt[, .(n_total = .N), by = year][order(year)]
+
   # Create result object
   result <- list(
     events = all_events,
     summary = summary_stats$by_species,
     by_year = summary_stats$by_year,
     by_month = summary_stats$by_month,
+    total_by_year = total_by_year,
     reference_stats = ref_stats,
     method = method,
     params = list(
@@ -488,12 +494,22 @@ summary.second_events <- function(object, ...) {
 #'
 #' @param x A \code{second_events} object
 #' @param type Character. Plot type: "overview", "timeline", "seasonal", "map"
+#' @param scale Character. Scale for y-axis in timeline/overview plots:
+#'   \describe{
+#'     \item{"absolute"}{(Default) Show raw counts of second events per year.}
+#'     \item{"relative"}{Show proportion of second events relative to total
+#'       observations per year. This accounts for varying data availability
+#'       over time and reveals whether second events are becoming proportionally
+#'       more common.}
+#'   }
 #' @param ... Additional arguments
 #' @return A ggplot object (invisibly)
 #' @export
 #' @import ggplot2
-plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "map"), ...) {
+plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "map"),
+                               scale = c("absolute", "relative"), ...) {
   type <- match.arg(type)
+  scale <- match.arg(scale)
 
   events <- x$events
 
@@ -511,20 +527,37 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
            x = "Day of Year", y = "Count") +
       theme_minimal()
 
-    p2 <- ggplot(x$by_year, aes(x = year, y = n_events)) +
-      geom_col(fill = "darkred", alpha = 0.7) +
-      geom_smooth(method = "loess", se = FALSE, color = "black", linewidth = 0.8) +
-      labs(title = "Second Events Over Time",
-           x = "Year", y = "Number of Events") +
-      theme_minimal()
+    # Prepare data for timeline panel based on scale
+    if (scale == "relative" && !is.null(x$total_by_year)) {
+      # Merge with total observations to calculate proportion
+      plot_data <- merge(x$by_year, x$total_by_year, by = "year", all.x = TRUE)
+      plot_data[, proportion := n_events / n_total * 100]  # as percentage
+      p2 <- ggplot(plot_data, aes(x = year, y = proportion)) +
+        geom_col(fill = "darkred", alpha = 0.7) +
+        geom_smooth(method = "loess", se = FALSE, color = "black", linewidth = 0.8) +
+        labs(title = "Relative Second Events Over Time",
+             x = "", y = "% of Total Observations") +
+        theme_minimal()
+    } else {
+      p2 <- ggplot(x$by_year, aes(x = year, y = n_events)) +
+        geom_col(fill = "darkred", alpha = 0.7) +
+        geom_smooth(method = "loess", se = FALSE, color = "black", linewidth = 0.8) +
+        labs(title = "Second Events Over Time",
+             x = "", y = "Number of Events") +
+        theme_minimal()
+    }
 
     if (nrow(x$by_month) > 0) {
-      month_names <- c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")
-      p3 <- ggplot(x$by_month, aes(x = factor(month), y = n_events)) +
+      month_abbr <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+      plot_month <- data.table::copy(x$by_month)
+      plot_month[, month_label := month_abbr[month]]
+      plot_month[, month_label := factor(month_label, levels = month_abbr)]
+      p3 <- ggplot(plot_month, aes(x = month_label, y = n_events)) +
         geom_col(fill = "darkred", alpha = 0.7) +
-        scale_x_discrete(labels = month_names) +
+        scale_x_discrete(drop = TRUE) +
         labs(title = "Monthly Distribution",
-             x = "Month", y = "Count") +
+             x = "", y = "Count") +
         theme_minimal()
     } else {
       p3 <- ggplot() + theme_void()
@@ -548,15 +581,30 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
   }
 
   if (type == "timeline") {
-    p <- ggplot(x$by_year, aes(x = year, y = n_events)) +
-      geom_line(color = "darkred", linewidth = 1) +
-      geom_point(color = "darkred", size = 2) +
-      geom_smooth(method = "loess", se = TRUE, alpha = 0.2, color = "black") +
-      labs(title = "Trend in Second Flowering Events",
-           subtitle = sprintf("Method: %s, Late threshold: DOY %d",
-                              x$method, x$params$late_threshold),
-           x = "Year", y = "Number of Events") +
-      theme_minimal()
+    if (scale == "relative" && !is.null(x$total_by_year)) {
+      # Merge with total observations to calculate proportion
+      plot_data <- merge(x$by_year, x$total_by_year, by = "year", all.x = TRUE)
+      plot_data[, proportion := n_events / n_total * 100]  # as percentage
+      p <- ggplot(plot_data, aes(x = year, y = proportion)) +
+        geom_line(color = "darkred", linewidth = 1) +
+        geom_point(color = "darkred", size = 2) +
+        geom_smooth(method = "loess", se = TRUE, alpha = 0.2, color = "black") +
+        labs(title = "Trend in Second Flowering Events (Relative)",
+             subtitle = sprintf("Method: %s, Late threshold: DOY %d | Proportion of total observations",
+                                x$method, x$params$late_threshold),
+             x = "Year", y = "% of Total Observations") +
+        theme_minimal()
+    } else {
+      p <- ggplot(x$by_year, aes(x = year, y = n_events)) +
+        geom_line(color = "darkred", linewidth = 1) +
+        geom_point(color = "darkred", size = 2) +
+        geom_smooth(method = "loess", se = TRUE, alpha = 0.2, color = "black") +
+        labs(title = "Trend in Second Flowering Events",
+             subtitle = sprintf("Method: %s, Late threshold: DOY %d",
+                                x$method, x$params$late_threshold),
+             x = "Year", y = "Number of Events") +
+        theme_minimal()
+    }
 
     print(p)
     return(invisible(p))
@@ -566,12 +614,14 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
     if (!"month" %in% names(events)) {
       events[, month := ceiling(day / 30.44)]
     }
-    month_names <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    month_abbr <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    events[, month_label := month_abbr[month]]
+    events[, month_label := factor(month_label, levels = month_abbr)]
 
-    p <- ggplot(events, aes(x = factor(month))) +
+    p <- ggplot(events, aes(x = month_label)) +
       geom_bar(fill = "darkred", alpha = 0.7) +
-      scale_x_discrete(labels = month_names, drop = FALSE) +
+      scale_x_discrete(drop = TRUE) +
       labs(title = "Seasonal Distribution of Second Events",
            subtitle = "When do 'second flowering' events occur?",
            x = "Month", y = "Number of Events") +

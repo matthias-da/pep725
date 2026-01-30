@@ -54,8 +54,8 @@ s_id, species, phase_id, year, day, event_type, expected timing info}
 \item{summary}{Summary statistics by species, phase, and event type}
 \item{by_year}{Annual counts of detected events}
 \item{by_month}{Monthly distribution of events}
-\item{method}{Detection method used
-}
+\item{total_by_year}{Total observations per year (for relative scaling in plots)}
+\item{method}{Detection method used}
 \item{params}{Parameters used for detection}
 }
 }

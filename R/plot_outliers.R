@@ -3,7 +3,8 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
                          "expected_doy", "outlier_type", "lon", "lat",
                          "phase_id", "genus", "species", "month", "season",
                          "n_outliers", "pct_outliers", "n_obs", "country",
-                         "outlier_category", "..density.."))
+                         "outlier_category", "..density..",
+                         "mean_deviation", "total_outliers"))
 
 #' Visualize Phenological Outliers for Inspection
 #'

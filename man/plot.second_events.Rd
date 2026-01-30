@@ -4,12 +4,26 @@
 \alias{plot.second_events}
 \title{Plot Method for Second Events Detection}
 \usage{
-\method{plot}{second_events}(x, type = c("overview", "timeline", "seasonal", "map"), ...)
+\method{plot}{second_events}(
+  x,
+  type = c("overview", "timeline", "seasonal", "map"),
+  scale = c("absolute", "relative"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{second_events} object}
 
 \item{type}{Character. Plot type: "overview", "timeline", "seasonal", "map"}
+
+\item{scale}{Character. Scale for y-axis in timeline/overview plots:
+\describe{
+\item{"absolute"}{(Default) Show raw counts of second events per year.}
+\item{"relative"}{Show proportion of second events relative to total
+observations per year. This accounts for varying data availability
+over time and reveals whether second events are becoming proportionally
+more common.}
+}}
 
 \item{...}{Additional arguments}
 }
