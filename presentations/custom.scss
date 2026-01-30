@@ -1,0 +1,32 @@
+/*-- scss:defaults --*/
+
+$presentation-heading-color: #2c3e50;
+$link-color: #27ae60;
+$code-block-bg: #f8f9fa;
+
+/*-- scss:rules --*/
+
+.reveal h1, .reveal h2 {
+  text-transform: none;
+}
+
+.reveal pre code {
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+.reveal .slide-number {
+  font-size: 0.6em;
+}
+
+.reveal table {
+  font-size: 0.8em;
+}
+
+.reveal ul li {
+  margin-bottom: 0.5em;
+}
+
+.notes {
+  display: none;
+}

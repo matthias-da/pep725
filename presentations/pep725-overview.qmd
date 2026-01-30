@@ -1,0 +1,557 @@
+---
+title: "pep725"
+subtitle: "Comprehensive Tools for Pan-European Phenological Data Analysis"
+author: "Matthias Templ & Barbara Templ"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    preview-links: auto
+    footer: "pep725 R Package"
+    logo: ""
+    transition: fade
+    background-transition: fade
+    highlight-style: github
+    code-line-numbers: false
+    code-overflow: wrap
+execute:
+  echo: true
+  eval: false
+---
+
+## What is Phenology? {.center}
+
+:::: {.columns}
+::: {.column width="60%"}
+**Phenology** is the study of cyclic and seasonal natural phenomena
+
+- When do plants flower?
+- When do birds migrate?
+- When do crops reach harvest?
+
+**Why it matters:**
+
+- Agriculture & food security
+- Climate change monitoring
+- Ecosystem management
+- Allergy forecasting
+:::
+
+::: {.column width="40%"}
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Cherry_blossoms_in_Vancouver_3_crop.jpg/440px-Cherry_blossoms_in_Vancouver_3_crop.jpg){height="400"}
+:::
+::::
+
+::: {.notes}
+Phenology is the study of how seasonal and climatic changes affect the timing of biological events. Think of cherry blossoms in spring, fall leaf colors, or when crops are ready for harvest. This data is crucial for agriculture, understanding climate change impacts, and managing ecosystems.
+:::
+
+---
+
+## The PEP725 Database {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Pan European Phenology Database**
+
+- 12+ million observations
+- 19,000+ stations across Europe
+- Records from 1868 to present
+- 260+ plant species
+- Standardized BBCH codes
+:::
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+#| code-line-numbers: false
+library(pep725)
+pep <- pep_download()
+
+nrow(pep)
+#> [1] 847,291
+
+length(unique(pep$s_id))
+#> [1] 2,847 stations
+
+range(pep$year)
+#> [1] 1951 2023
+```
+:::
+::::
+
+::: {.notes}
+PEP725 is the Pan European Phenology Database - one of the largest phenological databases in the world. It contains over 12 million observations from more than 19,000 stations across Europe, with records going back to 1868. The data uses standardized BBCH codes to describe plant development stages.
+:::
+
+---
+
+## The Challenge {.center}
+
+::: {.incremental}
+- Raw PEP725 data requires significant preprocessing
+- No standardized tools for phenological analysis in R
+- Climate-phenology relationships need specialized methods
+- Quality control is essential but time-consuming
+- Spatial patterns require geographic expertise
+:::
+
+::: {.notes}
+Working with phenological data presents several challenges. The raw data requires preprocessing, there haven't been standardized R tools for this type of analysis, and connecting phenology to climate data requires specialized methods. Quality control is critical but time-consuming, and understanding spatial patterns requires geographic expertise.
+:::
+
+---
+
+## Introducing pep725 {.center background-color="#2c3e50"}
+
+::: {.r-fit-text}
+**One package for complete phenological analysis**
+:::
+
+<br>
+
+```{r}
+#| eval: false
+install.packages("pep725")  # Coming to CRAN
+library(pep725)
+```
+
+::: {.notes}
+The pep725 R package solves these challenges by providing a complete toolkit for phenological data analysis. It's designed by phenology researchers for phenology researchers, with functions that handle everything from data import to publication-ready visualizations.
+:::
+
+---
+
+## Key Features {.center}
+
+| Category | Functions | Purpose |
+|----------|-----------|---------|
+| **Data Access** | `pep_download()`, `pep_import()` | Get and load data |
+| **Normals & Anomalies** | `pheno_normals()`, `pheno_anomalies()` | Climate baselines |
+| **Trends** | `kendall_tau()`, `pheno_trend_turning()` | Change detection |
+| **Spatial** | `pheno_gradient()`, `pheno_synchrony()` | Geographic patterns |
+| **Quality** | `flag_outliers()`, `pep_completeness()` | Data validation |
+| **Visualization** | `map_pep()`, `leaflet_pep()` | Maps and plots |
+
+::: {.notes}
+The package is organized around six main categories: data access for getting and loading data, normals and anomalies for establishing climate baselines, trend analysis for detecting changes over time, spatial analysis for understanding geographic patterns, quality control for data validation, and visualization for creating maps and plots.
+:::
+
+---
+
+## Quick Start {.center}
+
+```{r}
+#| eval: false
+library(pep725)
+
+# Get phenological data
+pep <- pep_download()
+
+# Calculate 30-year normals (WMO standard)
+normals <- pheno_normals(pep, period = 1991:2020)
+
+# Detect trends
+trends <- kendall_tau(pep$day)
+
+# Visualize stations
+map_pep(pep, background = "none", color_by = "n_obs")
+```
+
+**From raw data to insights in 4 lines of code!**
+
+::: {.notes}
+Getting started is incredibly simple. Load the package, download data, calculate climatological normals, detect trends, and visualize your stations - all in just four lines of code. The package handles all the complexity behind the scenes.
+:::
+
+---
+
+## Phenological Normals {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**WMO-standard climate normals**
+
+- 30-year reference periods
+- 1961-1990 (historical)
+- 1991-2020 (current)
+
+```{r}
+#| eval: false
+normals <- pheno_normals(
+  pep,
+  period = 1991:2020,
+  by = c("species", "phase_id")
+)
+```
+:::
+
+::: {.column width="50%"}
+**Output includes:**
+
+- Mean DOY (timing)
+- Standard deviation
+- Sample size
+- Percentiles (10th, 90th)
+- Year coverage
+:::
+::::
+
+::: {.notes}
+Phenological normals are baseline statistics calculated over standard 30-year periods, following World Meteorological Organization guidelines. The function calculates means, standard deviations, percentiles, and tracks data coverage - everything you need for rigorous climate baseline comparisons.
+:::
+
+---
+
+## Anomaly Detection {.center}
+
+```{r}
+#| eval: false
+# Calculate anomalies relative to 1991-2020 baseline
+anomalies <- pheno_anomalies(
+  pep,
+  reference_period = 1991:2020,
+  method = "zscore"
+)
+
+# Find extreme years
+extreme_early <- anomalies[z_score < -2]  # Very early years
+extreme_late <- anomalies[z_score > 2]    # Very late years
+```
+
+**Methods:** z-score, percentile, days deviation
+
+::: {.notes}
+Once you have normals, you can calculate anomalies - how much each year deviates from the baseline. The package supports z-scores, percentiles, and simple day deviations. This makes it easy to identify extreme years and quantify how unusual recent phenology has been.
+:::
+
+---
+
+## Trend Analysis {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Robust trend detection**
+
+```{r}
+#| eval: false
+# Kendall's tau - robust to outliers
+tau <- kendall_tau(time_series)
+
+# Detect trend changes
+turning <- pheno_trend_turning(
+  pep,
+  species = "Triticum aestivum",
+  phase_id = 60
+)
+```
+:::
+
+::: {.column width="50%"}
+**Why Kendall's tau?**
+
+- Non-parametric
+- Robust to outliers
+- No normality assumption
+- Handles ties well
+- Standard in climate science
+:::
+::::
+
+::: {.notes}
+For trend analysis, we use Kendall's tau - a non-parametric statistic that's robust to outliers and doesn't assume normality. This is the standard approach in climate science. The package also includes functions to detect when trends change direction - important for understanding recent acceleration of phenological shifts.
+:::
+
+---
+
+## Spatial Analysis {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Elevation gradients**
+
+```{r}
+#| eval: false
+gradient <- pheno_gradient(
+  pep,
+  variable = "alt",
+  species = "Triticum aestivum"
+)
+# Result: 2.8 days/100m
+```
+
+Phenology delays ~3 days per 100m elevation
+:::
+
+::: {.column width="50%"}
+**Spatial synchrony**
+
+```{r}
+#| eval: false
+sync <- pheno_synchrony(
+  pep,
+  species = "Triticum aestivum",
+  by = c("country", "year")
+)
+```
+
+How similar is timing across stations?
+:::
+::::
+
+::: {.notes}
+The spatial analysis functions help you understand how phenology varies across landscapes. Gradient analysis quantifies how timing changes with elevation or latitude - typically about 2-4 days delay per 100 meters in Europe. Synchrony analysis measures how similar timing is across stations within a region, which is important for understanding climate control versus local factors.
+:::
+
+---
+
+## Interactive Mapping {.center}
+
+```{r}
+#| eval: false
+# Launch interactive station selector
+selected <- leaflet_pep(pep, label_col = "species")
+
+# Draw rectangles or polygons to select regions
+# Returns data.frame of selected stations
+```
+
+**Features:**
+
+- Click to select individual stations
+- Draw rectangles for regional selection
+- Hover for station details
+- Export selected stations for analysis
+
+::: {.notes}
+The interactive mapping function launches a Shiny gadget where you can explore your data visually. Click individual stations, draw rectangles or polygons to select regions, and export your selection for focused analysis. This is incredibly useful for exploring large datasets before diving into statistical analysis.
+:::
+
+---
+
+## Static Maps {.center}
+
+```{r}
+#| eval: false
+# Map phenological patterns (no API key needed!)
+map_pep(pep, background = "none", color_by = "mean_doy", phase_id = 60)
+
+# Map trends: blue = earlier, red = later
+map_pep(pep, background = "none", color_by = "trend",
+        phase_id = 60, period = 1990:2020)
+```
+
+**Color options:** observations, species, mean timing, trends, species variation
+
+::: {.notes}
+For publication-ready maps, use the static mapping function. It can show station locations colored by various statistics - number of observations, mean phenological timing, trends over time, or variation among species. The "none" background option uses Natural Earth data and requires no API key, making it perfect for reproducible research.
+:::
+
+---
+
+## Data Quality Tools {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Outlier detection**
+
+```{r}
+#| eval: false
+outliers <- flag_outliers(
+  pep,
+  method = "mad",  # Robust
+  threshold = 3
+)
+
+plot_outliers(outliers,
+              type = "seasonal")
+```
+:::
+
+::: {.column width="50%"}
+**Completeness assessment**
+
+```{r}
+#| eval: false
+coverage <- pep_completeness(
+  pep,
+  by = c("s_id", "phase_id")
+)
+
+# Filter to well-covered stations
+good <- coverage[completeness_pct >= 80]
+```
+:::
+::::
+
+::: {.notes}
+Data quality is critical in phenology. The package provides robust outlier detection using the MAD method, which handles multiple outliers better than traditional approaches. The completeness function helps you identify stations with sufficient temporal coverage for trend analysis - typically you want at least 80% coverage for calculating normals.
+:::
+
+---
+
+## Second Flowering Detection {.center}
+
+```{r}
+#| eval: false
+# Find potential second flowering events
+second <- detect_second_events(
+  pep,
+  phases = c(60, 65),
+  late_threshold = 250  # After September 7
+)
+
+# These may indicate climate change impacts!
+plot(second, type = "timeline")
+```
+
+**Why it matters:** Second flowering is increasingly observed and may indicate climate disruption of normal seasonal patterns.
+
+::: {.notes}
+An exciting feature is the detection of second flowering events - when plants flower again in autumn after their normal spring flowering. This phenomenon is increasingly observed across Europe and may indicate climate disruption of normal seasonal inhibition. The package helps you identify and study these events rather than treating them as errors.
+:::
+
+---
+
+## Climate Integration {.center}
+
+```{r}
+#| eval: false
+# Built-in NASA GISS temperature data
+data(giss)
+
+# Analyze phenology-temperature relationships
+regional_data <- regional_box_ts(
+  species_name = "Triticum aestivum",
+  phase = 60,
+  year_min = 1950
+)
+
+# Visualize climate sensitivity
+pheno_plot(regional_data, type = "giss_sensitivity")
+```
+
+**Result:** Robust estimates of days shift per degree warming
+
+::: {.notes}
+The package integrates with climate data, including NASA GISS global temperature records. This allows you to analyze how phenology responds to temperature changes and quantify climate sensitivity - how many days earlier or later phenology occurs per degree of warming. These sensitivity estimates are crucial for climate impact projections.
+:::
+
+---
+
+## Who Is This For? {.center}
+
+::: {.incremental}
+- **Phenology researchers** - Your new standard toolkit
+- **Climate scientists** - Quantify biological climate impacts
+- **Agricultural scientists** - Crop timing and planning
+- **Ecologists** - Ecosystem timing and mismatches
+- **Students** - Learn phenological analysis with clear vignettes
+:::
+
+::: {.notes}
+The package is designed for phenology researchers as a comprehensive toolkit, climate scientists studying biological impacts, agricultural scientists working on crop timing, ecologists studying ecosystem dynamics, and students learning phenological analysis. The extensive vignettes make it accessible for beginners while providing advanced functionality for experts.
+:::
+
+---
+
+## Documentation {.center}
+
+**Four comprehensive vignettes:**
+
+1. **Getting Started** - Installation, data access, basic concepts
+2. **Phenological Analysis** - Normals, anomalies, trends
+3. **Spatial Patterns** - Gradients, synchrony, mapping
+4. **Data Quality** - Outliers, completeness, validation
+
+**Plus:** Full function documentation, examples, and best practices
+
+::: {.notes}
+The package comes with four comprehensive vignettes that guide you through every aspect of phenological analysis. From installation and basic concepts to advanced spatial analysis and data quality control, you'll find detailed explanations, code examples, and best practices throughout.
+:::
+
+---
+
+## Get Started Today {.center background-color="#27ae60"}
+
+<br>
+
+```{r}
+#| eval: false
+# Install from GitHub (CRAN submission pending)
+remotes::install_github("matthias-da/pep725")
+
+# Load and explore
+library(pep725)
+pep <- pep_download()
+
+# Read the vignettes
+vignette("getting-started", package = "pep725")
+```
+
+<br>
+
+**GitHub:** [github.com/matthias-da/pep725](https://github.com/matthias-da/pep725)
+
+::: {.notes}
+Getting started is easy. Install from GitHub, load the package, download the example data, and explore the vignettes. The package is being prepared for CRAN submission, so soon you'll be able to install it with a simple install.packages call.
+:::
+
+---
+
+## Summary {.center}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Complete toolkit for:**
+
+- Data access & import
+- Climate normals & anomalies
+- Trend detection
+- Spatial analysis
+- Quality control
+- Visualization
+:::
+
+::: {.column width="50%"}
+**Designed for:**
+
+- Reproducible research
+- Publication-ready outputs
+- Best practices built-in
+- Extensive documentation
+- Active development
+:::
+::::
+
+<br>
+
+::: {.r-fit-text}
+**pep725: From raw data to publication in one package**
+:::
+
+::: {.notes}
+To summarize, pep725 provides a complete toolkit for phenological data analysis - from data access through publication-ready visualizations. It's designed for reproducible research with best practices built in, extensive documentation, and active development. Whether you're a seasoned researcher or just starting out, pep725 helps you go from raw data to publication efficiently and rigorously.
+:::
+
+---
+
+## Thank You {.center background-color="#2c3e50"}
+
+<br>
+
+**Questions?**
+
+<br>
+
+Matthias Templ - matthias.templ@gmail.com
+
+Barbara Templ - barbara.a.templ@gmail.com
+
+<br>
+
+**GitHub:** [github.com/matthias-da/pep725](https://github.com/matthias-da/pep725)
+
+::: {.notes}
+Thank you for your attention. We're happy to answer any questions about the package. You can reach us by email or through the GitHub repository where you can also file issues and feature requests.
+:::

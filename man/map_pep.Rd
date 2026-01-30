@@ -2,12 +2,13 @@
 % Please edit documentation in R/map_pep.R
 \name{map_pep}
 \alias{map_pep}
-\title{Plot Phenology Station Maps with Google Maps}
+\title{Plot Phenology Station Maps}
 \usage{
 map_pep(
   pep,
   location = c(lon = 6.233, lat = 46.4),
   zoom = 4,
+  background = c("google", "none"),
   color_by = c("none", "n_obs", "n_species", "mean_doy", "trend", "species_cv"),
   phase_id = NULL,
   period = NULL,
@@ -28,9 +29,21 @@ Required columns depend on \code{color_by}:
 }}
 
 \item{location}{Named vector with center longitude and latitude for the map.
-Defaults to near Changins: \code{c(lon = 6.233, lat = 46.400)}.}
+Defaults to near Changins: \code{c(lon = 6.233, lat = 46.400)}.
+Used primarily for \code{background = "google"}.}
 
-\item{zoom}{Zoom level for the map (default: 4 for Europe-wide, 7 for regional).}
+\item{zoom}{Zoom level for the map. For \code{background = "google"}, this is
+the Google Maps zoom level (4 = Europe, 7 = regional). For
+\code{background = "none"}, this controls the padding around data extent
+(4 = wide view, 7 = tight view). Default is 4.}
+
+\item{background}{Character. Map background type:
+\describe{
+\item{"google"}{Google Maps satellite/terrain background. Requires API key
+(set via \code{ggmap::register_google()} or \code{key} parameter).}
+\item{"none"}{Simple map with country borders from Natural Earth data.
+No API key required. Good for publications and vignettes.}
+}}
 
 \item{color_by}{Character. What to color stations by:
 \describe{
@@ -60,7 +73,8 @@ Default is 3.}
 
 \item{output_file}{Optional file path to export the plot (e.g. \code{"map.pdf"}).}
 
-\item{key}{Google Maps API key (you can set globally via \code{register_google()} instead).}
+\item{key}{Google Maps API key. Only needed for \code{background = "google"}.
+You can set globally via \code{ggmap::register_google()} instead.}
 }
 \value{
 A ggplot map object.
@@ -71,7 +85,22 @@ by various statistics including mean phenological timing, trends, and species
 variation.
 }
 \details{
-The new color options provide insights into:
+The function supports two background types:
+
+\strong{Google Maps background} (\code{background = "google"}):
+Provides detailed satellite or terrain imagery but requires a Google Maps API key.
+Register at \url{https://console.cloud.google.com/} and enable the Maps Static API.
+
+\strong{No background} (\code{background = "none"}):
+Uses country outlines from Natural Earth data. No API key required, making it
+suitable for:
+\itemize{
+\item CRAN package vignettes (no external API calls)
+\item Reproducible research (no authentication needed)
+\item Publication-quality maps with clean appearance
+}
+
+The color options provide insights into:
 \itemize{
 \item \strong{mean_doy}: Spatial patterns in phenological timing. Earlier
 timing (lower DOY) typically in southern/lowland areas.
@@ -97,29 +126,21 @@ roughly from -3 to +3 for typical data:
 
 \examples{
 \dontrun{
-# Register API key (or provide via argument)
-ggmap::register_google(key = "your_api_key_here")
 pep <- pep_download()
 
-# Plot all stations (Europe-wide)
-map_pep(pep, color_by = "none", zoom = 4)
+# Simple map without Google Maps (no API key needed)
+map_pep(pep, background = "none", color_by = "n_obs")
 
-# Plot with number of observations
-map_pep(pep, color_by = "n_obs", zoom = 4)
+# Map with mean phenological timing
+map_pep(pep, background = "none", color_by = "mean_doy", phase_id = 60)
 
-# Plot mean phenological timing for flowering (phase 60)
-map_pep(pep, color_by = "mean_doy", phase_id = 60, zoom = 4)
+# Map with trends (blue = earlier, red = later)
+map_pep(pep, background = "none", color_by = "trend",
+        phase_id = 60, period = 1990:2020)
 
-# Plot trends in flowering timing
-map_pep(pep, color_by = "trend", phase_id = 60,
-        period = 1990:2020, min_years = 10, zoom = 4)
-
-# Plot species variation at each station
-map_pep(pep, color_by = "species_cv", phase_id = 60, zoom = 4)
-
-# Regional view near Changins with number of species per station
-pep_sub <- pep[pep$lat > 44.7 & pep$lat < 48.1 & pep$lon > 4.2 & pep$lon < 8.1, ]
-map_pep(pep_sub, color_by = "n_species", zoom = 7)
+# With Google Maps background (requires API key)
+ggmap::register_google(key = "your_api_key_here")
+map_pep(pep, background = "google", color_by = "n_species", zoom = 5)
 }
 }
 \seealso{

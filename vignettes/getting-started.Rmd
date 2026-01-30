@@ -16,345 +16,618 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Introduction
+## What is Phenology?
+Phenology is the study of cyclic and seasonal natural phenomena, especially in
+relation to climate and plant life cycles. In plant science, phenology focuses
+on the timing of recurring biological events such as:
 
-The **pep725** package provides tools for analyzing phenological data from the
-[PEP725 Pan European Phenology Database](http://www.pep725.eu/). This database
-contains millions of observations recording when plants reach specific
-developmental stages (like flowering or leaf emergence) across Europe, spanning
-over 250 years of observations.
-Phenological data is valuable for:
+- **Budburst**: When dormant buds begin to open in spring
+- **Leaf unfolding**: The emergence of new leaves
+- **Flowering**: When flowers open (anthesis)
+- **Fruit ripening**: The maturation of fruits
+- **Leaf senescence**: Autumn coloring and leaf fall
 
-- Tracking climate change impacts on ecosystems
-- Understanding plant-climate relationships
-- Agricultural planning and forecasting
-- Ecological research
+These events are highly sensitive to temperature and other environmental
+factors, making phenological records invaluable for understanding how plants
+respond to climate variability and change. A plant that flowered on May 15th
+in 1950 might now flower on May 1st due to warming temperatures - this shift
+of about two weeks represents a significant ecological change.
+
+## The PEP725 Database
+
+The [PEP725 Pan European Phenology Database](http://www.pep725.eu/) is one of
+the world's largest collections of plant phenological observations. It contains:
+
+- **Over 12 million observations** from across Europe
+- **Records spanning 250+ years** (some stations have data back to the 1750s)
+- **Thousands of monitoring stations** in more than 20 countries
+- **Multiple plant species** including crops, wild plants, and trees
+
+The database is maintained by a network of national phenological services and
+uses standardized observation protocols, making it ideal for large-scale
+analyses of phenological change.
+
+## Why Use the pep725 R Package?
+
+Working with phenological data presents several challenges:
+
+1. **Data volume**: Millions of observations require efficient data handling
+2. **Data quality**: Observations may contain errors or outliers
+3. **Standardization**: Different countries use different formats
+4. **Analysis complexity**: Calculating trends, normals, and anomalies requires
+   specialized methods
+
+The **pep725** package addresses these challenges by providing:
+
+- Efficient data import and handling using `data.table`
+- Quality assessment and outlier detection tools
+- Functions for calculating phenological normals and anomalies
+- Spatial analysis (gradients, synchrony)
+- Publication-ready visualizations
 
 ## Installation
+
+Before you begin, install the package:
 
 ```{r install, eval = FALSE}
 # Install from CRAN (when available)
 install.packages("pep725")
 
 # Or install development version from GitHub
+# First install devtools if you don't have it:
 # install.packages("devtools")
 devtools::install_github("matthias-da/pep725")
 ```
 
 ## Loading the Package
 
+Once installed, load the package at the start of your R session:
+
 ```{r setup, message=FALSE, warning=FALSE}
 library(pep725)
 ```
 
-## Getting Data
+When the package loads, you'll see a startup message with tips on how to get
+data. The package also automatically loads some small auxiliary datasets (like
+global temperature anomalies) that are used by certain functions.
 
-The **pep725** package offers four ways to obtain phenological data, each suited
-to different use cases:
+## Getting Phenological Data
 
-| Option | Best For | Data Size | Requires Internet |
+The **pep725** package offers four ways to obtain data. Understanding which
+option to use is important for your workflow:
+
+| Option | Best For | Data Size | Internet Required? |
 |--------|----------|-----------|-------------------|
-| **1. Download synthetic data** | Learning, tutorials, reproducible examples | ~7.24M rows | First use only |
-| **2. Seed dataset** | Quick offline tests, minimal examples | Small (~1,300 rows) | No |
-| **3. Generate synthetic data** | Creating shareable datasets from your own data | Variable | No |
-| **4. Import real PEP725 data** | Research with actual observations | ~7.24M rows | For download after registration |
+| **1. Download synthetic data** | Learning, tutorials, reproducible examples | ~7.24M rows | First download only |
+| **2. Seed dataset** | Quick offline tests, minimal examples | ~1,300 rows | No |
+| **3. Generate synthetic data** | Creating shareable versions of your data | Variable | No |
+| **4. Import real PEP725 data** | Actual research and publications | ~7.24M rows | For initial download |
 
-**Why synthetic data?** The original PEP725 database requires registration and
-has usage restrictions that prevent redistribution. Synthetic data preserves the
-statistical properties (distributions, correlations, seasonal patterns) of real
-observations while being freely shareable. This makes it ideal for tutorials,
-package examples, and reproducible research workflows.
+### Why Synthetic Data?
 
-**Which option should you choose?**
+You might wonder why we use synthetic data instead of real observations. The
+original PEP725 database has usage restrictions that prevent redistribution -
+you must register and agree to terms of use. This creates a problem for
+tutorials and examples that need to be reproducible.
 
-- **New users and learners**: Start with **Option 1**. The downloadable synthetic
-  dataset provides realistic data for exploring all package features.
-- **Package developers or offline work**: Use **Option 2** for quick tests when
- internet access is unavailable.
-- **Researchers with real data**: Use **Option 3** to create synthetic versions of your data for teaching and sharing with students, then **Option 4** for your actual analysis and research.
+**Synthetic data** solves this problem. It is generated to preserve the
+statistical properties of real data:
 
-### Option 1: Download Synthetic Data (Recommended)
-For learning and testing, you can download a pre-generated synthetic dataset
-that preserves the statistical properties of real PEP725 data:
+- Same distributions of flowering dates across seasons
+- Similar correlations between variables (e.g., latitude and flowering date)
+- Realistic spatial patterns across Europe
+- Comparable year-to-year variability
+
+This means you can learn all the analysis techniques using synthetic data, then
+apply them confidently to real data when you're ready for actual research.
+
+### Option 1: Download Synthetic Data (Recommended for Learning)
+
+For learning the package, download the pre-generated synthetic dataset:
 
 ```{r download, message=FALSE}
 # Download synthetic data (cached locally after first download)
 pep <- pep_download()
 ```
 
-Note, that you can optionally check the cache status or clear the cache using:
+**What happens here?**
+
+1. The first time you run this, the package downloads a ~64 MB file from GitHub
+2. The file is cached in a local directory (typically in your user folder)
+3. Subsequent calls load from the cache instantly - no re-download needed
+
+You can check your cache status or clear it if needed:
 
 ```{r cachestatus, message=FALSE}
-# Check cache status
+# Check cache status - shows file location and size
 pep_cache_info()
 
-# Clear cache if needed
+# If you need to clear the cache (e.g., to get an updated version):
 # pep_cache_clear()
 ```
 
-### Option 2: Use the Seed Dataset
+### Option 2: Use the Small Seed Dataset
 
-The package includes a small seed dataset (`pep_seed`) suitable for quick
-examples when offline:
+For quick tests when you don't need the full dataset, use the included seed
+data:
 
 ```{r load-seed, eval = FALSE}
 # Load the included seed dataset (small, for quick tests only)
 data(pep_seed)
+
+# This is a small subset (~1,300 rows) useful for:
+# - Testing code quickly
+# - Working offline
+# - Running examples in documentation
 ```
+
+**When to use this**: If you're developing code and want fast iteration without
+waiting for the full dataset to load, the seed dataset is perfect. However,
+it's too small for meaningful statistical analyses.
 
 ### Option 3: Generate Your Own Synthetic Data
 
-You can create synthetic data of any size from any PEP-structured dataset using `simulate_pep()`:
+If you have real PEP725 data and want to create a shareable synthetic version
+(e.g., for teaching or supplementary materials), use `simulate_pep()`:
 
 ```{r simulate, eval = FALSE}
-# Generate synthetic data from seed
-pep_synthetic <- simulate_pep(pep)
+# Generate synthetic data based on your real data
+# This preserves statistical properties while anonymizing observations
+pep_synthetic <- simulate_pep(your_real_pep_data)
+
+# You can then share pep_synthetic freely
 ```
 
-Note that `simulate_pep()` requires an input dataset with the same structure as PEP725. Ideally this is the original pep725 data set from Option 4, but you can also use the synthetic or seed dataset for small tests.
+**Use case**: You've done an analysis with real data for a paper, and you want
+to provide reproducible examples in supplementary materials without violating
+data sharing restrictions.
 
+### Option 4: Import Real PEP725 Data (For Research)
 
-### Option 4: Import Real PEP725 Data
+For actual research and publications, you'll want real data. Here's the process:
 
-If you have downloaded data from [PEP725](http://www.pep725.eu/), you can import it directly:
+1. **Register** at [pep725.eu](http://www.pep725.eu/) (free for research)
+2. **Download** data for your species/regions of interest
+3. **Import** using `pep_import()`
 
 ```{r import, eval = FALSE}
 # Import from downloaded PEP725 files
+# Point to the folder containing your downloaded CSV files
 pep <- pep_import("path/to/pep725_data/")
 ```
 
-Note that `pep_import` also applied data cleaning and formatting to ensure compatibility with package functions. This includes: 
+The `pep_import()` function automatically cleans and formats the data:
 
-- Converting selected columns to factors (\code{provider_id}, \code{s_id}, \code{gss_id}, \code{genus}, \code{species}, \code{subspecies}).
-- Replacing missing altitude values coded as \code{-9999} with \code{NA}.
-- Creating a combined altitude variable \code{alt2} using \code{alt} and \code{alt_dem}.
-- Converting the \code{date} column to \code{Date} class.
-- Recoding cultivation season (\code{cult_season}) and quality control flags (\code{qc_ori_flag}) into labeled factors.
-- Removing unused or problematic columns (\code{affected_flag}, \code{qc_flag}).
-- Optionally, add country names based on station coordinates.
+- Converts columns to appropriate types (factors, dates, etc.)
+- Handles missing values (e.g., -9999 altitude codes become NA)
+- Removes problematic columns
+- Optionally adds country names based on coordinates
 
 ---
 
-> **Note: Synthetic vs. Real Data**
+> **Important Note for Research**
 >
-> All vignettes in this package use **synthetic data** generated to mirror the
-> statistical properties of real PEP725 observations. This allows the examples
-> to run without requiring PEP725 registration.
+> All examples in these vignettes use **synthetic data**. The patterns you see
+> are realistic but not actual scientific observations.
 >
-> **We encourage you to re-run these examples with real PEP725 data!** After
-> registering at [pep725.eu](http://www.pep725.eu/) and downloading data, simply
-> replace `pep_download()` with `pep_import("your/data/path/")` to analyze
-> actual phenological observations. The results will be scientifically
-> meaningful and suitable for research.
+> **For publishable research, always use real PEP725 data!** After registering
+> at [pep725.eu](http://www.pep725.eu/), simply replace `pep_download()` with
+> `pep_import("your/data/path/")`. All the analysis techniques work identically.
 
 ---
 
 ## Understanding the Data Structure
 
-The pep dataset is a `data.table` with the `pep` class, containing phenological
-observations. Let's explore its structure:
+Now that we have data loaded, let's understand what we're working with. The
+`pep` object is a special type of data frame optimized for large datasets.
 
 ```{r structure}
-# View the data
+# View the data - the print method shows a summary
 print(pep)
 ```
 
-### Key Columns
+### What You See in the Output
 
-| Column | Description |
-|--------|-------------|
-| `s_id` | Station identifier |
-| `lon`, `lat` | Geographic coordinates |
-| `alt` | Altitude (meters) |
-| `genus`, `species` | Plant taxonomy |
-| `phase_id` | BBCH phenological phase code |
-| `year` | Observation year |
-| `day` | Day of year (DOY) when phase was observed |
-| `country` | Country name |
+The output shows you:
+
+- **Dimensions**: Number of rows (observations) and columns
+- **Column names and types**: What variables are available
+- **First few rows**: A preview of actual values
+
+### Key Columns Explained
+
+Each row in the dataset represents **one phenological observation** - a record
+of when a specific plant at a specific location reached a particular
+developmental stage.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `s_id` | **Station identifier** - A unique code for each monitoring location | "AT0001" |
+| `lon`, `lat` | **Geographic coordinates** - Longitude and latitude in decimal degrees | 15.5, 48.2 |
+| `alt` | **Altitude** - Elevation above sea level in meters | 350 |
+| `genus` | **Plant genus** - The genus name (first part of scientific name) | "Triticum" |
+| `species` | **Full species name** - Genus + specific epithet | "Triticum aestivum" |
+| `phase_id` | **BBCH code** - Standardized phenological stage (explained below) | 60 |
+| `year` | **Observation year** | 2015 |
+| `day` | **Day of year (DOY)** - The day when the phase was observed (1-365) | 145 |
+| `country` | **Country name** | "Austria" |
+
+### Understanding Day of Year (DOY)
+
+Phenological data uses **Day of Year (DOY)** rather than calendar dates. This
+simplifies calculations and comparisons:
+
+- DOY 1 = January 1
+- DOY 60 = March 1 (approximately)
+- DOY 91 = April 1 (approximately)
+- DOY 121 = May 1 (approximately)
+- DOY 152 = June 1 (approximately)
+- DOY 182 = July 1 (approximately)
+- DOY 213 = August 1 (approximately)
+- DOY 244 = September 1 (approximately)
+- DOY 274 = October 1 (approximately)
+- DOY 305 = November 1 (approximately)
+- DOY 335 = December 1 (approximately)
+- DOY 365/366 = December 31
+
+**Why DOY?** It makes it easy to calculate things like "flowering advanced by
+10 days" without dealing with month boundaries.
 
 ## The `pep` Class
 
-The package provides an S3 class system for phenological data with convenient
-methods. 
+The package provides a custom class system that extends `data.table` with
+phenology-specific methods. Let's verify what class our data has:
 
 ```{r class}
-# Check class
+# Check the class hierarchy
 class(pep)
 ```
 
-As you can see, the `data.frame` and `data.table` class is extended. The `print` method was already shown just before (`print(pep)`).
+You'll see three classes:
 
-### Summary Method
+1. `pep` - Our custom class with phenology-specific methods
+2. `data.table` - Fast data manipulation (from the data.table package)
+3. `data.frame` - Base R compatibility
 
-The `summary()` method provides flexible summaries of phenological data. It always
-shows an overview (total observations, stations, year range, DOY range), followed
-by a detailed breakdown controlled by the `by` parameter:
+This means you can use:
 
-| `by =` | Shows | Useful For |
-|--------|-------|------------|
-| `"species"` | Top species by observation count, with station counts and year ranges | Understanding which species are well-represented |
-| `"phase"` | BBCH phases with observation counts and median DOY | Seeing seasonal distribution of phenological events |
-| `"country"` | Countries by observation count, stations, and species diversity | Geographic coverage assessment |
-| `"year"` | Temporal coverage with observations per year | Identifying data gaps or peak periods |
+- **pep725 functions** designed for phenological analysis
+- **data.table syntax** for fast filtering and aggregation
+- **Base R functions** that work with data frames
 
-The `top` parameter controls how many entries to show (default: 10).
+### The Summary Method
+
+The `summary()` function is your first tool for understanding a phenological
+dataset. It provides different views depending on the `by` parameter:
 
 ```{r summary}
-# Default summary (by species)
+# Default summary - shows top species by observation count
 summary(pep)
 ```
+
+**What this tells you**: Which species have the most data, how many stations
+observe each species, and the year range of observations.
 
 ```{r summary-phase}
 # Summary by phenological phase
 summary(pep, by = "phase")
 ```
 
+**What this tells you**: Which developmental stages are recorded, how many
+observations of each, and the typical DOY (useful for understanding the
+seasonal distribution of your data).
+
 ```{r summary-country}
-# Summary by country
+# Summary by country (showing top 5)
 summary(pep, by = "country", top = 5)
 ```
+
+**What this tells you**: Geographic coverage - which countries contribute most
+data, how many stations they have, and species diversity.
 
 ```{r summary-year}
 # Temporal coverage summary
 summary(pep, by = "year")
 ```
 
-### Subsetting
+**What this tells you**: How observations are distributed across years - are
+there gaps? Is coverage increasing or decreasing over time?
 
-You can subset `pep` objects while preserving the class:
+### Subsetting the Data
+
+You'll often want to focus on specific subsets of the data. The package
+preserves the `pep` class when you subset, so all methods continue to work:
 
 ```{r subset}
-# Filter to wheat data
+# Filter to wheat data using data.table syntax
+# The syntax is: dataset[row_filter, column_selection]
 wheat <- pep[species == "Triticum aestivum"]
 print(wheat)
 
 # Filter by year range
 recent <- pep[year >= 2000 & year <= 2015]
 print(recent)
+
+# The summary method works on subsets too
 summary(recent)
 ```
 
+**Tip for beginners**: The `data.table` syntax `pep[condition]` is similar to
+base R's `subset()` function but much faster for large datasets. You can
+combine multiple conditions with `&` (and) or `|` (or).
+
 ## Understanding BBCH Codes
 
-The BBCH scale is a standardized system for describing plant developmental
-stages. The `phase_id` column contains these codes:
+The **BBCH scale** (from Biologische Bundesanstalt, Bundessortenamt und
+CHemische Industrie) is a standardized system for describing plant
+developmental stages. It's used worldwide, ensuring that "flowering" means the
+same thing whether observed in Germany or Spain.
+
+### How BBCH Codes Work
+
+BBCH codes are two-digit numbers where:
+
+- The **first digit** (0-9) indicates the principal growth stage
+- The **second digit** (0-9) indicates the secondary stage within that principal stage
+
+| First Digit | Principal Growth Stage |
+|-------------|------------------------|
+| 0 | Germination / sprouting |
+| 1 | Leaf development |
+| 2 | Formation of side shoots / tillering |
+| 3 | Stem elongation |
+| 4 | Development of harvestable vegetative parts |
+| 5 | Inflorescence emergence / heading |
+| 6 | Flowering |
+| 7 | Development of fruit |
+| 8 | Ripening of fruit and seed |
+| 9 | Senescence / dormancy |
+
+### Looking Up BBCH Codes
+
+The `bbch_description()` function translates codes to human-readable
+descriptions:
 
 ```{r bbch}
-# Get descriptions for BBCH codes in your data
+# Get descriptions for BBCH codes present in your data
 codes <- unique(pep$phase_id)
 bbch_description(codes)
 ```
 
-Note that common BBCH phases are
+### Commonly Used BBCH Codes in Phenology
 
-| Code | Stage | Description |
-|------|-------|-------------|
-| 10 | Emergence | First leaves emerged |
-| 11 | First leaf | First true leaf unfolded |
-| 60 | Flowering | First flowers open |
+| Code | Stage | What to Look For |
+|------|-------|------------------|
+| 10 | First leaves | Cotyledons or first true leaves visible |
+| 11 | First leaf unfolded | First true leaf fully unfolded |
+| 60 | First flowers open | Beginning of flowering (anthesis) |
 | 65 | Full flowering | 50% of flowers open |
-| 69 | End of flowering | Flowering complete |
-| 85 | Fruit ripening | Advanced fruit coloring |
-| 89 | Full ripeness | Harvest maturity |
+| 69 | End of flowering | All petals fallen |
+| 85 | Fruit coloring | Softening begins |
+| 87 | Fruit ripe | Ready for harvest |
+| 89 | Full ripeness | Fruit fully mature |
+| 91 | Shoot growth complete | Leaves fully colored |
+| 95 | Leaf fall | 50% of leaves fallen |
 
-### Filtering by Phase
+### Filtering by Phenological Phase
 
-For convenience, `select_phase()` extracts and labels specific phenophases from
-aggregated data:
+When analyzing phenology, you typically focus on specific phases. Here's how:
 
-```{r select-phase, eval=FALSE}
-# After aggregating data (e.g., with regional_box_ts)
-# select_phase() adds meaningful phase labels
-wheat_phases <- select_phase(
-  dt = aggregated_data,
-  sp = "Triticum aestivum",
-  phases = c(60, 100),  # Heading and Harvest
-  yrmin = 1961
-)
+```{r filter-phase}
+# Get all flowering observations (BBCH 60-69)
+flowering <- pep[phase_id >= 60 & phase_id <= 69]
+cat("Flowering observations:", nrow(flowering), "\n")
+
+# Get only full flowering (BBCH 65)
+full_flowering <- pep[phase_id == 65]
+cat("Full flowering observations:", nrow(full_flowering), "\n")
+
+# Get harvest-related observations
+harvest <- pep[phase_id %in% c(87, 89)]
+cat("Harvest observations:", nrow(harvest), "\n")
 ```
 
-## Basic Exploration
+## Exploring Data Coverage
 
-The `coverage()` function provides a comprehensive overview of your phenological
-dataset across three dimensions: temporal, geographical, and species coverage.
+Before diving into analysis, it's crucial to understand what your dataset
+contains. The `coverage()` function provides a comprehensive overview.
 
 ### Full Coverage Report
 
 ```{r coverage-all}
-# Get complete coverage report
+# Get a complete coverage report
 coverage(pep)
 ```
 
+This report shows you three dimensions of coverage:
+
+1. **Temporal**: What years are covered? Any gaps?
+2. **Geographical**: Which countries/regions? How many stations?
+3. **Species**: Which plants are observed? How many observations each?
+
 ### Focused Coverage Analysis
 
-You can focus on specific aspects using the `kind` parameter:
+You can focus on specific aspects and optionally generate plots:
 
 ```{r coverage-temporal}
-# Temporal coverage with visualization
+# Temporal coverage with a visualization
 coverage(pep, kind = "temporal", plot = TRUE)
 ```
 
+The temporal plot shows observation density over time. Look for:
+
+- **Gaps**: Years with few or no observations
+- **Trends**: Is coverage increasing or decreasing?
+- **Breakpoints**: Sudden changes (often due to methodology changes)
+
 ```{r coverage-geo}
-# Geographical coverage
+# Geographical coverage - which countries have most data
 coverage(pep, kind = "geographical", top = 5)
 ```
 
+Geographic coverage tells you where your data comes from. This is important
+because:
+
+- Different regions have different climates
+- Some countries have longer observation histories
+- Network density affects spatial analyses
+
 ```{r coverage-species}
-# Species coverage
+# Species coverage - which species are best represented
 coverage(pep, kind = "species", top = 5)
 ```
 
+Species coverage shows which plants have enough data for robust analyses. As a
+rule of thumb:
+
+- **>10,000 observations**: Excellent for most analyses
+- **1,000-10,000 observations**: Good for national/regional analyses
+- **<1,000 observations**: Limited; may need to combine with related species
+
 ### Coverage by Groups
 
-The `by` parameter allows grouping for more detailed temporal analysis:
+You can break down coverage by grouping variables:
 
 ```{r coverage-by-country}
 # Temporal coverage broken down by country
 cov_by_country <- coverage(pep, kind = "temporal", by = "country")
+# Show observations by group
 cov_by_country$temporal$obs_by_group
 ```
 
-## Quick Analysis Example
+This helps identify which countries have continuous records versus sporadic
+observations.
 
-Let's calculate the mean flowering date for wheat across years:
+## Your First Analysis: Tracking Flowering Trends
+
+Let's put everything together with a simple but meaningful analysis: tracking
+how wheat flowering dates have changed over time.
 
 ```{r quick-analysis}
-# Filter to wheat flowering (phase 60)
+# Step 1: Filter to wheat flowering (BBCH 60 = heading/first flowers)
 wheat_flowering <- pep[species == "Triticum aestivum" & phase_id == 60]
 
-# Calculate annual mean DOY
+cat("Wheat flowering observations:", nrow(wheat_flowering), "\n")
+cat("Year range:", min(wheat_flowering$year), "-", max(wheat_flowering$year), "\n")
+cat("Countries:", length(unique(wheat_flowering$country)), "\n")
+
+# Step 2: Calculate annual mean DOY
+# The data.table syntax here means:
+#   - Group by year
+#   - Calculate mean DOY and count observations
+#   - Order by year
 annual_mean <- wheat_flowering[, .(
   mean_doy = mean(day, na.rm = TRUE),
   n_obs = .N
 ), by = year][order(year)]
 
-# Plot trend
-if (nrow(annual_mean) > 1) {
-  plot(annual_mean$year, annual_mean$mean_doy, type = "b",
-       xlab = "Year", ylab = "Mean Day of Year",
-       main = "Wheat Flowering Date Over Time",
-       pch = 19, col = "steelblue")
+# Step 3: Look at the results
+print(annual_mean)
+```
 
-  # Add trend line
+Now let's visualize the trend:
+
+```{r quick-analysis-plot}
+# Step 4: Plot the trend
+if (nrow(annual_mean) > 1) {
+  plot(annual_mean$year, annual_mean$mean_doy,
+       type = "b",  # Both points and lines
+       xlab = "Year",
+       ylab = "Mean Day of Year",
+       main = "Wheat Flowering Date Over Time",
+       pch = 19,    # Solid circles
+       col = "steelblue")
+
+  # Step 5: Add a trend line
   if (nrow(annual_mean) >= 3) {
     trend <- lm(mean_doy ~ year, data = annual_mean)
     abline(trend, col = "red", lty = 2)
+
+    # Calculate and display the trend
+    slope <- coef(trend)[2]
+    cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
+    if (slope < 0) {
+      cat("Interpretation: Flowering is getting EARLIER\n")
+    } else {
+      cat("Interpretation: Flowering is getting LATER\n")
+    }
   }
 }
 ```
 
+**Interpreting the results**: A negative slope means flowering is occurring
+earlier in the year - a common finding for spring phenology in a warming
+climate. A shift of -2 days per decade means that over 50 years, flowering
+has advanced by about 10 days.
+
+## Common Pitfalls and Tips
+
+As you start working with phenological data, keep these points in mind:
+
+### Data Quality Matters
+
+- **Always check for outliers**: A flowering date of DOY 300 (late October) for
+  wheat is almost certainly an error
+- **Consider sample sizes**: Trends from 5 observations are not reliable
+- **Check spatial coverage**: Trends might differ between regions
+
+### DOY Arithmetic
+
+- **Leap years**: Remember that DOY 60 is February 29 in leap years, March 1
+  otherwise
+- **Cross-year comparisons**: Be careful comparing autumn phenology (DOY ~300)
+  with spring (DOY ~100)
+- **Averaging DOY**: Mean DOY is only meaningful within a phase; don't average
+  flowering with harvest!
+
+### Species Considerations
+
+- **Check taxonomy**: "Triticum" might include multiple wheat species
+- **Consider subspecies**: Some records have subspecies/variety information
+- **Wild vs. cultivated**: Agricultural species may behave differently than
+  wild populations
+
 ## Next Steps
 
-Now that you understand the basics, explore the other vignettes:
+Now that you understand the basics, explore the other vignettes for more
+advanced analyses:
 
-- **Phenological Analysis**: Learn to calculate normals, detect anomalies, and
-  assess data quality using `pheno_normals()`, `pheno_anomaly()`, and
-  `pep_quality()`
+### Phenological Analysis Vignette
 
-- **Spatial Phenological Patterns**: Analyze elevation/latitude gradients and
-  spatial synchrony using `pheno_gradient()` and `pheno_synchrony()`
+Learn to calculate phenological normals (long-term averages), detect anomalies
+(unusual years), and analyze trends using:
+
+- `pheno_normals()` - Calculate climatological baselines
+- `pheno_anomaly()` - Identify deviations from normal
+- `pheno_trend_turning()` - Detect changes in trend direction
+
+### Spatial Phenological Patterns Vignette
+
+Analyze how phenology varies across landscapes:
+
+- `pheno_gradient()` - Quantify elevation and latitude effects
+- `pheno_synchrony()` - Measure spatial coherence
+- `map_pep()` - Create maps of phenological patterns
+
+### Data Quality & Irregular Events Vignette
+
+Ensure your data is reliable and investigate unusual observations:
+
+- `flag_outliers()` - Identify suspicious observations
+- `plot_outliers()` - Visualize outliers in context
+- `detect_second_events()` - Find potential second flowering events
+
+## Getting Help
+
+If you encounter problems:
+
+1. **Check the function documentation**: `?function_name` (e.g., `?pheno_normals`)
+2. **Read the vignettes**: They contain worked examples
+3. **Report issues**: [github.com/matthias-da/pep725/issues](https://github.com/matthias-da/pep725/issues)
 
 ## Session Info
+
+For reproducibility, here's the R environment used for this vignette:
 
 ```{r session}
 sessionInfo()

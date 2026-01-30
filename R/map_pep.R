@@ -2,7 +2,7 @@
 utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
                          "species_cv", "year", "day", "species", "s_id"))
 
-#' Plot Phenology Station Maps with Google Maps
+#' Plot Phenology Station Maps
 #'
 #' Generates a map of PEP725 phenological station locations with optional coloring
 #' by various statistics including mean phenological timing, trends, and species
@@ -17,7 +17,18 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #'   }
 #' @param location Named vector with center longitude and latitude for the map.
 #'   Defaults to near Changins: \code{c(lon = 6.233, lat = 46.400)}.
-#' @param zoom Zoom level for the map (default: 4 for Europe-wide, 7 for regional).
+#'   Used primarily for \code{background = "google"}.
+#' @param zoom Zoom level for the map. For \code{background = "google"}, this is
+#'   the Google Maps zoom level (4 = Europe, 7 = regional). For
+#'   \code{background = "none"}, this controls the padding around data extent
+#'   (4 = wide view, 7 = tight view). Default is 4.
+#' @param background Character. Map background type:
+#'   \describe{
+#'     \item{"google"}{Google Maps satellite/terrain background. Requires API key
+#'       (set via \code{ggmap::register_google()} or \code{key} parameter).}
+#'     \item{"none"}{Simple map with country borders from Natural Earth data.
+#'       No API key required. Good for publications and vignettes.}
+#'   }
 #' @param color_by Character. What to color stations by:
 #'   \describe{
 #'     \item{"none"}{Black points showing station locations only}
@@ -39,12 +50,28 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #'   Default is 3.
 #' @param point_size Size of station points (default: 0.8).
 #' @param output_file Optional file path to export the plot (e.g. \code{"map.pdf"}).
-#' @param key Google Maps API key (you can set globally via \code{register_google()} instead).
+#' @param key Google Maps API key. Only needed for \code{background = "google"}.
+#'   You can set globally via \code{ggmap::register_google()} instead.
 #'
 #' @return A ggplot map object.
 #'
 #' @details
-#' The new color options provide insights into:
+#' The function supports two background types:
+#'
+#' \strong{Google Maps background} (\code{background = "google"}):
+#' Provides detailed satellite or terrain imagery but requires a Google Maps API key.
+#' Register at \url{https://console.cloud.google.com/} and enable the Maps Static API.
+#'
+#' \strong{No background} (\code{background = "none"}):
+#' Uses country outlines from Natural Earth data. No API key required, making it
+#' suitable for:
+#' \itemize{
+#'   \item CRAN package vignettes (no external API calls)
+#'   \item Reproducible research (no authentication needed)
+#'   \item Publication-quality maps with clean appearance
+#' }
+#'
+#' The color options provide insights into:
 #' \itemize{
 #'   \item \strong{mean_doy}: Spatial patterns in phenological timing. Earlier
 #'     timing (lower DOY) typically in southern/lowland areas.
@@ -58,7 +85,6 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #'
 #' @section Interpreting Trends:
 #' The trend is calculated as Kendall's normalized tau statistic, which ranges
-
 #' roughly from -3 to +3 for typical data:
 #' \itemize{
 #'   \item Negative values (blue): Phenology is getting earlier over time
@@ -76,31 +102,24 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #' @importFrom dplyr group_by summarise n n_distinct
 #' @importFrom ggmap register_google get_map
 #' @importFrom stats sd coef lm na.omit
+#' @importFrom sf st_as_sf st_bbox
 #' @examples
 #' \dontrun{
-#' # Register API key (or provide via argument)
-#' ggmap::register_google(key = "your_api_key_here")
 #' pep <- pep_download()
 #'
-#' # Plot all stations (Europe-wide)
-#' map_pep(pep, color_by = "none", zoom = 4)
+#' # Simple map without Google Maps (no API key needed)
+#' map_pep(pep, background = "none", color_by = "n_obs")
 #'
-#' # Plot with number of observations
-#' map_pep(pep, color_by = "n_obs", zoom = 4)
+#' # Map with mean phenological timing
+#' map_pep(pep, background = "none", color_by = "mean_doy", phase_id = 60)
 #'
-#' # Plot mean phenological timing for flowering (phase 60)
-#' map_pep(pep, color_by = "mean_doy", phase_id = 60, zoom = 4)
+#' # Map with trends (blue = earlier, red = later)
+#' map_pep(pep, background = "none", color_by = "trend",
+#'         phase_id = 60, period = 1990:2020)
 #'
-#' # Plot trends in flowering timing
-#' map_pep(pep, color_by = "trend", phase_id = 60,
-#'         period = 1990:2020, min_years = 10, zoom = 4)
-#'
-#' # Plot species variation at each station
-#' map_pep(pep, color_by = "species_cv", phase_id = 60, zoom = 4)
-#'
-#' # Regional view near Changins with number of species per station
-#' pep_sub <- pep[pep$lat > 44.7 & pep$lat < 48.1 & pep$lon > 4.2 & pep$lon < 8.1, ]
-#' map_pep(pep_sub, color_by = "n_species", zoom = 7)
+#' # With Google Maps background (requires API key)
+#' ggmap::register_google(key = "your_api_key_here")
+#' map_pep(pep, background = "google", color_by = "n_species", zoom = 5)
 #' }
 #' @author Matthias Templ
 #' @export
@@ -108,6 +127,7 @@ map_pep <- function(
     pep,
     location = c(lon = 6.233, lat = 46.400),
     zoom = 4,
+    background = c("google", "none"),
     color_by = c("none", "n_obs", "n_species", "mean_doy", "trend", "species_cv"),
     phase_id = NULL,
     period = NULL,
@@ -117,6 +137,7 @@ map_pep <- function(
     output_file = NULL,
     key = NULL
 ) {
+  background <- match.arg(background)
   color_by <- match.arg(color_by)
 
   # Input validation
@@ -133,7 +154,6 @@ map_pep <- function(
   dt <- data.table::copy(pep)
 
   # Apply phase filter if specified
-
   if (!is.null(phase_id)) {
     if (!"phase_id" %in% names(dt)) {
       warning("'phase_id' column not found. Ignoring phase_id filter.", call. = FALSE)
@@ -158,15 +178,53 @@ map_pep <- function(
     }
   }
 
-  # Register Google Maps API key
-  if (!is.null(key)) {
-    register_google(key = key)
-  }
+  # Create base map depending on background type
+  if (background == "google") {
+    # Google Maps background (requires API key)
+    if (!is.null(key)) {
+      register_google(key = key)
+    }
 
-  # Download map
-  gmap <- get_map(location = location, zoom = zoom)
-  g <- ggmap(gmap) +
-    theme_minimal()
+    gmap <- get_map(location = location, zoom = zoom)
+    g <- ggmap(gmap) +
+      theme_minimal()
+
+  } else {
+
+    # No background - use Natural Earth country outlines
+    # Get world countries
+    world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+    # Calculate extent from data with padding based on zoom
+    lon_range <- range(dt$lon, na.rm = TRUE)
+    lat_range <- range(dt$lat, na.rm = TRUE)
+
+    # Padding factor: higher zoom = less padding
+    # zoom 4 -> 50% padding, zoom 7 -> 10% padding
+    padding_factor <- max(0.1, 0.7 - zoom * 0.1)
+
+    lon_pad <- diff(lon_range) * padding_factor
+    lat_pad <- diff(lat_range) * padding_factor
+
+    # Ensure minimum extent for small datasets
+    if (lon_pad < 1) lon_pad <- 2
+    if (lat_pad < 1) lat_pad <- 2
+
+    lon_min <- lon_range[1] - lon_pad
+    lon_max <- lon_range[2] + lon_pad
+    lat_min <- lat_range[1] - lat_pad
+    lat_max <- lat_range[2] + lat_pad
+
+    g <- ggplot() +
+      geom_sf(data = world, fill = "gray95", color = "gray60", linewidth = 0.3) +
+      coord_sf(xlim = c(lon_min, lon_max), ylim = c(lat_min, lat_max),
+               expand = FALSE) +
+      theme_minimal() +
+      theme(
+        panel.grid.major = element_line(color = "gray85", linewidth = 0.2),
+        panel.background = element_rect(fill = "aliceblue", color = NA)
+      )
+  }
 
   # Build the plot based on color_by option
   if (color_by == "none") {

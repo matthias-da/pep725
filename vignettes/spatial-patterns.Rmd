@@ -19,22 +19,33 @@ knitr::opts_chunk$set(
 ## Introduction
 
 Phenological timing varies systematically across space due to environmental
-gradients. This vignette covers spatial analysis and visualization functions:
+gradients. Understanding these spatial patterns is fundamental to phenological
+research because it allows us to:
 
-**Spatial Analysis:**
-- `pheno_gradient()` - Quantify how phenology changes with elevation or latitude
-- `pheno_synchrony()` - Measure spatial coherence of phenological events
+- **Scale observations**: Extrapolate from point measurements to landscapes
+- **Predict impacts**: Forecast how climate change will shift phenological timing
+- **Design networks**: Optimize monitoring station placement
+- **Validate models**: Compare observed gradients with model predictions
 
-**Mapping & Visualization:**
-- `leaflet_pep()` - Interactive map for station exploration and selection
-- `map_pep()` - Static maps of station networks
+This vignette covers spatial analysis and visualization functions in the
+`pep725` package, organized into three main topics:
 
-Understanding these patterns helps us:
+### What You'll Learn
 
-- Predict phenology across landscapes
-- Assess climate change impacts
-- Design effective monitoring networks
-- Visualize station coverage and data density
+| Section | Key Concepts | Functions |
+|---------|--------------|-----------|
+| Part 1: Gradients | How phenology changes with altitude & latitude | `pheno_gradient()` |
+| Part 2: Synchrony | Spatial coherence of phenological events | `pheno_synchrony()` |
+| Part 3: Mapping | Visualizing station networks and patterns | `leaflet_pep()`, `map_pep()` |
+
+### Prerequisites
+
+This vignette assumes you have completed the "Getting Started" vignette and are
+familiar with:
+
+- The basic structure of PEP725 data
+- BBCH phenological phase codes
+- Day of Year (DOY) as a timing metric
 
 ## Setup
 
@@ -54,22 +65,65 @@ cat("Latitude range:", round(min(pep$lat, na.rm = TRUE), 2), "-",
     round(max(pep$lat, na.rm = TRUE), 2), "N\n")
 ```
 
-## Phenological Gradients
+---
 
-### What are Phenological Gradients?
+# Part 1: Phenological Gradients
 
-Phenological gradients describe how the timing of biological events changes
-with environmental factors:
+## What are Phenological Gradients?
 
-- **Altitude gradient**: Phenology typically delays 2-4 days per 100m elevation
-- **Latitude gradient**: Phenology typically delays 2-5 days per degree north
+A **phenological gradient** describes how the timing of biological events
+changes systematically along an environmental axis. The two most important
+gradients in phenology are:
 
-These "phenological lapse rates" are valuable for:
-- Scaling point observations to landscapes
-- Validating phenological models
-- Understanding local adaptation
+### Elevation (Altitudinal) Gradient
 
-### Elevation Gradient Analysis
+As you go higher in elevation, temperatures decrease. This causes phenological
+events to occur later at higher altitudes. The rate of delay is called the
+**phenological lapse rate**.
+
+```
+                     Mountain Profile
+                          /\
+                         /  \  <- Higher elevation = LATER phenology
+                        /    \
+                       /      \
+         ____________/        \____________
+              ^                     ^
+         Earlier                  Earlier
+        (lowland)                (lowland)
+```
+
+**Typical values**: In temperate Europe, phenology delays by **2-4 days per
+100 meters** of elevation gain. This means:
+- A station at 500m might observe flowering 10-20 days later than one at sea level
+- Alpine stations (2000m+) can be 40-80 days behind lowland stations
+
+### Latitude Gradient
+
+As you move northward (in the Northern Hemisphere), temperatures decrease and
+day length patterns shift. This causes phenological events to occur later at
+higher latitudes.
+
+**Typical values**: In Europe, phenology delays by **2-5 days per degree of
+latitude** northward. This means:
+- Moving from southern France (43°N) to northern Germany (54°N) = 11 degrees
+- Expected delay: 22-55 days difference in spring phenology
+
+### Why Study Gradients?
+
+Understanding phenological gradients is valuable for:
+
+1. **Scaling observations**: If you know the gradient, you can predict phenology
+   at locations without observations
+2. **Validating models**: Phenological models should reproduce observed gradients
+3. **Detecting change**: If gradients are weakening over time, this might indicate
+   climate change effects
+4. **Understanding adaptation**: Differences from expected gradients may reveal
+   local adaptation or genetic variation
+
+## Elevation Gradient Analysis
+
+Let's calculate the elevation gradient for wheat flowering:
 
 ```{r gradient-altitude}
 # Calculate elevation gradient for wheat flowering
@@ -84,20 +138,37 @@ grad_alt <- pheno_gradient(
 print(grad_alt)
 ```
 
+### Understanding the Function Parameters
+
+| Parameter | Purpose | Your Choice |
+|-----------|---------|-------------|
+| `pep` | Input data | Your phenological dataset |
+| `variable` | Environmental gradient | `"alt"` for elevation, `"lat"` for latitude |
+| `species` | Species to analyze | Must match exactly (e.g., "Triticum aestivum") |
+| `phase_id` | BBCH phase code | 60 = heading/flowering |
+| `method` | Regression method | `"robust"` recommended for phenological data |
+
 ### Interpreting the Results
 
-The key outputs are:
+The output contains several important metrics:
 
-| Metric | Description |
-|--------|-------------|
-| `slope` | Days delay per 100m elevation (or per degree latitude) |
-| `intercept` | Predicted DOY at zero altitude/latitude |
-| `r_squared` | Proportion of variance explained |
-| `n_points` | Number of stations in analysis |
+| Metric | What It Tells You | How to Interpret |
+|--------|-------------------|------------------|
+| `slope` | Days delay per 100m elevation | **The phenological lapse rate** |
+| `intercept` | Predicted DOY at 0m altitude | Theoretical baseline (extrapolation) |
+| `r_squared` | Proportion of variance explained | How well elevation predicts phenology |
+| `n_points` | Number of stations used | Sample size (affects reliability) |
 
-A positive slope indicates later phenology at higher elevations/latitudes.
+**Key interpretation points:**
 
-### Latitude Gradient Analysis
+- **Positive slope**: Later phenology at higher elevations (expected)
+- **Negative slope**: Earlier phenology at higher elevations (unusual - investigate!)
+- **Slope magnitude**: Compare to literature values (2-4 days/100m typical)
+- **R-squared**: Values > 0.3 indicate meaningful gradient; < 0.1 suggests weak control
+
+## Latitude Gradient Analysis
+
+The same function works for latitude gradients:
 
 ```{r gradient-latitude}
 # Calculate latitude gradient
@@ -112,9 +183,14 @@ grad_lat <- pheno_gradient(
 print(grad_lat)
 ```
 
-### Comparing Regression Methods
+**Interpretation tip**: For latitude, the slope represents days delay per degree
+northward. Multiply by the latitude range of your study area to understand the
+total phenological span.
 
-The function offers three regression methods:
+## Comparing Regression Methods
+
+The `pheno_gradient()` function offers three regression methods. Choosing the
+right method matters because phenological data often contains outliers.
 
 ```{r gradient-methods}
 # Robust regression (default) - handles outliers
@@ -131,12 +207,25 @@ cat("Robust slope:", round(grad_robust$summary$slope, 2), "days/100m\n")
 cat("OLS slope:", round(grad_ols$summary$slope, 2), "days/100m\n")
 ```
 
-The robust method is recommended because phenological data often contains
-outliers from observation errors or local microclimate effects.
+### Which Method Should You Use?
 
-### Gradients by Region
+| Method | Strengths | Weaknesses | When to Use |
+|--------|-----------|------------|-------------|
+| `robust` | Resistant to outliers | Slightly less efficient with clean data | **Default choice** for phenological data |
+| `ols` | Maximum efficiency with clean data | Sensitive to outliers | When you've pre-cleaned data |
+| `quantile` | Estimates median relationship | Wider confidence intervals | When interested in median behavior |
 
-You can calculate separate gradients for different regions:
+**Recommendation**: Always start with `method = "robust"`. If the robust and OLS
+estimates differ substantially, investigate the outliers causing the difference.
+
+## Gradients by Region
+
+Phenological gradients can vary by region due to:
+- Different climate regimes
+- Local adaptation of species
+- Data quality differences
+
+Calculate separate gradients for different regions:
 
 ```{r gradient-by-region}
 # Calculate gradient by country
@@ -152,7 +241,14 @@ grad_by_country <- pheno_gradient(
 print(grad_by_country$summary)
 ```
 
-### Visualizing Gradients
+**What to look for:**
+- Are slopes consistent across regions? (Similar values = robust pattern)
+- Are R-squared values similar? (Consistent explanatory power)
+- Do sample sizes support reliable estimates? (n > 20 preferred)
+
+## Visualizing Gradients
+
+Visualization is essential for understanding and communicating gradient results:
 
 ```{r gradient-plot, fig.height=5}
 # Plot the gradient relationship
@@ -162,35 +258,74 @@ if (!is.null(grad_alt$data) && nrow(grad_alt$data) > 2) {
 }
 ```
 
-### Expected Values
+**Reading the plot:**
+- Each point is one station (averaged across years)
+- The line shows the fitted relationship
+- Points far from the line are poorly predicted by elevation alone
+- Clusters of residuals might indicate regional effects
 
-Typical gradient values from the literature:
+## Expected Values and Troubleshooting
 
-| Gradient | Typical Range | Region |
-|----------|---------------|--------|
-| Altitude | 2-4 days/100m | Temperate Europe |
-| Latitude | 2-5 days/degree | Europe |
+### Reference Values from Literature
 
-Values outside these ranges may indicate:
+| Gradient | Typical Range | Region | Source |
+|----------|---------------|--------|--------|
+| Altitude | 2-4 days/100m | Temperate Europe | Multiple studies |
+| Altitude | 1-2 days/100m | Mediterranean | Warmer baseline |
+| Latitude | 2-5 days/degree | Europe | Continental studies |
+| Latitude | 3-7 days/degree | North America | Larger continent |
 
-- Local adaptation effects
-- Data quality issues
-- Complex terrain interactions
+### When Your Results Differ from Expected
 
-## Phenological Synchrony
+| Observation | Possible Causes | What to Do |
+|-------------|-----------------|------------|
+| Slope too steep (>5 days/100m) | Outliers, microclimate effects | Check for data errors, use robust method |
+| Slope too shallow (<1 day/100m) | Limited elevation range, species adaptation | Expand geographic scope |
+| Negative slope | Data errors, southern aspect effects | Investigate unusual observations |
+| Very low R-squared | Other factors dominate (precipitation, soil) | Consider multiple regression |
 
-### What is Synchrony?
+---
 
-Phenological synchrony measures how similar the timing of events is across
-different stations within a region. High synchrony means stations experience
-events at similar times; low synchrony indicates high spatial variability.
+# Part 2: Phenological Synchrony
 
-Synchrony is important for:
-- Understanding ecosystem coherence
-- Designing monitoring networks
-- Detecting climate change impacts on spatial variability
+## What is Phenological Synchrony?
 
-### Calculating Synchrony
+**Phenological synchrony** measures how similar the timing of events is across
+different locations within a region during the same time period. It answers
+the question: "Do stations experience phenological events at similar times?"
+
+### Visualizing Synchrony Concepts
+
+```
+High Synchrony (SD = 5 days)        Low Synchrony (SD = 25 days)
+
+Station A: ●────────●               Station A: ●────────●
+Station B:  ●────────●              Station B:          ●────────●
+Station C: ●────────●               Station C:   ●────────●
+Station D:  ●────────●              Station D:              ●────────●
+           ▲                                    ▲
+           All stations flower                  Stations flower at
+           within ~10 day window                very different times
+```
+
+### Why Study Synchrony?
+
+1. **Ecosystem coherence**: High synchrony suggests strong regional climate
+   control; low synchrony indicates local factors dominate
+
+2. **Network design**: If synchrony is high, fewer stations are needed to
+   characterize a region; if low, denser networks are required
+
+3. **Climate change detection**: Changes in synchrony over time may indicate
+   shifts in climate variability or local adaptation
+
+4. **Ecological implications**: Synchrony affects pollination success,
+   pest-crop interactions, and trophic mismatches
+
+## Calculating Synchrony
+
+The `pheno_synchrony()` function calculates several metrics of spatial
+variability:
 
 ```{r synchrony-basic}
 # Calculate synchrony by country and year
@@ -205,24 +340,49 @@ sync <- pheno_synchrony(
 print(sync)
 ```
 
-### Understanding Synchrony Metrics
+### Understanding the Parameters
 
-| Metric | Description | Interpretation |
-|--------|-------------|----------------|
-| `sd_doy` | Standard deviation across stations | Lower = more synchronous |
-| `cv_pct` | Coefficient of variation | Relative variability |
-| `range_doy` | Range of DOY values | Span of timing |
-| `iqr_doy` | Interquartile range | Robust spread measure |
+| Parameter | Purpose | Typical Values |
+|-----------|---------|----------------|
+| `pep` | Input data | Your phenological dataset |
+| `species` | Species to analyze | Single species for interpretable results |
+| `phase_id` | BBCH phase | 60 (flowering), 65 (full flowering), etc. |
+| `by` | Grouping variables | `c("country", "year")` for spatio-temporal analysis |
+| `min_stations` | Minimum stations required | 3-5 minimum; 10+ preferred |
+| `compute_trend` | Calculate temporal trends? | TRUE (default) for trend analysis |
 
-### Summary Statistics
+## Understanding Synchrony Metrics
+
+The function returns multiple metrics because different aspects of variability
+matter in different contexts:
+
+| Metric | Formula | Interpretation | When to Use |
+|--------|---------|----------------|-------------|
+| `sd_doy` | Standard deviation | Absolute variability in days | Comparing variability across phases |
+| `cv_pct` | (SD/Mean) × 100 | Relative variability | Comparing phases with different timing |
+| `range_doy` | Max - Min | Total span | Understanding extremes |
+| `iqr_doy` | Q75 - Q25 | Robust spread | When outliers are present |
+
+**Interpretation guide:**
+
+| SD Value | Interpretation |
+|----------|----------------|
+| < 5 days | Very high synchrony - stations very similar |
+| 5-10 days | Moderate synchrony - regional pattern clear |
+| 10-20 days | Low synchrony - substantial local variation |
+| > 20 days | Very low synchrony - local factors dominate |
 
 ```{r synchrony-summary}
 summary(sync)
 ```
 
-### Trend Analysis
+## Temporal Trends in Synchrony
 
-The function can detect trends in synchrony over time:
+One of the most interesting questions is: "Is phenological synchrony changing
+over time?" This might indicate:
+
+- **Decreasing synchrony**: More variable climate, or loss of regional coherence
+- **Increasing synchrony**: Stronger climate signal overriding local factors
 
 ```{r synchrony-trend}
 # Check if trend analysis was performed
@@ -239,13 +399,20 @@ if (!is.null(sync$trend) && nrow(sync$trend) > 0) {
 }
 ```
 
-A negative trend in SD indicates increasing synchrony over time (stations
-becoming more similar), which could indicate:
-- Strengthening climate signal
-- Loss of local microhabitat variation
-- Changes in land use homogenizing landscapes
+### Interpreting Trend Results
 
-### Visualizing Synchrony Over Time
+| Trend Direction | What It Means | Ecological Implications |
+|-----------------|---------------|-------------------------|
+| Decreasing SD | Increasing synchrony | Stations becoming more similar |
+| Increasing SD | Decreasing synchrony | Greater spatial variability |
+| No trend | Stable synchrony | Consistent spatial patterns |
+
+**Cautions with trend interpretation:**
+- Network changes (stations added/removed) can create artificial trends
+- At least 15-20 years of data needed for reliable trend detection
+- Consider whether changes are ecologically meaningful vs. statistically significant
+
+## Visualizing Synchrony Over Time
 
 ```{r synchrony-plot, fig.height=5}
 # Plot synchrony time series
@@ -255,9 +422,14 @@ if (nrow(sync$data[!is.na(sd_doy)]) > 5) {
 }
 ```
 
-### Synchrony Without Trend Analysis
+**Reading the plot:**
+- Y-axis shows the synchrony metric (typically SD)
+- Trend line indicates temporal change
+- Scatter around trend indicates year-to-year variability
 
-For quick analyses without trend calculation:
+## Synchrony Without Trend Analysis
+
+For quick exploratory analyses, you can skip trend calculation:
 
 ```{r synchrony-simple}
 sync_simple <- pheno_synchrony(
@@ -273,9 +445,17 @@ sync_simple <- pheno_synchrony(
 head(sync_simple$data)
 ```
 
-## Combining Gradient and Synchrony Analysis
+---
 
-A complete spatial analysis might combine both approaches:
+# Part 3: Combining Gradient and Synchrony Analysis
+
+A complete spatial analysis typically combines both gradient and synchrony
+approaches. They answer complementary questions:
+
+| Analysis | Question Answered |
+|----------|-------------------|
+| Gradient | How does MEAN phenology change across space? |
+| Synchrony | How VARIABLE is phenology within regions? |
 
 ```{r combined-analysis}
 # 1. Understand elevation gradient
@@ -302,29 +482,37 @@ cat("  Mean SD across stations:", round(synchrony$overall$mean_sd_doy, 1), "days
 cat("  Mean CV:", round(synchrony$overall$mean_cv_pct, 1), "%\n")
 ```
 
-### Interpreting Combined Results
+## Interpreting Combined Results
 
-- **Strong gradient + High synchrony**: Clear environmental control, but stations
-  respond uniformly to climate
-- **Strong gradient + Low synchrony**: Environmental control present, but local
-  factors add variability
-- **Weak gradient + High synchrony**: Regional climate dominates over
-  elevation/latitude effects
-- **Weak gradient + Low synchrony**: Complex local factors dominate
+The combination of gradient strength and synchrony level tells you about the
+dominant controls on phenology in your region:
 
-## Mapping Phenological Patterns
+| Gradient | Synchrony | Interpretation | Example |
+|----------|-----------|----------------|---------|
+| Strong | High | Clear environmental control, uniform response | Continental climate regions |
+| Strong | Low | Environmental control + local variation | Mountain regions with microclimates |
+| Weak | High | Regional climate dominates over elevation | Coastal regions |
+| Weak | Low | Complex local factors dominate | Highly fragmented landscapes |
 
-The package includes functions for visualizing station networks and selecting
-data interactively. These are useful for:
+---
 
-- Exploring geographic coverage before analysis
-- Selecting stations within a region of interest
-- Creating publication-quality maps
+# Part 4: Mapping Phenological Patterns
 
-### Interactive Maps with leaflet_pep()
+Visual exploration of station networks is often the first step in spatial
+analysis. The `pep725` package provides two mapping functions:
 
+| Function | Type | Best For |
+|----------|------|----------|
+| `leaflet_pep()` | Interactive | Exploring data, selecting stations |
+| `map_pep()` | Static | Publication-quality figures |
+
+## Interactive Maps with leaflet_pep()
 The `leaflet_pep()` function launches an interactive Shiny gadget for exploring
-and selecting stations:
+and selecting stations. This is useful for:
+
+- Visually exploring your data before analysis
+- Selecting stations within a geographic region
+- Understanding the spatial distribution of observations
 
 ```{r leaflet-example, eval=FALSE}
 # Launch interactive map (opens in viewer)
@@ -334,10 +522,39 @@ selected_stations <- leaflet_pep(pep, label_col = "species")
 # The function returns a data.frame of selected stations
 print(selected_stations)
 ```
-For large datasets, consider filtering first to improve loading speed:
+
+```{r leaflet-screenshot, echo=FALSE, out.width="100%", fig.cap="The leaflet_pep() interface showing station locations with drawing tools for selection."}
+# Display screenshot if it exists
+screenshot_path <- "leaflet_pep_screenshot.png"
+if (file.exists(screenshot_path)) {
+  knitr::include_graphics(screenshot_path)
+} else {
+  # Placeholder message when screenshot doesn't exist
+  cat("*[Screenshot: Interactive map showing PEP725 stations across Europe with drawing toolbar for rectangle and polygon selection]*\n")
+}
+```
+
+### Features of leaflet_pep()
+
+The interactive map provides several selection methods:
+
+| Feature | How to Use |
+|---------|------------|
+| **Click selection** | Click individual points to add them to selection |
+| **Rectangle selection** | Use the rectangle tool (in toolbar) to select regions |
+| **Polygon selection** | Draw custom shapes for irregular regions |
+| **Hover labels** | Move mouse over points to see station information |
+| **Done button** | Click "Done" to return selected stations |
+
+The function returns a `data.frame` containing all selected stations with their
+coordinates and metadata, which you can then use for focused analysis.
+
+### Best Practices for Interactive Mapping
+
+**Tip**: For large datasets, filter first to improve loading speed:
 
 ```{r leaflet-filtered, eval=FALSE}
-# Filter to a specific species for faster loading
+# Filter to a specific species for faster loading (recommended)
 wheat <- pep[species == "Triticum aestivum"]
 selected <- leaflet_pep(wheat, label_col = "s_id")
 
@@ -345,53 +562,126 @@ selected <- leaflet_pep(wheat, label_col = "s_id")
 wheat_subset <- wheat[s_id %in% selected$s_id]
 ```
 
-**Features of `leaflet_pep()`:**
-- Click individual points to select stations
-- Draw rectangles or polygons to select multiple stations
-- Hover over points to see labels (species, station ID, etc.)
-- Returns a data.frame of all selected stations
+**Why filter first?** The full PEP725 dataset contains millions of observations.
+Rendering all these points in an interactive map can take 10-20 seconds. By
+filtering to your species or region of interest first, the map loads much faster.
 
-### Static Maps with map_pep()
+## Static Maps with map_pep()
 
-For publication-quality static maps, use `map_pep()` which creates Google Maps
-overlays:
+The `map_pep()` function creates static maps for publication and exploration.
+It supports two background options:
 
-```{r map-static, eval=FALSE}
-# Basic station map
-map_pep(pep)
+| `background` | Description | API Key Required? |
+|--------------|-------------|-------------------|
+| `"none"` | Country borders from Natural Earth | No |
+| `"google"` | Google Maps satellite/terrain | Yes |
 
+The `background = "none"` option is recommended for most uses because it:
+- Requires no API key setup
+- Works in package vignettes
+- Produces clean, publication-ready maps
+
+### Basic Station Maps
+
+```{r map-basic, fig.height=6, fig.width=8}
+# Basic station map with country borders (no API key needed)
+map_pep(pep, background = "none", color_by = "none", point_size = 1.5)
+```
+
+### Coloring by Data Attributes
+
+```{r map-nobs, fig.height=6, fig.width=8}
 # Color stations by number of observations
-map_pep(pep, color_by = "n_obs", zoom = 5)
+map_pep(pep, background = "none", color_by = "n_obs", point_size = 1.5)
+```
 
+```{r map-nspecies, fig.height=6, fig.width=8}
 # Color by species diversity at each station
-map_pep(pep, color_by = "n_species", zoom = 5)
+map_pep(pep, background = "none", color_by = "n_species", point_size = 1.5)
+```
 
-# Regional focus (e.g., Switzerland)
+### Using Google Maps Background
+
+For satellite imagery (requires API key from Google Cloud Console):
+
+```{r map-google, eval=FALSE}
+# Register your API key first
+ggmap::register_google(key = "your_api_key_here")
+
+# Then use background = "google"
+map_pep(pep, background = "google", color_by = "n_obs", zoom = 5)
+
+# Regional focus with Google Maps
 map_pep(
   pep,
+  background = "google",
   location = c(lon = 8.2, lat = 46.8),
   zoom = 7,
   color_by = "n_obs"
 )
-
-# Export to file
-map_pep(pep, color_by = "n_species", output_file = "station_map.pdf")
 ```
 
-**Parameters for `map_pep()`:**
+## Mapping Phenological Patterns
 
-| Parameter | Description |
-|-----------|-------------|
-| `location` | Map center coordinates (lon, lat) |
-| `zoom` | Zoom level (4 = Europe, 7 = regional) |
-| `color_by` | `"none"`, `"n_obs"`, or `"n_species"` |
-| `point_size` | Size of station markers |
-| `output_file` | Optional path to save the map |
+Beyond simple station counts, `map_pep()` can visualize phenological statistics
+at each station. This is where mapping becomes scientifically informative:
 
-### Combining Mapping with Analysis
+### Mean Phenological Timing
 
-A typical workflow might start with mapping to select a region, then proceed
-with gradient and synchrony analysis:
+```{r map-mean-doy, fig.height=6, fig.width=8}
+# Map mean phenological timing for flowering (phase 60)
+# Earlier timing = darker colors, later = lighter (plasma scale)
+map_pep(pep, background = "none", color_by = "mean_doy",
+        phase_id = 60, point_size = 1.5)
+```
+
+### Phenological Trends
+
+```{r map-trend, fig.height=6, fig.width=8}
+# Map trends per station
+# Blue = phenology getting earlier, Red = getting later
+map_pep(pep, background = "none", color_by = "trend",
+        phase_id = 60, period = 1990:2020, min_years = 10, point_size = 1.5)
+```
+
+### Species Variation
+
+```{r map-species-cv, fig.height=6, fig.width=8}
+# Map species variation at each station
+# Higher CV = more variation in timing among species
+map_pep(pep, background = "none", color_by = "species_cv",
+        phase_id = 60, min_species = 3, point_size = 1.5)
+```
+
+### Understanding the Color Options
+
+| `color_by` | What It Shows | Scientific Use |
+|------------|---------------|----------------|
+| `"none"` | Station locations only | Basic network visualization |
+| `"n_obs"` | Data density | Identify well-monitored stations |
+| `"n_species"` | Species diversity | Find multi-species stations |
+| `"mean_doy"` | Average phenology | Reveal spatial phenology gradients |
+| `"trend"` | Temporal trend direction | Identify where phenology is shifting |
+| `"species_cv"` | Inter-species variation | Find stations with consistent timing |
+
+### Parameter Reference for map_pep()
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `background` | Map background: "none" or "google" | "google" |
+| `location` | Map center as c(lon, lat) | European center |
+| `zoom` | Zoom level (4=wide, 7=tight) | 4 |
+| `color_by` | Coloring option | "none" |
+| `phase_id` | BBCH phase for phenological colors | NULL |
+| `period` | Years for trend calculation | All years |
+| `min_years` | Minimum years for trend | 10 |
+| `min_species` | Minimum species for CV | 3 |
+| `point_size` | Marker size | 0.8 |
+| `output_file` | Path to save map | NULL (display only) |
+
+## Combining Mapping with Analysis
+
+A typical workflow integrates mapping with spatial analysis:
 
 ```{r mapping-workflow, eval=FALSE}
 # 1. Explore stations interactively
@@ -407,36 +697,97 @@ gradient <- pheno_gradient(pep_region, variable = "alt",
 # 4. Assess synchrony
 synchrony <- pheno_synchrony(pep_region, species = "Triticum aestivum",
                               phase_id = 60)
+
+# 5. Create publication map of the region (no API needed)
+map_pep(pep_region, background = "none", color_by = "mean_doy",
+        phase_id = 60, output_file = "regional_phenology.pdf")
 ```
 
-## Best Practices
+---
 
-### For Gradient Analysis
+# Best Practices Summary
+
+## For Gradient Analysis
 
 1. **Check sample size**: Need sufficient stations across the gradient range
-2. **Use robust methods**: Phenological data often has outliers
-3. **Consider regional differences**: Gradients may vary by location
-4. **Validate against literature**: Compare to expected lapse rates
+   (minimum 20 stations, ideally 50+)
 
-### For Synchrony Analysis
+2. **Use robust methods**: Phenological data often has outliers from observation
+   errors or microclimate effects - always start with `method = "robust"`
 
-1. **Set appropriate minimum stations**: Too few stations gives unreliable estimates
-2. **Consider temporal scale**: Annual synchrony vs. decadal changes
-3. **Account for network changes**: Station additions/removals affect comparisons
-4. **Interpret trends carefully**: Changes may reflect data quality or network changes
+3. **Consider regional differences**: Gradients may vary by location - use
+   the `by` parameter to check consistency
+
+4. **Validate against literature**: Compare your results to published lapse
+   rates (2-4 days/100m for altitude is typical in temperate Europe)
+
+5. **Report uncertainty**: Always include R-squared and sample size when
+   reporting gradient estimates
+
+## For Synchrony Analysis
+
+1. **Set appropriate minimum stations**: Too few stations gives unreliable
+   estimates (minimum 3, ideally 10+)
+
+2. **Consider temporal scale**: Annual synchrony captures different patterns
+   than decadal averages
+
+3. **Account for network changes**: Station additions/removals can create
+   artificial trends - check if network composition changed
+
+4. **Use appropriate metrics**: SD for absolute variability, CV for relative
+   comparisons across phases
+
+5. **Interpret trends cautiously**: Distinguish statistically significant
+   trends from ecologically meaningful changes
+
+## For Mapping
+
+1. **Start with exploration**: Use `leaflet_pep()` to understand your data
+   before formal analysis
+
+2. **Choose appropriate zoom**: Match zoom level to your study area
+   (4=Europe, 6=country, 8=region)
+
+3. **Use meaningful colors**: Choose `color_by` option that matches your
+   research question
+
+4. **Document selections**: Save selected station lists for reproducibility
+
+5. **Export for publication**: Use `output_file` to create high-quality figures
+
+---
 
 ## Summary
 
 This vignette covered spatial analysis of phenological data:
 
-- **Elevation gradients**: Phenology typically delays with increasing altitude
-- **Latitude gradients**: Phenology typically delays northward
-- **Synchrony**: Measures spatial coherence and its temporal trends
+| Topic | Key Function | Main Output |
+|-------|--------------|-------------|
+| Elevation gradients | `pheno_gradient()` | Days delay per 100m |
+| Latitude gradients | `pheno_gradient()` | Days delay per degree |
+| Spatial synchrony | `pheno_synchrony()` | SD/CV of timing across stations |
+| Interactive mapping | `leaflet_pep()` | Selected station data.frame |
+| Static mapping | `map_pep()` | Publication-quality maps |
 
-These analyses help understand how phenology varies across landscapes and how
-these patterns may be changing over time.
+### Key Take-Home Messages
+
+1. **Phenology delays systematically** with increasing altitude and latitude -
+   quantifying these gradients helps scale point observations to landscapes
+
+2. **Synchrony tells you about spatial variability** - high synchrony suggests
+   strong regional climate control, low synchrony indicates local factors matter
+
+3. **Combine approaches** for complete understanding - gradients show mean
+   patterns, synchrony shows variability around those patterns
+
+4. **Mapping is essential** for exploring data, selecting regions, and
+   communicating results
+
+---
 
 ## Session Info
+
 ```{r session}
 sessionInfo()
 ```

@@ -4,5 +4,6 @@ CLAUDE.md
 .claude
 ^pepperPaper$
 ^inst/scripts$
+^presentations$
 ^.*\.Rproj$
 ^\.Rproj\.user$
