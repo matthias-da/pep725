@@ -19,11 +19,11 @@ Description: Provides comprehensive tools for analyzing phenological data from
     regression. Integration with climate data (NASA GISS temperature anomalies,
     MeteoSwiss) enables climate-phenology relationship analysis. Quality
     assessment tools help identify reliable observation series.
-License: GPL-3
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr, patchwork
-Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, purrr, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: knitr, rmarkdown, devtools, rnaturalearthdata
+Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, nlme, purrr, quantreg, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Suggests: knitr, rmarkdown, devtools, rnaturalearthdata, pls
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

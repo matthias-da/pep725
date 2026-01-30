@@ -1,4 +1,4 @@
-#' Plot Hail–Phenology Overlap for One or Multiple Countries and Scenarios
+#' Plot Hail-Phenology Overlap for One or Multiple Countries and Scenarios
 #'
 #' This function visualizes the temporal overlap between daily hail probability
 #' and the phenological window (between two BBCH phenophases) for a selected
@@ -23,7 +23,9 @@
 #'   \code{DOY}, and \code{mean}. Must include both CTRL and SCEN where
 #'   applicable.
 #' @param pep A PEP phenology dataset from which phenological DOYs are estimated.
+#' @param giss Data frame with GISS temperature data. Required for robust_shift method.
 #' @param Country Character. Country to plot when \code{facet_countries = FALSE}.
+#' @param regions Character vector. Countries/regions to include. If NULL, all are used.
 #'   Ignored when \code{facet_countries = TRUE}.
 #' @param phase1,phase2 Integer. BBCH phenophases defining the phenology window.
 #' @param genus_name Character. Genus to filter from \code{pep}
@@ -57,12 +59,13 @@
 #'     \item CTRL and SCEN hail curves overlaid.
 #'     \item Phenology windows for both scenarios drawn as semi-transparent bands.
 #'   }
-#'   This mode resembles a multi-country comparison of full CTRL–SCEN
+#'   This mode resembles a multi-country comparison of full CTRL-SCEN
 #'   climatologies without splitting the panels by scenario.
 #'
 #'
 #' @param show_integral Logical. If \code{TRUE}, the integrated hail exposure
 #'   (computed by \code{integral_hail()}) is displayed in each panel.
+#' @param integral_cex Numeric. Text size for integral labels (default is 3).
 #'
 #' @param scen_warming Numeric. Warming increment (°C) used in the
 #'   simple-shift phenology model.
@@ -87,6 +90,7 @@
 #'
 #'
 #' @examples
+#' \dontrun{
 #' data(hail)
 #' pep <- pep_download()
 #' data(giss)
@@ -116,15 +120,15 @@
 #'
 #' # --- Both scenarios for all countries ------------------------------------
 #'
-#' # Country × Scenario facet grid (default)
+#' # Country x Scenario facet grid (default)
 #' plot_hail_overlap(hail, pep, Country = "Austria",
 #'                   scen = "both", facet_countries = TRUE)
 #'
-#' # NEW: Overlay CTRL + SCEN inside each country panel
+#' # Overlay CTRL + SCEN inside each country panel
 #' plot_hail_overlap(hail, pep, giss, Country = "Austria",
 #'                   scen = "both", facet_countries = TRUE,
 #'                   overlay_both = TRUE)
-#'
+#' }
 #'
 #' @author Matthias Templ
 #' @export
@@ -363,7 +367,7 @@ plot_hail_overlap <- function(
       ggplot2::theme(legend.position = "none") +
       ggplot2::labs(
         title = if (is.null(title))
-          paste("Hail–Phenology Overlap:", Country) else title,
+          paste("Hail-Phenology Overlap:", Country) else title,
         x = "DOY", y = "Hail Probability"
       )
 
@@ -435,7 +439,7 @@ plot_hail_overlap <- function(
       ggplot2::facet_wrap(~Country, ncol = 2) +
       ggplot2::theme_minimal(14) +
       ggplot2::labs(
-        title = paste0("Hail–Phenology Overlap (", scen, ")"),
+        title = paste0("Hail-Phenology Overlap (", scen, ")"),
         x = "DOY", y = "Hail Probability"
       )
 
@@ -630,7 +634,7 @@ plot_hail_overlap <- function(
     ggplot2::facet_grid(Country ~ Scenario) +
     ggplot2::theme_minimal(14) +
     ggplot2::labs(
-      title = "Hail–Phenology Overlap by Country and Scenario",
+      title = "Hail-Phenology Overlap by Country and Scenario",
       x = "DOY", y = "Hail Probability"
     ) +
     ggplot2::theme(legend.position = "none")
@@ -827,7 +831,7 @@ plot_hail_overlap <- function(
 #       ggplot2::scale_fill_manual(values = c(CTRL = color_ctrl, SCEN = color_scen)) +
 #       ggplot2::theme_minimal(14) +
 #       ggplot2::labs(
-#         title = paste("Hail–Phenology Overlap:", Country),
+#         title = paste("Hail-Phenology Overlap:", Country),
 #         x = "DOY", y = "Hail Probability"
 #       ) +
 #       ggplot2::theme(legend.position = "none")
@@ -878,7 +882,7 @@ plot_hail_overlap <- function(
 #       ggplot2::geom_vline(ggplot2::aes(xintercept = doy_end),   linetype = 2) +
 #       ggplot2::facet_wrap(~Country, ncol = 2) +
 #       ggplot2::labs(
-#         title = paste("Hail–Phenology Overlap (", scen, ")", sep = ""),
+#         title = paste("Hail-Phenology Overlap (", scen, ")", sep = ""),
 #         x = "DOY", y = "Hail Probability"
 #       ) +
 #       ggplot2::theme_minimal(14) +
@@ -983,7 +987,7 @@ plot_hail_overlap <- function(
 #     ggplot2::scale_fill_manual(values = color_map) +
 #     ggplot2::facet_grid(Country ~ ScenarioLabel) +
 #     ggplot2::labs(
-#       title = "Hail–Phenology Overlap by Country and Scenario",
+#       title = "Hail-Phenology Overlap by Country and Scenario",
 #       x = "DOY", y = "Hail Probability"
 #     ) +
 #     ggplot2::theme_minimal(14) +
@@ -1165,7 +1169,7 @@ plot_hail_overlap <- function(
 #       ggplot2::facet_wrap(~Scenario, ncol = 2, scales = "fixed") +
 #       ggplot2::theme_minimal(14) +
 #       ggplot2::labs(
-#         title = paste("Hail–Phenology Overlap:", Country),
+#         title = paste("Hail-Phenology Overlap:", Country),
 #         x = "DOY", y = "Hail Probability"
 #       ) +
 #       ggplot2::theme(legend.position = "none")
@@ -1229,7 +1233,7 @@ plot_hail_overlap <- function(
 #       ggplot2::facet_wrap(~Country, ncol = 2, scales = "fixed") +
 #       ggplot2::theme_minimal(14) +
 #       ggplot2::labs(
-#         title = paste("Hail–Phenology Overlap (", scen, ")", sep = ""),
+#         title = paste("Hail-Phenology Overlap (", scen, ")", sep = ""),
 #         x = "DOY", y = "Hail Probability"
 #       ) +
 #       ggplot2::theme(legend.position = "none")
@@ -1291,7 +1295,7 @@ plot_hail_overlap <- function(
 #     ggplot2::facet_grid(Country ~ Scenario, scales = "fixed") +
 #     ggplot2::theme_minimal(14) +
 #     ggplot2::labs(
-#       title = "Hail–Phenology Overlap by Country and Scenario",
+#       title = "Hail-Phenology Overlap by Country and Scenario",
 #       x = "DOY", y = "Hail Probability"
 #     ) +
 #     ggplot2::theme(legend.position = "none")

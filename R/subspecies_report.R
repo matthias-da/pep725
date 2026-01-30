@@ -19,7 +19,7 @@
 #' @param phases Integer vector. BBCH phases to evaluate.
 #' @param years Numeric vector. Years to include.
 #' @param subregions Character vector of region/country names.
-#' @param include_empty Logical. If TRUE, include subspecies × country rows
+#' @param include_empty Logical. If TRUE, include subspecies x country rows
 #'   even when no observations are present.
 #' @param metric Character vector. Metrics to compute. Use `"all"` for:
 #'   `"n_obs"`, `"n_stations"`, `"first_year"`, `"last_year"`,
@@ -35,7 +35,7 @@
 #'     \item{heatmap}{A ggplot2 object}
 #'   }
 #'
-#' @seealso [plot_phenology_trends()] for trend visualization
+#' @seealso \code{\link{pheno_trend_turning}} for trend visualization
 #'
 #' @author Matthias Templ
 #' @export
@@ -160,7 +160,7 @@ subspecies_report <- function(
 #'   `"n_obs"`, `"n_stations"`, `"first_year"`, `"last_year"`,
 #'   `"median_doy"`, `"completeness"`, or `"all"`.
 #'
-#' @return A tibble in long format with one row per `subspecies × country`.
+#' @return A tibble in long format with one row per `subspecies x country`.
 #'
 #' @author Matthias Templ
 #' @export
@@ -432,7 +432,7 @@ plot_subspecies_missingness_heatmap <- function(
       panel.grid = ggplot2::element_blank()
     ) +
     ggplot2::labs(
-      title = "Subspecies × Country × BBCH Phase: Data Availability",
+      title = "Subspecies x Country x BBCH Phase: Data Availability",
       x = "",
       y = ""
     )

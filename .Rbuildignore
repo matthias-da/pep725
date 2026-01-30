@@ -1,2 +1,8 @@
+Rplots.pdf
+Claude.md
+CLAUDE.md
+.claude
+^pepperPaper$
+^inst/scripts$
 ^.*\.Rproj$
 ^\.Rproj\.user$

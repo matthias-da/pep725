@@ -4,7 +4,6 @@
 #'
 #' @param data_list A named list of prepared data objects, typically output from \code{\link{regional_box_ts}}. Must contain elements like \code{ts_tidy} and \code{pep_giss}.
 #' @param type Type of plot to generate. One of \code{"timeseries"}, \code{"giss_smooth"}, or \code{"giss_sensitivity"}.
-#' @param phase_select Optional character string to filter the plot to a single phenological phase (e.g., \code{"Heading"}, \code{"Harvest"}). Only applies to GISS plots.
 #' @param alpha_lines Alpha transparency for time series lines (default is \code{0.6}).
 #' @param linewidth Line width for time series lines (default is \code{0.7}).
 #' @param smooth Smoothing method for \code{type = "giss_smooth"}: either \code{"gam"} or \code{"loess"}.
@@ -17,15 +16,16 @@
 #'
 #' @details
 #' \itemize{
-#'   \item \strong{type = "timeseries"}: Shows DOY trends by source (PEP725, Agroscope, MeteoSwiss) with faceting by phenophase and spatial scope.
+#'   \item \strong{type = "timeseries"}: Shows DOY trends by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
 #'   \item \strong{type = "giss_smooth"}: Plots phenological timing (DOY) against GISS global temperature anomalies, applying the selected smoother.
-#'   \item \strong{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) to estimate phenological sensitivity (days/°C).
+#'   \item \strong{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) to estimate phenological sensitivity (days/degC).
 #' }
 #' Use \code{phase_select} to restrict to one phenophase for clearer interpretation or focused analysis.
 #'
 #' @seealso \code{\link{regional_box_ts}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
 #'
 #' @examples
+#' \dontrun{
 #' ################################
 #' # NEW: functional_groups:
 #' d1 <- regional_box_ts(phase = 10, year_min = 1950,
@@ -48,53 +48,18 @@
 #' p3 <- pheno_plot(out, type = "giss_sensitivity")
 #'
 #' p2 | p3
+#' }
 #'
+#' \dontrun{
 #' ## Another example:
 #' d1 <- regional_box_ts(phase = 31, year_min = 1950,
 #'                                 pep_for_giss = "near",
-#'                                 lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                                 lat_min = 44.7, lat_max = 48.1, # default near Changins)
-#' )
+#'                                 lon_min = 4.2,  lon_max = 8.1,
+#'                                 lat_min = 44.7, lat_max = 48.1)
 #' pC <- pheno_plot(d1, type = "giss_smooth")
 #' pD <- pheno_plot(d1, type = "giss_sensitivity")
 #' pC | pD
-#'
-#'
-#' ## Another example:
-#' d1 <- regional_box_ts(phase = 100, year_min = 1970,
-#'                                 pep_for_giss = "near",
-#'                                 lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                                 lat_min = 44.7, lat_max = 48.1, # default near Changins)
-#' )
-#' pC <- pheno_plot(d1, type = "giss_smooth")
-#' pD <- pheno_plot(d1, type = "giss_sensitivity")
-#' pC | pD
-#'
-#'
-#' ## Another example:
-#' d1 <- regional_box_ts(phase = 51, year_min = 1970,
-#'                                 pep_for_giss = "aggregated"
-#' )
-#' pC <- pheno_plot(d1, type = "giss_smooth")
-#' pD <- pheno_plot(d1, type = "giss_sensitivity")
-#' pC | pD
-#'
-#' ## Another example:
-#' d1 <- regional_box_ts(phase = 51, year_min = 1970,
-#'                                 pep_for_giss = "near",
-#'                                 lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                                lat_min = 44.7, lat_max = 48.1, # default near Changins)
-#' )
-#' pC <- pheno_plot(d1, type = "giss_smooth")
-#' pD <- pheno_plot(d1, type = "giss_sensitivity")
-#' pC | pD
-#'
-#'
-#' # Play around with different parameters:
-#' # phases
-#' # year_min
-#' # lon/lat ranges
-#' # pep_for_giss = "near" or "aggregated"
+#' }
 
 
 #'
@@ -132,7 +97,6 @@ pheno_plot <- function(
       theme(legend.position = "top") +
       scale_linetype_manual(values = c(
         "Obs. Changins (MeteoCH)"   = "dashed",
-        "Obs. Changins (Agroscope)" = "solid",
         "PEP725 (aggregated)"       = "solid",
         "PEP725 (near Changins)"    = "solid"
       ))
@@ -164,7 +128,7 @@ pheno_plot <- function(
     `111` = "First cut for silage winning",
     `131` = "First cut for hay winning",
     `151` = "Start of harvest for silage (corn, grass)",
-    `205` = "Autumnal leaf colouring ≥ 50%"
+    `205` = "Autumnal leaf colouring >= 50%"
   )
   phase_name <- function(id) {
     res <- as.character(phase_lookup[as.character(id)])
@@ -226,13 +190,13 @@ pheno_plot <- function(
       pep_giss <- pep_giss[phase == phase_select]
     }
 
-    # robust slopes (days / °C)
+    # robust slopes (days / degC)
     slopes <- pep_giss[, {
       fit <- robustbase::lmrob(DOY ~ dTgl)
       .(slope = unname(coef(fit)[2]))
     }, by = phase]
 
-    lbls <- slopes[, sprintf("%s: robust sensitivity = %.1f days/°C", phase, slope)]
+    lbls <- slopes[, sprintf("%s: robust sensitivity = %.1f days/degC", phase, slope)]
 
     p <- ggplot(pep_giss, aes(dTgl, DOY, color = phase)) +
       geom_point(alpha = 0.8) +

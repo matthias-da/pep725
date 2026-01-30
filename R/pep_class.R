@@ -7,16 +7,37 @@
 #' @name pep-class
 #' @aliases pep-class
 #'
-#' @importFrom data.table as.data.table uniqueN .N .SD setDT
-#' @importFrom ggplot2 ggplot aes geom_point geom_histogram geom_line
-#' @importFrom ggplot2 labs theme_minimal coord_quickmap
-#' @importFrom stats IQR median
+#' @importFrom data.table as.data.table uniqueN .N .SD setDT copy fifelse rbindlist fread setcolorder setnames setorderv melt
+#' @importFrom ggplot2 ggplot aes geom_point geom_histogram geom_line labs theme_minimal coord_quickmap
+#' @importFrom stats IQR median sd quantile rnorm residuals lm pnorm as.formula complete.cases contr.sum coef predict contrasts<-
+#' @importFrom utils head tail txtProgressBar setTxtProgressBar
+#' @importFrom patchwork wrap_plots
+#' @import methods
 NULL
 
-# Prevent R CMD check notes for data.table columns
+# Prevent R CMD check notes for data.table columns and other non-standard evaluation
 utils::globalVariables(c(
-"s_id", "lon", "lat", "genus", "species", "phase_id", "year", "day",
-  "n_obs", "country", "phase_name", ".N"
+  # Core pep columns
+  "s_id", "lon", "lat", "genus", "species", "phase_id", "year", "day",
+  "n_obs", "country", "phase_name",
+  # data.table special symbols
+  ".N", ".I", ".SD", ":=", ".row_id", ".has_na",
+  # Analysis variables
+  "Country", "DOY", "DOYHd", "DOYHv", "HarvestDOY", "HarvestYEAR", "HeadingDOY",
+  "Integral", "N", "PLZ", "Scenario", "Tgl", "alt", "altitude", "annual_mean_doy",
+  "anomaly_days", "b", "baseline_doy", "baseline_spread", "bound", "colname",
+  "dT", "dTgl", "d_mean", "daylength", "days_decade", "direction", "doy",
+  "doy_ctrl", "doy_end", "doy_end_ctrl", "doy_end_scen", "doy_scen", "doy_start",
+  "doy_start_ctrl", "doy_start_scen", "doy_synth", "elevation", "filter_type",
+  "first_year", "geometry", "giss", "inside", "interpretation", "iqr_doy",
+  "is_extreme", "label", "label_y", "last_year", "mad_doy", "mean_DOY", "mean_day",
+  "mean_doy", "median_DOY", "median_day", "median_doy", "n_species", "n_stations",
+  "observed_doy", "panel", "pct_outliers", "percentile", "phase", "pheno",
+  "present", "q25", "q75", "qc_ori_flag", "r_squared", "s_ctrl", "s_scen",
+  "sd_doy", "se", "series", "significant", "slope", "station_mean_doy",
+  "subspecies", "tau", "thermal_sum", "tmp_end_ctrl", "tmp_end_scen",
+  "tmp_start_ctrl", "tmp_start_scen", "total", "value", "var_value", "x", "y",
+  "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score"
 ))
 
 # =============================================================================

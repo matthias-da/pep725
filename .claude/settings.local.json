@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(Rscript:*)",
+      "Bash(R CMD check:*)",
+      "WebFetch(domain:cran.r-project.org)",
+      "WebFetch(domain:bluegreen-labs.github.io)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "WebFetch(domain:search.r-project.org)"
+    ]
+  }
+}

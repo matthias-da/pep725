@@ -26,6 +26,8 @@ integral_hail(
 
 \item{pep}{PEP725 phenology data frame.}
 
+\item{giss}{Data frame with GISS temperature data. Required for robust_shift method.}
+
 \item{phase1}{Integer. First phenophase (BBCH).}
 
 \item{phase2}{Integer. Second phenophase (BBCH).}
@@ -40,7 +42,11 @@ integral_hail(
 
 \item{cmip6_tas}{Optional list of temperature time series for GDD phenology.}
 
-\item{gdd_base, }{gdd_threshold1, gdd_threshold2 Numeric. GDD model parameters.}
+\item{gdd_base}{Numeric. Base temperature for GDD accumulation.}
+
+\item{gdd_threshold1}{Numeric. GDD threshold for phenophase 1.}
+
+\item{gdd_threshold2}{Numeric. GDD threshold for phenophase 2.}
 }
 \value{
 A data frame with:

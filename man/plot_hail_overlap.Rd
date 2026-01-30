@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_hail_overlap.R
 \name{plot_hail_overlap}
 \alias{plot_hail_overlap}
-\title{Plot Hail–Phenology Overlap for One or Multiple Countries and Scenarios}
+\title{Plot Hail-Phenology Overlap for One or Multiple Countries and Scenarios}
 \usage{
 plot_hail_overlap(
   hail,
@@ -37,7 +37,11 @@ applicable.}
 
 \item{pep}{A PEP phenology dataset from which phenological DOYs are estimated.}
 
-\item{Country}{Character. Country to plot when \code{facet_countries = FALSE}.
+\item{giss}{Data frame with GISS temperature data. Required for robust_shift method.}
+
+\item{Country}{Character. Country to plot when \code{facet_countries = FALSE}.}
+
+\item{regions}{Character vector. Countries/regions to include. If NULL, all are used.
 Ignored when \code{facet_countries = TRUE}.}
 
 \item{phase1, phase2}{Integer. BBCH phenophases defining the phenology window.}
@@ -73,11 +77,13 @@ a new overlay mode:
 \item CTRL and SCEN hail curves overlaid.
 \item Phenology windows for both scenarios drawn as semi-transparent bands.
 }
-This mode resembles a multi-country comparison of full CTRL–SCEN
+This mode resembles a multi-country comparison of full CTRL-SCEN
 climatologies without splitting the panels by scenario.}
 
 \item{show_integral}{Logical. If \code{TRUE}, the integrated hail exposure
 (computed by \code{integral_hail()}) is displayed in each panel.}
+
+\item{integral_cex}{Numeric. Text size for integral labels (default is 3).}
 
 \item{scen_warming}{Numeric. Warming increment (°C) used in the
 simple-shift phenology model.}
@@ -126,6 +132,7 @@ with both scenarios overlaid—including their phenological windows.
 }
 }
 \examples{
+\dontrun{
 data(hail)
 pep <- pep_download()
 data(giss)
@@ -155,15 +162,15 @@ plot_hail_overlap(hail, pep, giss, Country = "Austria",
 
 # --- Both scenarios for all countries ------------------------------------
 
-# Country × Scenario facet grid (default)
+# Country x Scenario facet grid (default)
 plot_hail_overlap(hail, pep, Country = "Austria",
                   scen = "both", facet_countries = TRUE)
 
-# NEW: Overlay CTRL + SCEN inside each country panel
+# Overlay CTRL + SCEN inside each country panel
 plot_hail_overlap(hail, pep, giss, Country = "Austria",
                   scen = "both", facet_countries = TRUE,
                   overlay_both = TRUE)
-
+}
 
 }
 \author{

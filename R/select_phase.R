@@ -25,7 +25,7 @@
 #'
 #' The function is particularly useful for visualizing specific growth stages or comparing phenological trends across datasets and locations.
 #'
-#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep}}, \code{\link{pheno_plot}}
+#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
 #'
 #' @examples
 #' \dontrun{
@@ -61,7 +61,7 @@ select_phase <- function(dt, label, sp, yrmin, phases = c(60, 100)) {
     `111` = "First cut for silage winning",
     `131` = "First cut for hay winning",
     `151` = "Start of harvest for silage (corn, grass)",
-    `205` = "Autumnal leaf colouring ≥ 50%"
+    `205` = "Autumnal leaf colouring >= 50%"
   )
 
   # Mapping function

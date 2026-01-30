@@ -11,13 +11,19 @@
 #' @param phase2 Integer. Second phenophase (e.g. 87).
 #' @param genus_name Character. Genus to filter (e.g. "Malus").
 #' @param phenology_method Either \code{"simple_shift"} or \code{"gdd_cmip6"}.
-#' @param scen_warming Numeric. Warming in °C (simple shift model).
-#' @param shift_per_deg Numeric. DOY shift per °C (simple shift).
-#' @param cmip6_tas Optional list of daily temperature vectors—only required
+#' @param scen_warming Numeric. Warming in degC (simple shift model).
+#' @param shift_per_deg Numeric. DOY shift per degC (simple shift).
+#' @param cmip6_tas Optional list of daily temperature vectors--only required
 #'   if using \code{"gdd_cmip6"}.
 #' @param gdd_base Numeric. Base temperature for GDD model.
 #' @param gdd_threshold1 Numeric. GDD threshold for phase1.
 #' @param gdd_threshold2 Numeric. GDD threshold for phase2.
+#' @param ctrl_years Integer vector. Years for CTRL period (default 2011:2021).
+#' @param scen_years Integer vector. Years for scenario period (default 2085:2095).
+#' @param calib_years Integer vector. Years for calibration period (default 1991:2020).
+#' @param regions Character vector. Countries/regions to include. If NULL, all are used.
+#' @param delta_Tgl Numeric. Global temperature change (degC) for scenario.
+#' @param giss_data Data frame with GISS temperature data. Required for robust_shift method.
 #' @author Matthias Templ
 #'
 #' @return A data frame containing:
@@ -31,7 +37,7 @@
 #'
 #' This function computes the mean phenological day-of-year (DOY) for two
 #' phenophases (e.g., BBCH 65 and BBCH 87) for each country. The calculation
-#' can use a simple warming‐shift model or a GDD-based model using CMIP6 daily
+#' can use a simple warming-shift model or a GDD-based model using CMIP6 daily
 #' temperature time series.
 #'
 #' @param pep A data frame containing PEP725 phenology data, including columns
@@ -40,8 +46,8 @@
 #' @param phase2 Integer. Second phenophase (e.g., 87).
 #' @param genus_name Character. Genus to filter (e.g., "Malus").
 #' @param phenology_method Either \code{"simple_shift"} or \code{"gdd_cmip6"}.
-#' @param scen_warming Numeric. Warming (°C) for simple shift model.
-#' @param shift_per_deg Numeric. Shift in DOY per °C warming.
+#' @param scen_warming Numeric. Warming (degC) for simple shift model.
+#' @param shift_per_deg Numeric. Shift in DOY per degC warming.
 #' @param cmip6_tas Optional named list with daily temperature time series
 #'   (one numeric vector per country) for GDD phenology.
 #' @param gdd_base Numeric. Base temperature for GDD accumulation.
@@ -94,9 +100,9 @@ get_phenology_doys <- function(
     phase2,
     genus_name,
     phenology_method = c("robust_shift", "simple_shift", "gdd_cmip6"),
-    ctrl_years = 2011:2021,       # CTRL für Tgl-Mittel (PGW-Setup)
+    ctrl_years = 2011:2021,       # CTRL for Tgl mean (PGW setup)
     scen_years = 2085:2095,       # PGW-Periode
-    calib_years = 1991:2020,       # Kalibrierzeitraum für Regression
+    calib_years = 1991:2020,       # Calibration period for regression
     scen_warming = 3,
     shift_per_deg = -4,
     cmip6_tas = NULL,
@@ -230,7 +236,7 @@ get_phenology_doys <- function(
     Tgl_CTRL <- mean(giss_sub$Tgl[giss_sub$year %in% ctrl_years], na.rm = TRUE)
 
     # -------------------------
-    # ΔTgl logic
+    # delta_Tgl logic
     # -------------------------
     if (is.character(delta_Tgl) && delta_Tgl == "estimate") {
 
@@ -238,7 +244,7 @@ get_phenology_doys <- function(
       delta_val <- Tgl_SCEN_est - Tgl_CTRL
 
       message(sprintf(
-        "Estimated ΔTgl from GISS: %.3f K.", delta_val))
+        "Estimated delta_Tgl from GISS: %.3f K.", delta_val))
 
     } else if (is.numeric(delta_Tgl)) {
       delta_val <- delta_Tgl
@@ -320,7 +326,7 @@ get_phenology_doys <- function(
         .groups = "drop"
       ) %>%
       dplyr::rename(Country = country) %>%
-      # erst jetzt Ordnung sichern und dann auf [1,366] beschränken
+      # ensure correct order and then constrain to [1,366]
       dplyr::mutate(
         # CTRL
         tmp_start_ctrl = pmin(doy_start_ctrl, doy_end_ctrl),

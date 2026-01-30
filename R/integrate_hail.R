@@ -14,8 +14,11 @@
 #' @param scen_warming Numeric. Warming (°C) for simple-shift phenology model.
 #' @param shift_per_deg Numeric. DOY shift per °C.
 #' @param phenology_method Either \code{"simple_shift"} or \code{"gdd_cmip6"}.
+#' @param giss Data frame with GISS temperature data. Required for robust_shift method.
 #' @param cmip6_tas Optional list of temperature time series for GDD phenology.
-#' @param gdd_base, gdd_threshold1, gdd_threshold2 Numeric. GDD model parameters.
+#' @param gdd_base Numeric. Base temperature for GDD accumulation.
+#' @param gdd_threshold1 Numeric. GDD threshold for phenophase 1.
+#' @param gdd_threshold2 Numeric. GDD threshold for phenophase 2.
 #' @author Matthias Templ
 #'
 #' @return A data frame with:

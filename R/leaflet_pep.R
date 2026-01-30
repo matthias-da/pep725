@@ -41,7 +41,6 @@ leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
   requireNamespace("miniUI")
   requireNamespace("leaflet")
   requireNamespace("leaflet.extras")
-  library(dplyr)
 
   if (!all(c("lon", "lat") %in% names(pep))) stop("pep must contain 'lon' and 'lat' columns.")
 

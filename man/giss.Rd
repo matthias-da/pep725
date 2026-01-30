@@ -16,7 +16,7 @@ A \code{data.table} with 145 rows and 3 variables:
 NASA GISS Surface Temperature Analysis (GISTEMP v4) via \url{https://data.giss.nasa.gov/gistemp/}
 }
 \usage{
-giss
+data(giss)
 }
 \description{
 This dataset contains global annual surface air temperature anomalies
@@ -33,9 +33,9 @@ to link phenological responses with temperature anomalies.
 \examples{
 data(giss)
 plot(giss$year, giss$dT, type = "l", main = "Global Temperature Anomalies (GISS)",
-     ylab = "Anomaly (°C)", xlab = "Year")
+     ylab = "Anomaly (degC)", xlab = "Year")
 }
 \seealso{
-\code{\link{regional_box_ts}}, \code{\link{pep}}, \code{\link{agroscope}}, \code{\link{meteoSwiss}}
+\code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{meteoSwiss}}
 }
 \keyword{datasets}

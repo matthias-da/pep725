@@ -6,6 +6,7 @@
 #'
 #' @param data_list A named list returned by \code{\link{regional_box_ts}}, containing at minimum \code{ts_tidy} and \code{pep_giss}.
 #' @param type Character. Type of plot to produce. One of \code{"timeseries"} (default), \code{"giss_smooth"}, or \code{"giss_sensitivity"}.
+#' @param phase_select Character. Optional filter for a specific phenological phase (e.g., "Heading", "Harvest"). If NULL, all phases are shown.
 #' @param alpha_lines Numeric. Transparency level for lines (default is 0.6).
 #' @param linewidth Numeric. Line width for time series plots (default is 0.7).
 #' @param smooth Character. Smoother type for \code{"giss_smooth"} plots. Either \code{"gam"} (default) or \code{"loess"}.
@@ -33,43 +34,16 @@
 #' @seealso \code{\link{regional_box_ts}}, \code{\link[ggplot2]{ggplot}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
 #'
 #' @examples
+#' \dontrun{
 #' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
 #' str(out$ts_tidy)
 #' gt <- pheno_plot_hh(out, type = "timeseries")
 #' gt
 #' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 #' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
 #' gt | gc
-#' pcs | gc
-#'
-#' # Example for other (selected) coordinates of the PEP data:
-#' out <- regional_box_ts_heading_harvest(pep_for_giss = "near",
-#'                         lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                         lat_min = 44.7, lat_max = 48.1, # default near Changins
-#' )
-#' str(out$ts_tidy)
-#' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
-#' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-#' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
-#' gt | gc
-#' pcs | gc
-#'
-#' # Example for other year selection
-#' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum", year_min = 1980)
-#' str(out$ts_tidy)
-#' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
-#' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-#' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
-#' gt | gc
-#' pcs | gc
+#' }
+#' \dontrun{
 #' # Example to select only nearby stations (more useful that using all PEP station data)
 #'
 #' # Better to select only stations near Changins and for the last 40 years:
@@ -87,6 +61,7 @@
 #' pcs <- pheno_plot_hh(d, type = "giss_smooth") # TODO: wrong
 #' pcs | gc
 #' pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
+#' }
 #' @author Matthias Templ
 #' @export
 pheno_plot_hh <- function(
@@ -129,7 +104,6 @@ pheno_plot_hh <- function(
       theme(legend.position = "top") +
       scale_linetype_manual(values = c(
         "Obs. Changins (MeteoCH)"   = "dashed",
-        "Obs. Changins (Agroscope)" = "solid",
         "PEP725 (aggregated)"       = "solid",
         "PEP725 (near Changins)"    = "solid"
       ))
@@ -182,13 +156,13 @@ pheno_plot_hh <- function(
       pep_giss <- pep_giss[phase == phase_select]
     }
 
-    # robust slopes (days / °C)
+    # robust slopes (days / degC)
     slopes <- pep_giss[, {
       fit <- robustbase::lmrob(DOY ~ dTgl)
       .(slope = unname(coef(fit)[2]))
     }, by = phase]
 
-    lbls <- slopes[, sprintf("%s: robust sensitivity = %.1f days/°C", phase, slope)]
+    lbls <- slopes[, sprintf("%s: robust sensitivity = %.1f days/degC", phase, slope)]
 
     p <- ggplot(pep_giss, aes(dTgl, DOY, color = phase)) +
       geom_point(alpha = 0.8) +

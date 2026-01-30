@@ -19,12 +19,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' pep <- pep_download()
 #' # Example: aggregated flowering DOY by species
-#' pheno_plot_timeseries(data = pep65, color_by = "functional_group",
+#' pheno_plot_timeseries(data = pep, color_by = "functional_group",
 #'                       facet_by = NULL, smooth = TRUE)
-#'                       ########################################## Usage examples ###############
-
-#' # 1️⃣ Example with all species, colored by functional group
+#'
+#' # Example 1: all species, colored by functional group
 #' pheno_plot_timeseries(
 #'   data = pep[phase_id == 65],
 #'   color_by = "functional_group",
@@ -32,7 +33,7 @@
 #'   title = "Flowering (BBCH 65) time series since 1961"
 #' )
 #'
-#' # 2️⃣ Example with a single species, colored by site
+#' # Example 2: single species, colored by site
 #' pheno_plot_timeseries(
 #'   data = pep[species == "Triticum aestivum" & phase_id == 65],
 #'   color_by = "s_id",
@@ -40,23 +41,14 @@
 #'   title = "Winter wheat flowering (BBCH 65) across sites"
 #' )
 #'
-#' # 3️⃣ Example with facets by functional group
+#' # Example 3: facets by functional group
 #' pheno_plot_timeseries(
 #'   data = pep[phase_id == 65],
 #'   color_by = "species",
 #'   facet_by = "functional_group",
 #'   smooth = TRUE
 #' )
-#'
-#' # Example 2: Focus on cereals only
-#' pheno_plot_timeseries_group(
-#'   data = pep[phase_id == 65 & functional_group %in% c("C₃_winter_cereals","C₄_summer_cereals")],
-#'   color_by = "species",
-#'   group_by = "functional_group",
-#'   show_sites = FALSE,    # cleaner figure
-#'   smooth = TRUE,
-#'   summary_fun = "sd"
-#' )
+#' }
 pheno_plot_timeseries <- function(
     data,
     color_by = "species",
@@ -68,9 +60,6 @@ pheno_plot_timeseries <- function(
     year_min = 1961,
     title = "Phenological time series of flowering (BBCH 65)"
 ) {
-  library(ggplot2)
-  library(data.table)
-
   # ensure data.table and filter by year
   setDT(data)
   data <- data[year >= year_min]

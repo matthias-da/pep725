@@ -1,7 +1,8 @@
-#' @importFrom utils data globalVariables
+#' @importFrom utils data globalVariables head tail txtProgressBar setTxtProgressBar
+#' @importFrom stats sd quantile rnorm residuals lm pnorm as.formula complete.cases contr.sum coef predict
+#' @importFrom data.table copy setDT fifelse rbindlist fread setcolorder setnames setorderv
 .onAttach <- function(libname, pkgname) {
   # Load small auxiliary datasets into global environment
- utils::data("agroscope", package = pkgname, envir = globalenv())
   utils::data("meteoSwiss", package = pkgname, envir = globalenv())
   utils::data("giss", package = pkgname, envir = globalenv())
   utils::data("hail", package = pkgname, envir = globalenv())

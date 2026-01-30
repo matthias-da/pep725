@@ -36,9 +36,15 @@ get_phenology_doys(
 
 \item{phenology_method}{Either \code{"simple_shift"} or \code{"gdd_cmip6"}.}
 
-\item{scen_warming}{Numeric. Warming (°C) for simple shift model.}
+\item{ctrl_years}{Integer vector. Years for CTRL period (default 2011:2021).}
 
-\item{shift_per_deg}{Numeric. Shift in DOY per °C warming.}
+\item{scen_years}{Integer vector. Years for scenario period (default 2085:2095).}
+
+\item{calib_years}{Integer vector. Years for calibration period (default 1991:2020).}
+
+\item{scen_warming}{Numeric. Warming (degC) for simple shift model.}
+
+\item{shift_per_deg}{Numeric. Shift in DOY per degC warming.}
 
 \item{cmip6_tas}{Optional named list with daily temperature time series
 (one numeric vector per country) for GDD phenology.}
@@ -48,6 +54,12 @@ get_phenology_doys(
 \item{gdd_threshold1}{Numeric. GDD threshold for phenophase 1.}
 
 \item{gdd_threshold2}{Numeric. GDD threshold for phenophase 2.}
+
+\item{regions}{Character vector. Countries/regions to include. If NULL, all are used.}
+
+\item{delta_Tgl}{Numeric. Global temperature change (degC) for scenario.}
+
+\item{giss_data}{Data frame with GISS temperature data. Required for robust_shift method.}
 }
 \value{
 A data frame containing:
@@ -61,7 +73,7 @@ Compute CTRL and SCEN Phenology Day-of-Year Values
 
 This function computes the mean phenological day-of-year (DOY) for two
 phenophases (e.g., BBCH 65 and BBCH 87) for each country. The calculation
-can use a simple warming‐shift model or a GDD-based model using CMIP6 daily
+can use a simple warming-shift model or a GDD-based model using CMIP6 daily
 temperature time series.
 
 A data frame with:

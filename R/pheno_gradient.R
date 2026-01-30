@@ -58,6 +58,7 @@
 #'
 #' @examples
 #' \dontrun{
+#' pep <- pep_download()
 #' # Altitude gradient for wheat heading
 #' grad_alt <- pheno_gradient(pep,
 #'                            variable = "alt",
@@ -297,10 +298,10 @@ pheno_gradient <- function(pep,
       abs_slope <- abs(slope)
 
       if (var_name == "alt") {
-        return(sprintf("Phenology is %.1f days %s per 100m elevation increase (R² = %.2f)",
+        return(sprintf("Phenology is %.1f days %s per 100m elevation increase (R-sq = %.2f)",
                 abs_slope, direction, r_sq))
       } else {
-        return(sprintf("Phenology is %.1f days %s per degree latitude increase (R² = %.2f)",
+        return(sprintf("Phenology is %.1f days %s per degree latitude increase (R-sq = %.2f)",
                 abs_slope, direction, r_sq))
       }
     }
@@ -313,10 +314,10 @@ pheno_gradient <- function(pep,
       abs_slope <- abs(s)
 
       if (var_name == "alt") {
-        sprintf("Phenology is %.1f days %s per 100m elevation increase (R² = %.2f)",
+        sprintf("Phenology is %.1f days %s per 100m elevation increase (R-sq = %.2f)",
                 abs_slope, direction, r)
       } else {
-        sprintf("Phenology is %.1f days %s per degree latitude increase (R² = %.2f)",
+        sprintf("Phenology is %.1f days %s per degree latitude increase (R-sq = %.2f)",
                 abs_slope, direction, r)
       }
     }, slope, r_sq, USE.NAMES = FALSE)
@@ -461,7 +462,7 @@ plot.pheno_gradient <- function(x, ...) {
       y = "Day of Year",
       title = sprintf("Phenological %s Gradient",
                       ifelse(x$variable == "alt", "Elevation", "Latitude")),
-      subtitle = sprintf("Method: %s | R² = %.3f",
+      subtitle = sprintf("Method: %s | R-sq = %.3f",
                          x$method,
                          ifelse(!is.null(x$summary$r_squared[1]),
                                 x$summary$r_squared[1], NA))

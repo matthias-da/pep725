@@ -34,8 +34,6 @@ pheno_plot(
 \item{gam_k}{Optional \code{k} parameter (basis dimension) for GAM smoothing. If \code{NULL}, the default from \code{mgcv::gam} is used.}
 
 \item{se}{Logical. Whether to include confidence bands in smoothed plots (default is \code{FALSE}).}
-
-\item{phase_select}{Optional character string to filter the plot to a single phenological phase (e.g., \code{"Heading"}, \code{"Harvest"}). Only applies to GISS plots.}
 }
 \value{
 A \code{ggplot} object for visual inspection and further customization.
@@ -45,13 +43,14 @@ Generates diagnostic plots from processed phenology–climate data. Supports thr
 }
 \details{
 \itemize{
-\item \strong{type = "timeseries"}: Shows DOY trends by source (PEP725, Agroscope, MeteoSwiss) with faceting by phenophase and spatial scope.
+\item \strong{type = "timeseries"}: Shows DOY trends by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
 \item \strong{type = "giss_smooth"}: Plots phenological timing (DOY) against GISS global temperature anomalies, applying the selected smoother.
-\item \strong{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) to estimate phenological sensitivity (days/°C).
+\item \strong{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) to estimate phenological sensitivity (days/degC).
 }
 Use \code{phase_select} to restrict to one phenophase for clearer interpretation or focused analysis.
 }
 \examples{
+\dontrun{
 ################################
 # NEW: functional_groups:
 d1 <- regional_box_ts(phase = 10, year_min = 1950,
@@ -74,53 +73,18 @@ p2 <- pheno_plot(out, type = "giss_smooth", smooth = "gam")
 p3 <- pheno_plot(out, type = "giss_sensitivity")
 
 p2 | p3
+}
 
+\dontrun{
 ## Another example:
 d1 <- regional_box_ts(phase = 31, year_min = 1950,
                                 pep_for_giss = "near",
-                                lon_min = 4.2,  lon_max = 8.1, # default near Changins
-                                lat_min = 44.7, lat_max = 48.1, # default near Changins)
-)
+                                lon_min = 4.2,  lon_max = 8.1,
+                                lat_min = 44.7, lat_max = 48.1)
 pC <- pheno_plot(d1, type = "giss_smooth")
 pD <- pheno_plot(d1, type = "giss_sensitivity")
 pC | pD
-
-
-## Another example:
-d1 <- regional_box_ts(phase = 100, year_min = 1970,
-                                pep_for_giss = "near",
-                                lon_min = 4.2,  lon_max = 8.1, # default near Changins
-                                lat_min = 44.7, lat_max = 48.1, # default near Changins)
-)
-pC <- pheno_plot(d1, type = "giss_smooth")
-pD <- pheno_plot(d1, type = "giss_sensitivity")
-pC | pD
-
-
-## Another example:
-d1 <- regional_box_ts(phase = 51, year_min = 1970,
-                                pep_for_giss = "aggregated"
-)
-pC <- pheno_plot(d1, type = "giss_smooth")
-pD <- pheno_plot(d1, type = "giss_sensitivity")
-pC | pD
-
-## Another example:
-d1 <- regional_box_ts(phase = 51, year_min = 1970,
-                                pep_for_giss = "near",
-                                lon_min = 4.2,  lon_max = 8.1, # default near Changins
-                               lat_min = 44.7, lat_max = 48.1, # default near Changins)
-)
-pC <- pheno_plot(d1, type = "giss_smooth")
-pD <- pheno_plot(d1, type = "giss_sensitivity")
-pC | pD
-
-
-# Play around with different parameters:
-# phases
-# year_min
-# lon/lat ranges
-# pep_for_giss = "near" or "aggregated"
+}
 
 }
 \seealso{

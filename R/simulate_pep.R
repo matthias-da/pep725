@@ -22,9 +22,6 @@
 #'                        phase = 10)
 #' }
 simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
-  library(data.table)
-  library(mgcv)
-
   set.seed(seed)
   pep <- copy(pep)
   setDT(pep)

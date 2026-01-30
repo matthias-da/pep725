@@ -35,7 +35,7 @@ subspecies_report(
 
 \item{subregions}{Character vector of region/country names.}
 
-\item{include_empty}{Logical. If TRUE, include subspecies × country rows
+\item{include_empty}{Logical. If TRUE, include subspecies x country rows
 even when no observations are present.}
 
 \item{metric}{Character vector. Metrics to compute. Use \code{"all"} for:
@@ -91,7 +91,7 @@ subspecies_report(
 }
 }
 \seealso{
-\code{\link[=plot_phenology_trends]{plot_phenology_trends()}} for trend visualization
+\code{\link{pheno_trend_turning}} for trend visualization
 }
 \author{
 Matthias Templ

@@ -67,7 +67,7 @@ NULL
 #'
 #' @details These observational records are used to validate phenological models and assess long-term changes in crop development stages under historical climate. The data originates from the MeteoSwiss station network near Changins, which is part of Switzerland’s official agricultural phenology monitoring.
 #'
-#' @source MeteoSwiss (Bundesamt für Meteorologie und Klimatologie), via Agroscope archives
+#' @source MeteoSwiss (Bundesamt für Meteorologie und Klimatologie)
 #'
 #' @docType data
 #' @keywords datasets
@@ -79,38 +79,6 @@ NULL
 #' plot(meteoSwiss$yearHd, meteoSwiss$DOYHd, type = "b", ylab = "Heading DOY", xlab = "Year")
 #' plot(meteoSwiss$yearHv, meteoSwiss$DOYHv, type = "b", ylab = "Harvest DOY", xlab = "Year")
 "meteoSwiss"
-
-#' Agroscope Winter Wheat Phenological Trials
-#'
-#' This dataset contains phenological observations from Agroscope winter wheat field trials in Switzerland. It includes sowing, heading, and harvest dates for different wheat varieties and locations (postal codes) over multiple years. These data are typically used for model calibration and validation of crop phenology under Swiss agroclimatic conditions.
-#'
-#' @format A data.table with 41,424 rows and 7 variables:
-#' \describe{
-#'   \item{Variety}{Wheat variety name (character), may contain missing values}
-#'   \item{PLZ}{Swiss postal code of the trial location (integer)}
-#'   \item{SowingYEAR}{Year of sowing (integer)}
-#'   \item{SowingDOY}{Day of year of sowing (integer)}
-#'   \item{HarvestYEAR}{Year of harvest (integer)}
-#'   \item{HeadingDOY}{Day of year of heading (numeric)}
-#'   \item{HarvestDOY}{Day of year of harvest (integer)}
-#' }
-#'
-#' @details The dataset originates from Agroscope’s official winter wheat variety trials. Observations cover multiple varieties and locations, providing key phenological stages (sowing, heading, harvest) required for climate impact assessments, phenological model calibration, and sensitivity analyses. Missing values in the \code{Variety} column indicate unclassified entries but retain valid phenological dates.
-#'
-#' @source Agroscope (Swiss Federal Research Station for Agroecology and Agriculture)
-#'
-#' @docType data
-#' @keywords datasets
-#' @name agroscope
-#' @usage data(agroscope)
-#'
-#' @examples
-#' data(agroscope)
-#' summary(agroscope)
-#' with(agroscope, plot(HeadingDOY, HarvestDOY,
-#'      xlab = "Heading DOY", ylab = "Harvest DOY", main = "Phenological stages"))
-#' table(agroscope$Variety)
-"agroscope"
 
 #' Global GISS Temperature Anomalies (1880–2024)
 #'
@@ -134,12 +102,17 @@ NULL
 #' This dataset is automatically loaded with the package and used by the function \code{\link{regional_box_ts}}
 #' to link phenological responses with temperature anomalies.
 #'
-#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep}}, \code{\link{agroscope}}, \code{\link{meteoSwiss}}
+#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{meteoSwiss}}
+#'
+#' @docType data
+#' @keywords datasets
+#' @name giss
+#' @usage data(giss)
 #'
 #' @examples
 #' data(giss)
 #' plot(giss$year, giss$dT, type = "l", main = "Global Temperature Anomalies (GISS)",
-#'      ylab = "Anomaly (°C)", xlab = "Year")
+#'      ylab = "Anomaly (degC)", xlab = "Year")
 "giss"
 
 #' Daily Hail Probability Data for Austria, Germany, and Switzerland
@@ -204,5 +177,7 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
+#' @name hail
+#' @usage data(hail)
 "hail"
 

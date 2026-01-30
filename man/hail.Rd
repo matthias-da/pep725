@@ -27,7 +27,7 @@ analyses (e.g., \code{"Austria"}, \code{"Germany"}).}
 }
 }
 \usage{
-hail
+data(hail)
 }
 \description{
 This dataset contains daily hail probability estimates derived from

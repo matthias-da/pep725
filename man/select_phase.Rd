@@ -47,7 +47,7 @@ head(df)
 
 }
 \seealso{
-\code{\link{regional_box_ts}}, \code{\link{pep}}, \code{\link{pheno_plot}}
+\code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
 }
 \author{
 Matthias Templ

@@ -8,22 +8,53 @@ map_pep(
   pep,
   location = c(lon = 6.233, lat = 46.4),
   zoom = 4,
-  color_by = c("none", "n_obs", "n_species"),
+  color_by = c("none", "n_obs", "n_species", "mean_doy", "trend", "species_cv"),
+  phase_id = NULL,
+  period = NULL,
+  min_years = 10,
+  min_species = 3,
   point_size = 0.8,
   output_file = NULL,
   key = NULL
 )
 }
 \arguments{
-\item{pep}{A \code{data.table} or \code{data.frame} with at least columns \code{lon}, \code{lat}, and \code{species}.}
+\item{pep}{A \code{data.table} or \code{data.frame} with phenological observations.
+Required columns depend on \code{color_by}:
+\itemize{
+\item Always required: \code{lon}, \code{lat}
+\item For \code{"n_species"}, \code{"mean_doy"}, \code{"species_cv"}: \code{species}
+\item For \code{"mean_doy"}, \code{"trend"}: \code{year}, \code{day}
+}}
 
 \item{location}{Named vector with center longitude and latitude for the map.
 Defaults to near Changins: \code{c(lon = 6.233, lat = 46.400)}.}
 
 \item{zoom}{Zoom level for the map (default: 4 for Europe-wide, 7 for regional).}
 
-\item{color_by}{One of \code{"none"}, \code{"n_obs"}, or \code{"n_species"}:
-controls how points are colored.}
+\item{color_by}{Character. What to color stations by:
+\describe{
+\item{"none"}{Black points showing station locations only}
+\item{"n_obs"}{Number of observations per station}
+\item{"n_species"}{Number of species recorded per station}
+\item{"mean_doy"}{Mean day-of-year (phenological timing) per station}
+\item{"trend"}{Trend in days/year per station (positive = later, negative = earlier)}
+\item{"species_cv"}{Coefficient of variation in timing across species at each station
+(higher = more variation among species)}
+}}
+
+\item{phase_id}{Integer. BBCH phase code to filter by. Recommended for
+\code{"mean_doy"} and \code{"trend"} to ensure meaningful comparisons.
+If \code{NULL} (default), all phases are included.}
+
+\item{period}{Integer vector of years to include. Default is all years.
+For trend calculation, at least 10 years are recommended.}
+
+\item{min_years}{Integer. Minimum years required for trend calculation.
+Stations with fewer years show as NA. Default is 10.}
+
+\item{min_species}{Integer. Minimum species required for \code{species_cv}.
+Default is 3.}
 
 \item{point_size}{Size of station points (default: 0.8).}
 
@@ -36,12 +67,39 @@ A ggplot map object.
 }
 \description{
 Generates a map of PEP725 phenological station locations with optional coloring
-by number of observations or number of species per station.
+by various statistics including mean phenological timing, trends, and species
+variation.
 }
+\details{
+The new color options provide insights into:
+\itemize{
+\item \strong{mean_doy}: Spatial patterns in phenological timing. Earlier
+timing (lower DOY) typically in southern/lowland areas.
+\item \strong{trend}: Where phenology is advancing (negative = earlier over time,
+shown in blue) or delaying (positive, shown in red). Uses Kendall's tau
+normalized statistic for robustness.
+\item \strong{species_cv}: Stations where different species show similar timing
+(low CV) vs. divergent timing (high CV). High variation may indicate
+species-specific responses to local conditions.
+}
+}
+\section{Interpreting Trends}{
+
+The trend is calculated as Kendall's normalized tau statistic, which ranges
+roughly from -3 to +3 for typical data:
+\itemize{
+\item Negative values (blue): Phenology is getting earlier over time
+\item Positive values (red): Phenology is getting later over time
+\item Values near 0: No clear trend
+\item |tau| > 1.96: Statistically significant at 95\% level
+}
+}
+
 \examples{
 \dontrun{
 # Register API key (or provide via argument)
 ggmap::register_google(key = "your_api_key_here")
+pep <- pep_download()
 
 # Plot all stations (Europe-wide)
 map_pep(pep, color_by = "none", zoom = 4)
@@ -49,10 +107,25 @@ map_pep(pep, color_by = "none", zoom = 4)
 # Plot with number of observations
 map_pep(pep, color_by = "n_obs", zoom = 4)
 
-# Plot near Changins with number of species per station
-pep_sub <- pep[pep$lat > 44.7 & pep$lat < 48.1 & pep$lon > 4.2 & pep$lon < 8.1]
+# Plot mean phenological timing for flowering (phase 60)
+map_pep(pep, color_by = "mean_doy", phase_id = 60, zoom = 4)
+
+# Plot trends in flowering timing
+map_pep(pep, color_by = "trend", phase_id = 60,
+        period = 1990:2020, min_years = 10, zoom = 4)
+
+# Plot species variation at each station
+map_pep(pep, color_by = "species_cv", phase_id = 60, zoom = 4)
+
+# Regional view near Changins with number of species per station
+pep_sub <- pep[pep$lat > 44.7 & pep$lat < 48.1 & pep$lon > 4.2 & pep$lon < 8.1, ]
 map_pep(pep_sub, color_by = "n_species", zoom = 7)
 }
+}
+\seealso{
+\code{\link{pheno_normals}} for detailed normal calculations,
+\code{\link{kendall_tau}} for trend calculation,
+\code{\link{pheno_synchrony}} for synchrony analysis
 }
 \author{
 Matthias Templ

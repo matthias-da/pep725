@@ -78,6 +78,7 @@ that allows comparison across phases with different mean timing}
 
 \examples{
 \dontrun{
+pep <- pep_download()
 # Calculate synchrony for wheat heading by country and year
 sync <- pheno_synchrony(pep,
                         species = "Triticum",

@@ -70,6 +70,7 @@
 #'
 #' @examples
 #' \dontrun{
+#' pep <- pep_download()
 #' # Calculate anomalies relative to 1961-1990 baseline
 #' anomalies <- pheno_anomaly(pep,
 #'                            baseline_period = 1961:1990,
@@ -97,7 +98,7 @@
 #'
 #' @seealso
 #' \code{\link{pheno_normals}} for calculating baseline statistics,
-#' \code{\link{pep}} for the main dataset
+#' \code{\link{pep_download}} for obtaining the main dataset
 #'
 #' @author Matthias Templ
 #' @export

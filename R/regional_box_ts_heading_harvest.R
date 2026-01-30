@@ -1,94 +1,93 @@
 #' Compile Regional Phenological and Climate Time Series
 #'
-#' Generates a collection of harmonized phenological time series for a specified species and spatial region, using data from multiple sources: PEP725 (aggregated and filtered), Agroscope field trials, MeteoSwiss observations, and GISS global temperature anomalies. This function supports comparative analysis across data sources and climate-sensitivity studies.
+#' Generates a collection of harmonized phenological time series for a specified
+#' species and spatial region, using data from multiple sources: PEP725
+#' (aggregated and filtered), MeteoSwiss observations, and GISS global
+#' temperature anomalies. This function supports comparative analysis across
+#' data sources and climate-sensitivity studies.
 #'
+#' @param pep A data.table containing PEP725 phenological data. Defaults to
+#'   object from parent environment.
+#' @param giss A data.table with GISS global temperature anomalies. Defaults to
+#'   object from parent environment.
+#' @param meteoSwiss A data.table with MeteoSwiss phenological observations.
+#'   Defaults to object from parent environment.
 #' @param lon_min Minimum longitude for bounding box filter (default is 4.2)
 #' @param lon_max Maximum longitude for bounding box filter (default is 8.1)
 #' @param lat_min Minimum latitude for bounding box filter (default is 44.7)
 #' @param lat_max Maximum latitude for bounding box filter (default is 48.1)
-#' @param plz_target Postal code used to filter Agroscope trials (default is 1260 = Changins)
-#' @param species_name Name of the species to filter (default is \code{"Triticum aestivum"})
+#' @param species_name Name of the species to filter (default is
+#'   \code{"Triticum aestivum"})
 #' @param year_min Minimum year for all time series outputs (default is 1961)
-#' @param pep_for_giss Which PEP725 dataset to use for merging with GISS climate anomalies. Either \code{"aggregated"} (global) or \code{"near"} (spatially filtered near Changins)
+#' @param pep_for_giss Which PEP725 dataset to use for merging with GISS climate
+#'   anomalies. Either \code{"aggregated"} (global) or \code{"near"} (spatially
+#'   filtered near Changins)
 #'
 #' @return A named list with the following elements:
 #' \describe{
-#'   \item{\code{ts_tidy}}{Long-format time series combining PEP725, Agroscope, and MeteoSwiss data, with consistent phase and source labeling}
+#'   \item{\code{ts_tidy}}{Long-format time series combining PEP725 and
+#'     MeteoSwiss data, with consistent phase and source labeling}
 #'   \item{\code{pep_agg}}{Aggregated PEP725 time series (global species-level)}
-#'   \item{\code{pep_cgi}}{Spatially filtered PEP725 time series (based on lat/lon box)}
+#'   \item{\code{pep_cgi}}{Spatially filtered PEP725 time series (based on
+#'     lat/lon box)}
 #'   \item{\code{giss}}{GISS global temperature anomalies for matching years}
-#'   \item{\code{pep_giss}}{PEP time series (aggregated or filtered) merged with GISS anomalies}
+#'   \item{\code{pep_giss}}{PEP time series (aggregated or filtered) merged with
+#'     GISS anomalies}
 #' }
 #'
 #' @details
-#' This function filters the PEP725 dataset by species and optionally by spatial box. It aggregates phenological phases (Heading = 60, Harvest = 100) and computes mean day-of-year (DOY) per year. Agroscope and MeteoSwiss observations are transformed to tidy format and included for regional comparison. GISS temperature anomalies are merged with the selected PEP time series to support phenology–climate analysis. Warnings are issued if phases are missing for selected periods.
+#' This function filters the PEP725 dataset by species and optionally by spatial
+#' box. It aggregates phenological phases (Heading = 60, Harvest = 100) and
+#' computes mean day-of-year (DOY) per year. MeteoSwiss observations are
+#' transformed to tidy format and included for regional comparison. GISS
+#' temperature anomalies are merged with the selected PEP time series to support
+#' phenology-climate analysis. Warnings are issued if phases are missing for
+#' selected periods.
 #'
-#' @seealso \code{\link{pep_import}}, \code{\link{agroscope}}, \code{\link{meteoSwiss}}, \code{\link{giss}}
+#' @seealso \code{\link{pep_import}}, \code{\link{meteoSwiss}}, \code{\link{giss}}
 #'
 #' @examples
-#' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
+#' \dontrun{
+#' pep <- pep_download()
+#' out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum")
 #' str(out$ts_tidy)
 #' gt <- pheno_plot_hh(out, type = "timeseries")
 #' gt
 #' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 #' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
 #' gt | gc
-#' pcs | gc
 #'
 #' # Example for other (selected) coordinates of the PEP data:
-#' out <- regional_box_ts_heading_harvest(pep_for_giss = "near",
-#'                         lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                         lat_min = 44.7, lat_max = 48.1, # default near Changins
+#' out <- regional_box_ts_heading_harvest(pep, pep_for_giss = "near",
+#'                         lon_min = 4.2,  lon_max = 8.1,
+#'                         lat_min = 44.7, lat_max = 48.1
 #' )
 #' str(out$ts_tidy)
-#' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
 #' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-#' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
-#' gt | gc
-#' pcs | gc
 #'
 #' # Example for other year selection
-#' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum", year_min = 1980)
-#' str(out$ts_tidy)
+#' out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum",
+#'                                        year_min = 1980)
 #' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
-#' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 #' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' gc
 #' gt | gc
-#' pcs | gc
-#' # Example to select only nearby stations (more useful that using all PEP station data)
 #'
+#' # Example to select only nearby stations (more useful that using all PEP station data)
 #' # Better to select only stations near Changins and for the last 40 years:
-#' d <- regional_box_ts_heading_harvest(pep_for_giss = "near",
-#'                         lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                         lat_min = 44.7, lat_max = 48.1, # default near Changins
-#'                         year_min = 1980 # <- only for the last 40 years
+#' d <- regional_box_ts_heading_harvest(pep, pep_for_giss = "near",
+#'                         lon_min = 4.2,  lon_max = 8.1,
+#'                         lat_min = 44.7, lat_max = 48.1,
+#'                         year_min = 1980
 #' )
-#' # becomes linear!
-#' str(out$ts_tidy)
-#' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
-#' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-#' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-#' pcs | gc
 #' pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
+#' }
 #' @author Matthias Templ
 #' @export
 regional_box_ts_heading_harvest <- function(pep = get("pep", envir = parent.frame()),
                             giss = get("giss", envir = parent.frame()),
-                            agroscope = get("agroscope", envir = parent.frame()),
                             meteoSwiss = get("meteoSwiss", envir = parent.frame()),
     lon_min = 4.2,  lon_max = 8.1, # default near Changins
     lat_min = 44.7, lat_max = 48.1, # default near Changins
-    plz_target = 1260,
     species_name = "Triticum aestivum",
     year_min   = 1961,
     pep_for_giss = c("aggregated","near")
@@ -113,25 +112,6 @@ regional_box_ts_heading_harvest <- function(pep = get("pep", envir = parent.fram
     , .(n = .N, mean_day = mean(day, na.rm = TRUE)),
     by = .(species, year, phase_id)
   ][order(species, year, mean_day, phase_id)]
-
-
-  # --- Agroscope (avg by HarvestYEAR at PLZ), tidy long -------------------
-  ags_wide <- agroscope[PLZ == plz_target,
-                      .(DOY_Hd = mean(HeadingDOY, na.rm = TRUE),
-                        DOY_Hv = mean(HarvestDOY, na.rm = TRUE)),
-                      by = .(year = HarvestYEAR)
-  ][order(year)]
-
-  ags_long <- melt(
-    ags_wide, id.vars = "year",
-    variable.name = "phase", value.name = "DOY"
-  )[
-    , phase := fifelse(phase == "DOY_Hd", "Heading", "Harvest")
-  ][
-    , `:=`(source = "Obs. Changins (Agroscope)", site = "Changins")
-  ][
-    year >= year_min                                    # <- filter by year_min
-  ][]
 
   # --- MeteoCH, tidy long -----------------------------------------------
   obs_long <- rbindlist(list(
@@ -174,24 +154,19 @@ regional_box_ts_heading_harvest <- function(pep = get("pep", envir = parent.fram
   pep_agg <- pepfun(PEPData,         "PEP725 (aggregated)",    species_name, year_min)
   pep_cgi <- pepfun(PEPDataChangins, "PEP725 (near Changins)", species_name, year_min)
 
-  # Warn for Obs & Agroscope as well (within window)
-  check_phases(ags_long, "Agroscope data", year_min)
-  check_phases(obs_long, "MeteoCH data",   year_min)
+  # Warn for MeteoSwiss as well (within window)
+  check_phases(obs_long, "MeteoCH data", year_min)
 
   # --- One tidy dataset for both time-series panels ----------------------
   obs_both <- rbindlist(list(
     copy(obs_long)[, panel := "PEP aggregated"],
     copy(obs_long)[, panel := "PEP near Changins"]
   ))
-  ags_both <- rbindlist(list(
-    copy(ags_long)[, panel := "PEP aggregated"],
-    copy(ags_long)[, panel := "PEP near Changins"]
-  ))
   pep_both <- rbindlist(list(
     copy(pep_agg)[, panel := "PEP aggregated"],
     copy(pep_cgi)[, panel := "PEP near Changins"]
   ))
-  ts_tidy <- rbindlist(list(obs_both, ags_both, pep_both), use.names = TRUE)[
+  ts_tidy <- rbindlist(list(obs_both, pep_both), use.names = TRUE)[
     year >= year_min                                    # <- safety filter
   ][]
 
@@ -210,4 +185,3 @@ regional_box_ts_heading_harvest <- function(pep = get("pep", envir = parent.fram
     species = species_name
   )
 }
-

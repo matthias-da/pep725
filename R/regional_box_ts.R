@@ -1,6 +1,6 @@
 #' Compile Regional Phenology Data and Climate Sensitivity Inputs
 #'
-#' Extracts and aggregates phenological observations for a selected species and phenological phase from the PEP725 dataset (globally and spatially filtered), and links them with global temperature anomalies (GISS data). This function supports flexible phase selection and comparative regional–global climate impact studies.
+#' Extracts and aggregates phenological observations for a selected species and phenological phase from the PEP725 dataset (globally and spatially filtered), and links them with global temperature anomalies (GISS data). This function supports flexible phase selection and comparative regional-global climate impact studies.
 #'
 #' @param pep A data.table containing the full PEP725 dataset, typically loaded at package startup. Must include at least columns: \code{species}, \code{year}, \code{phase_id}, \code{day}, \code{lat}, \code{lon}. Defaults to a global object \code{pep} from the parent environment.
 #' @param giss A data.table with GISS global temperature anomalies, typically containing columns \code{year}, \code{dT}, and \code{dT_sm}. Defaults to global object \code{giss}.
@@ -9,6 +9,7 @@
 #' @param lat_min Minimum latitude for spatial filtering of PEP data (default is \code{44.7})
 #' @param lat_max Maximum latitude for spatial filtering of PEP data (default is \code{48.1})
 #' @param species_name Character name of the species to be extracted (default is \code{"Triticum aestivum"})
+#' @param functional_group Character. Optional functional group name to filter by (e.g., "C4_summer_cereals"). If provided, overwrites species_name filtering.
 #' @param year_min Minimum year to include in all outputs (default is \code{1961})
 #' @param pep_for_giss Selects which PEP data subset to use for merging with GISS data. Either \code{"near"} (box-filtered) or \code{"aggregated"} (global).
 #' @param phase Integer or vector of phase_id(s) to extract (default is \code{60} = Heading). Named phase mappings are applied.
@@ -33,7 +34,7 @@
 #' downstream plotting functions or regression models linking phenology with
 #' global warming trends.
 #'
-#' @seealso \code{\link{pheno_plot}}, \code{\link{pep}}, \code{\link{giss}}
+#' @seealso \code{\link{pheno_plot}}, \code{\link{pep_download}}, \code{\link{giss}}
 #'
 #' @examples
 #' \dontrun{
@@ -135,7 +136,7 @@ regional_box_ts <- function(
     `111` = "First cut for silage winning",
     `131` = "First cut for hay winning",
     `151` = "Start of harvest for silage (corn, grass)",
-    `205` = "Autumnal leaf colouring ≥ 50%"
+    `205` = "Autumnal leaf colouring >= 50%"
   )
   phase_name <- function(id) {
     res <- as.character(phase_lookup[as.character(id)])
@@ -233,7 +234,7 @@ regional_box_ts <- function(
   attr(pep_giss, "pep_source") <- pep_for_giss
 
   if (nrow(pep_giss) == 0L) {
-    warning("No GISS merge possible (pep_giss is empty) — check date/region/phase", call. = FALSE)
+    warning("No GISS merge possible (pep_giss is empty) -- check date/region/phase", call. = FALSE)
   }
 
 

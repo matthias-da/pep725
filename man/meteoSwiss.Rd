@@ -18,7 +18,7 @@ A data.table with 30 rows and 8 variables:
 }
 }
 \source{
-MeteoSwiss (Bundesamt für Meteorologie und Klimatologie), via Agroscope archives
+MeteoSwiss (Bundesamt für Meteorologie und Klimatologie)
 }
 \usage{
 data(meteoSwiss)

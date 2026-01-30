@@ -22,6 +22,8 @@ pheno_plot_hh(
 
 \item{type}{Character. Type of plot to produce. One of \code{"timeseries"} (default), \code{"giss_smooth"}, or \code{"giss_sensitivity"}.}
 
+\item{phase_select}{Character. Optional filter for a specific phenological phase (e.g., "Heading", "Harvest"). If NULL, all phases are shown.}
+
 \item{alpha_lines}{Numeric. Transparency level for lines (default is 0.6).}
 
 \item{linewidth}{Numeric. Line width for time series plots (default is 0.7).}
@@ -55,43 +57,16 @@ Global temperature data are taken from the \code{\link{giss}} dataset. Phenologi
 Aggregation and preparation is assumed to be done via \code{\link{regional_box_ts}}.
 }
 \examples{
+\dontrun{
 out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
 str(out$ts_tidy)
 gt <- pheno_plot_hh(out, type = "timeseries")
 gt
 pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-gc
 gt | gc
-pcs | gc
-
-# Example for other (selected) coordinates of the PEP data:
-out <- regional_box_ts_heading_harvest(pep_for_giss = "near",
-                        lon_min = 4.2,  lon_max = 8.1, # default near Changins
-                        lat_min = 44.7, lat_max = 48.1, # default near Changins
-)
-str(out$ts_tidy)
-gt <- pheno_plot_hh(out, type = "timeseries")
-gt
-pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-gc
-gt | gc
-pcs | gc
-
-# Example for other year selection
-out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum", year_min = 1980)
-str(out$ts_tidy)
-gt <- pheno_plot_hh(out, type = "timeseries")
-gt
-pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-pcs <- pheno_plot_hh(out, type = "giss_smooth") # TODO: wrong
-gc
-gt | gc
-pcs | gc
+}
+\dontrun{
 # Example to select only nearby stations (more useful that using all PEP station data)
 
 # Better to select only stations near Changins and for the last 40 years:
@@ -109,6 +84,7 @@ gc <- pheno_plot_hh(out, type = "giss_sensitivity")
 pcs <- pheno_plot_hh(d, type = "giss_smooth") # TODO: wrong
 pcs | gc
 pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
+}
 }
 \seealso{
 \code{\link{regional_box_ts}}, \code{\link[ggplot2]{ggplot}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}

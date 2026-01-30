@@ -125,7 +125,7 @@ shift <- period2$mean_doy - period1$mean_doy
 }
 \seealso{
 \code{\link{pheno_anomaly}} for calculating anomalies relative to normals,
-\code{\link{pep}} for the main dataset
+\code{\link{pep_download}} for obtaining the main dataset
 }
 \author{
 Matthias Templ

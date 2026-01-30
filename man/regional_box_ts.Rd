@@ -33,6 +33,8 @@ regional_box_ts(
 
 \item{species_name}{Character name of the species to be extracted (default is \code{"Triticum aestivum"})}
 
+\item{functional_group}{Character. Optional functional group name to filter by (e.g., "C4_summer_cereals"). If provided, overwrites species_name filtering.}
+
 \item{year_min}{Minimum year to include in all outputs (default is \code{1961})}
 
 \item{pep_for_giss}{Selects which PEP data subset to use for merging with GISS data. Either \code{"near"} (box-filtered) or \code{"aggregated"} (global).}
@@ -50,7 +52,7 @@ A named list with the following elements:
 }
 }
 \description{
-Extracts and aggregates phenological observations for a selected species and phenological phase from the PEP725 dataset (globally and spatially filtered), and links them with global temperature anomalies (GISS data). This function supports flexible phase selection and comparative regional–global climate impact studies.
+Extracts and aggregates phenological observations for a selected species and phenological phase from the PEP725 dataset (globally and spatially filtered), and links them with global temperature anomalies (GISS data). This function supports flexible phase selection and comparative regional-global climate impact studies.
 }
 \details{
 The function aggregates PEP observations by species, year, and phase,
@@ -75,7 +77,7 @@ str(out)
 
 }
 \seealso{
-\code{\link{pheno_plot}}, \code{\link{pep}}, \code{\link{giss}}
+\code{\link{pheno_plot}}, \code{\link{pep_download}}, \code{\link{giss}}
 }
 \author{
 Matthias Templ

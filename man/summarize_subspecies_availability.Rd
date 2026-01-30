@@ -34,7 +34,7 @@ summarize_subspecies_availability(
 
 \item{subregions}{Character vector of region/country names.}
 
-\item{include_empty}{Logical. If TRUE, include subspecies × country rows
+\item{include_empty}{Logical. If TRUE, include subspecies x country rows
 even when no observations are present.}
 
 \item{metric}{Character vector specifying which metrics to compute.
@@ -43,7 +43,7 @@ Allowed values:
 \code{"median_doy"}, \code{"completeness"}, or \code{"all"}.}
 }
 \value{
-A tibble in long format with one row per \verb{subspecies × country}.
+A tibble in long format with one row per \verb{subspecies x country}.
 }
 \description{
 Computes data availability metrics for specified genus, species, or

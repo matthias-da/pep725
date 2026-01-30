@@ -6,14 +6,14 @@
 #' from NASA GISS to compute climate-driven trends using the model:
 #' \deqn{DOY = a + b \cdot T_{\mathrm{gl}}}
 #' where \eqn{T_{\mathrm{gl}}} is the global mean surface temperature
-#' (absolute temperature reconstructed as anomaly + 14°C).
+#' (absolute temperature reconstructed as anomaly + 14 degC).
 #'
 #' The function produces a faceted panel plot showing:
 #' \itemize{
 #'   \item annual mean DOY and interquartile range,
 #'   \item robust trend lines for past and future periods,
-#'   \item CTRL (1991–2020) and PGW (2066–2095) climate windows,
-#'   \item optional layouts (country × phase or phase × country).
+#'   \item CTRL (1991-2020) and PGW (2066-2095) climate windows,
+#'   \item optional layouts (country x phase or phase x country).
 #' }
 #'
 #' @param pep A PEP725-style data frame with columns \code{year}, \code{DOY},
@@ -21,10 +21,14 @@
 #' @param genus_name Character string specifying a genus to filter (optional).
 #' @param species_name Character string specifying a species to filter (optional).
 #'   If both genus and species are provided, the species filter is applied last.
+#' @param subspecies_name Character string specifying a subspecies to filter (optional).
+#'   Only one of genus_name, species_name, or subspecies_name can be specified.
 #' @param phases Integer vector of phenological phase IDs to include
 #'   (default: \code{c(65, 87)} for flowering and maturity of fruit).
-#' @param common_ids Logical. If \code{TRUE} (default), only stations with observations
-#'  for all selected phases are included. If \code{FALSE}, all stations with any of the selected phases are included.
+#' @param common_stations Logical. If \code{TRUE} (default), only stations with observations
+#'   for all selected phases are included. If \code{FALSE}, all stations with any of the selected phases are included.
+#' @param combine_regions Logical. If \code{TRUE}, combines all regions into a single panel. Default is \code{FALSE}.
+#' @param combine_layout Character. Layout for combined regions plot: either \code{"vertical"} or \code{"horizontal"}.
 #' @param years Numeric vector of years to include in the analysis.
 #'   Default is \code{1961:2024}.
 #' @param calib_years Numeric vector specifying the calibration window for robust
@@ -45,7 +49,7 @@
 #' The function performs the following steps:
 #' \enumerate{
 #'   \item Filter PEP data by species, phases, regions, years.
-#'   \item Aggregate DOYs by year–country–phase.
+#'   \item Aggregate DOYs by year-country-phase.
 #'   \item Merge with GISS global temperature anomalies.
 #'   \item Fit robust regression \eqn{DOY ~ Tgl} over the calibration window.
 #'   \item Predict past and future trends using historical and PGW-temperature.
@@ -239,7 +243,7 @@ plot_phenology_trends <- function(
   # 3. Prepare GISS temperature data
   # ------------------------------------------------------------------
   if (!("Tgl" %in% names(giss_data))) {
-    message("No Tgl column found — computing Tgl = dT + 14.")
+    message("No Tgl column found -- computing Tgl = dT + 14.")
     giss_data <- giss_data %>% dplyr::mutate(Tgl = dT + 14)
   }
 
@@ -312,7 +316,7 @@ plot_phenology_trends <- function(
     else if (!is.null(genus_name))
       title <- genus_name
     else
-      title <- "Phenology – Robust Trend"
+      title <- "Phenology -- Robust Trend"
   }
 
   # Slope annotation at year = 2085
