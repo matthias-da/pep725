@@ -56,23 +56,29 @@
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' # Assess quality for all stations
-#' quality <- pep_quality(pep)
+#'
+#' # Subset to one country for speed
+#' pep_de <- pep[country == "Germany"]
+#'
+#' # Assess quality for stations in Germany
+#' quality <- pep_quality(pep_de)
+#' print(quality)
 #'
 #' # Filter to high-quality stations only
 #' high_quality <- quality[quality_grade %in% c("A", "B")]
 #'
-#' # Assess specific species
-#' wheat_quality <- pep_quality(pep,
+#' # Assess specific species and phase
+#' wheat_quality <- pep_quality(pep_de,
 #'                              species = "Triticum",
 #'                              phase_id = 60)
 #'
-#' # Country-level quality assessment
-#' country_quality <- pep_quality(pep,
+#' # Country-level assessment (use subset of countries)
+#' pep_subset <- pep[country %in% c("Germany", "Switzerland")]
+#' country_quality <- pep_quality(pep_subset,
 #'                                by = c("country", "genus", "phase_id"))
 #'
 #' # Assess quality within a specific time window
-#' modern_quality <- pep_quality(pep,
+#' modern_quality <- pep_quality(pep_de,
 #'                               year_range = c(1991, 2020))
 #' }
 #'

@@ -59,25 +59,31 @@
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
+#'
+#' # Subset to fewer countries for speed
+#' pep_subset <- pep[country %in% c("Germany", "Switzerland", "Austria")]
+#'
 #' # Altitude gradient for wheat heading
-#' grad_alt <- pheno_gradient(pep,
+#' grad_alt <- pheno_gradient(pep_subset,
 #'                            variable = "alt",
 #'                            species = "Triticum",
 #'                            phase_id = 60)
 #' print(grad_alt)
 #'
 #' # Latitude gradient
-#' grad_lat <- pheno_gradient(pep,
+#' grad_lat <- pheno_gradient(pep_subset,
 #'                            variable = "lat",
 #'                            species = "Triticum",
 #'                            phase_id = 60)
 #'
-#' # Compare methods
-#' grad_ols <- pheno_gradient(pep, species = "Triticum", phase_id = 60, method = "ols")
-#' grad_robust <- pheno_gradient(pep, species = "Triticum", phase_id = 60, method = "robust")
+#' # Compare regression methods
+#' grad_ols <- pheno_gradient(pep_subset, species = "Triticum",
+#'                            phase_id = 60, method = "ols")
+#' grad_robust <- pheno_gradient(pep_subset, species = "Triticum",
+#'                               phase_id = 60, method = "robust")
 #'
-#' # Gradient by country
-#' grad_by_country <- pheno_gradient(pep,
+#' # Gradient by country (separate regression per country)
+#' grad_by_country <- pheno_gradient(pep_subset,
 #'                                   variable = "alt",
 #'                                   species = "Triticum",
 #'                                   phase_id = 60,
