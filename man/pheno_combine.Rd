@@ -97,6 +97,7 @@ print(combined)
 
 # Identify potential outliers (residuals > 30 days)
 outliers <- combined$residuals[abs(residual) > 30]
+outliers
 }
 
 }

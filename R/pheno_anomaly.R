@@ -72,11 +72,11 @@
 #' \donttest{
 #' pep <- pep_download()
 #'
-#' # Filter to one country for speed, analyze wheat heading
-#' wheat_de <- pep[country == "Germany" & species == "Triticum aestivum"]
+#' # Filter to one country for speed, analyze apple flowering
+#' apple_ch <- pep[country == "Switzerland" & species == "Malus domestica"]
 #'
 #' # Calculate anomalies relative to 1961-1990 baseline
-#' anomalies <- pheno_anomaly(wheat_de,
+#' anomalies <- pheno_anomaly(apple_ch,
 #'                            baseline_period = 1961:1990,
 #'                            phase_id = 60)
 #' print(anomalies)
@@ -85,7 +85,7 @@
 #' extreme_early <- anomalies[is_extreme == TRUE & direction == "early"]
 #'
 #' # Anomalies for recent years only
-#' recent <- pheno_anomaly(wheat_de,
+#' recent <- pheno_anomaly(apple_ch,
 #'                         baseline_period = 1961:1990,
 #'                         target_years = 2000:2020,
 #'                         phase_id = 60)

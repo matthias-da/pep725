@@ -54,11 +54,11 @@
 #' pep <- pep_download()
 #'
 #' # Subset to two countries for speed
-#' pep_subset <- pep[country %in% c("Germany", "Switzerland")]
+#' pep_subset <- pep[country %in% c("Switzerland", "Austria")]
 #'
-#' # Calculate synchrony for wheat heading by country and year
+#' # Calculate synchrony for apple flowering by country and year
 #' sync <- pheno_synchrony(pep_subset,
-#'                         species = "Triticum",
+#'                         species = "Malus",
 #'                         phase_id = 60)
 #' print(sync)
 #'
@@ -67,13 +67,13 @@
 #'
 #' # Synchrony without trend analysis (faster)
 #' sync_simple <- pheno_synchrony(pep_subset,
-#'                                species = "Triticum",
+#'                                species = "Malus",
 #'                                phase_id = 60,
 #'                                compute_trend = FALSE)
 #'
 #' # Custom grouping variables
 #' sync_detailed <- pheno_synchrony(pep_subset,
-#'                                  species = "Triticum",
+#'                                  species = "Malus",
 #'                                  phase_id = 60,
 #'                                  by = c("country", "year"))
 #' }
