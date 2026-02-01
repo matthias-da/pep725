@@ -116,12 +116,14 @@ print(anomalies)
 
 # Find extreme early years
 extreme_early <- anomalies[is_extreme == TRUE & direction == "early"]
+extreme_early
 
 # Anomalies for recent years only
 recent <- pheno_anomaly(apple_ch,
                         baseline_period = 1961:1990,
                         target_years = 2000:2020,
                         phase_id = 60)
+recent
 }
 
 }

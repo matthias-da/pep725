@@ -93,20 +93,24 @@ print(quality)
 
 # Filter to high-quality stations only
 high_quality <- quality[quality_grade \%in\% c("A", "B")]
+high_quality
 
 # Assess specific species and phase
 apple_quality <- pep_quality(pep_ch,
                              species = "Malus",
                              phase_id = 60)
+apple_quality
 
 # Country-level assessment (use subset of countries)
 pep_subset <- pep[country \%in\% c("Switzerland", "Austria")]
 country_quality <- pep_quality(pep_subset,
                                by = c("country", "genus", "phase_id"))
+country_quality
 
 # Assess quality within a specific time window
 modern_quality <- pep_quality(pep_ch,
                               year_range = c(1991, 2020))
+modern_quality
 }
 
 }

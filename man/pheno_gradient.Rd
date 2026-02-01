@@ -104,12 +104,16 @@ grad_lat <- pheno_gradient(pep_subset,
                            variable = "lat",
                            species = "Malus",
                            phase_id = 60)
+print(grad_lat)
 
 # Compare regression methods
 grad_ols <- pheno_gradient(pep_subset, species = "Malus",
                            phase_id = 60, method = "ols")
+print(grad_ols)
+
 grad_robust <- pheno_gradient(pep_subset, species = "Malus",
                               phase_id = 60, method = "robust")
+print(grad_robust)
 
 # Gradient by country (separate regression per country)
 grad_by_country <- pheno_gradient(pep_subset,
@@ -117,6 +121,7 @@ grad_by_country <- pheno_gradient(pep_subset,
                                   species = "Malus",
                                   phase_id = 60,
                                   by = "country")
+print(grad_by_country)
 }
 
 }

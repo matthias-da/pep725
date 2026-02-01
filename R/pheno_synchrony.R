@@ -70,12 +70,14 @@
 #'                                species = "Malus",
 #'                                phase_id = 60,
 #'                                compute_trend = FALSE)
+#' sync_simple
 #'
 #' # Custom grouping variables
 #' sync_detailed <- pheno_synchrony(pep_subset,
 #'                                  species = "Malus",
 #'                                  phase_id = 60,
 #'                                  by = c("country", "year"))
+#' sync_detailed
 #' }
 #'
 #' @seealso
