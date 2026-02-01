@@ -9,17 +9,21 @@
 #' @author Matthias Templ
 #' @export
 #' @examples
-#' \donttest{
-#' # Download or load PEP data first
+#' \dontrun{
+#' # Download PEP data first
 #' pep <- pep_download()
 #'
+#' # Use subset for faster simulation
+#' pep_ch <- pep[country == "Switzerland"]
+#'
 #' # Generate synthetic data
-#' pep_synth <- simulate_pep(pep)
+#' pep_synth <- simulate_pep(pep_ch)
 #'
 #' # Use with analysis functions
-#' out <- regional_box_ts(pep = pep_synth,
-#'                        species_name = "Triticum aestivum",
-#'                        phase = 10)
+#' data(giss)
+#' out <- regional_box_ts(pep = pep_synth, giss = giss,
+#'                        species_name = "Malus domestica",
+#'                        phase = 60)
 #' }
 simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
   set.seed(seed)

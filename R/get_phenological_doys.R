@@ -65,22 +65,24 @@
 #' pep <- pep_download()
 #' data(giss)
 #'
-#' regions <- c("Austria", "Germany-North", "Germany-South", "Switzerland")
+#' # Use Alpine subset for faster computation
+#' regions <- c("Austria", "Switzerland")
+#' pep_alpine <- pep[country %in% regions]
 #'
 #' # Simple shift method
 #' d1 <- get_phenology_doys(
-#'   pep = pep,
+#'   pep = pep_alpine,
 #'   phase1 = 65,
 #'   phase2 = 87,
 #'   genus_name = "Malus",
 #'   regions = regions,
-#'   phenology_method = 'simple_shift',
+#'   phenology_method = 'simple_shift'
 #' )
 #' d1
 #'
-#' # robust shift
+#' # Robust shift method
 #' d2 <- get_phenology_doys(
-#'   pep = pep,
+#'   pep = pep_alpine,
 #'   phase1 = 65,
 #'   phase2 = 87,
 #'   genus_name = "Malus",

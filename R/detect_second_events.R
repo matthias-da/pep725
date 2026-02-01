@@ -81,29 +81,25 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #' \donttest{
 #' pep <- pep_download()
 #'
+#' # Use subset for speed (apple flowering in Switzerland/Austria)
+#' pep_subset <- pep[species == "Malus domestica" &
+#'                   country %in% c("Switzerland", "Austria")]
+#'
 #' # Method 1: Detect late-season flowering events (default)
-#' second <- detect_second_events(pep, phases = c(60, 65))
+#' second <- detect_second_events(pep_subset, phases = c(60, 65))
 #' print(second)
 #' summary(second)
 #'
-#' # Plot from 1950 onwards for clearer trends
-#' plot(second, from_year = 1950)
-#' plot(second, scale = "relative", from_year = 1950)
+#' # Plot from 1980 onwards for clearer trends
+#' plot(second, from_year = 1980)
 #'
 #' # Method 2: Detect repeated observations at same station
-#' repeated <- detect_second_events(pep, method = "multiple_per_year")
+#' repeated <- detect_second_events(pep_subset, method = "multiple_per_year")
 #' print(repeated)
 #'
 #' # Method 3: Combine both detection methods
-#' all_events <- detect_second_events(pep, method = "both")
+#' all_events <- detect_second_events(pep_subset, method = "both")
 #' summary(all_events)
-#'
-#' # Analyze specific species (apple flowering)
-#' apple <- detect_second_events(
-#'   pep[species == "Malus domestica"],
-#'   phases = c(60, 65)
-#' )
-#' print(apple)
 #' }
 #'
 #' @seealso \code{\link{flag_outliers}} for general outlier detection,

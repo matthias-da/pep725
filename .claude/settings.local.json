@@ -10,7 +10,8 @@
       "WebSearch",
       "WebFetch(domain:search.r-project.org)",
       "Bash(quarto render:*)",
-      "Bash(__NEW_LINE_78726fff34bb660e__ echo \"All files now:\")"
+      "Bash(__NEW_LINE_78726fff34bb660e__ echo \"All files now:\")",
+      "Bash(done)"
     ]
   }
 }

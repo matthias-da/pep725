@@ -57,18 +57,24 @@ utils::globalVariables(c("n_obs", "completeness_pct", ".data"))
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
+#'
+#' # Use Swiss subset for faster computation
+#' pep_ch <- pep[country == "Switzerland"]
+#'
 #' # Basic completeness by species and phase
-#' comp <- pep_completeness(pep)
+#' comp <- pep_completeness(pep_ch)
 #' print(comp)
 #'
 #' # Filter to well-observed combinations
 #' comp_good <- comp[n_obs >= 100 & completeness_pct >= 80]
 #'
-#' # Completeness by country
-#' comp_country <- pep_completeness(pep, by = c("country", "genus", "phase_id"))
+#' # Completeness by country (use Alpine countries)
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#' comp_country <- pep_completeness(pep_alpine,
+#'                                  by = c("country", "genus", "phase_id"))
 #'
 #' # Year-level detail for a specific period
-#' comp_yearly <- pep_completeness(pep,
+#' comp_yearly <- pep_completeness(pep_ch,
 #'                                  year_range = c(1991, 2020),
 #'                                  include_years = TRUE)
 #'
@@ -321,7 +327,9 @@ summary.pep_completeness <- function(object, ...) {
 #'
 #' @examples
 #' \donttest{
-#' comp <- pep_completeness(pep, by = c("genus", "phase_id"))
+#' pep <- pep_download()
+#' pep_ch <- pep[country == "Switzerland"]
+#' comp <- pep_completeness(pep_ch, by = c("genus", "phase_id"))
 #' plot(comp, type = "heatmap")
 #' plot(comp, type = "bar", top = 15)
 #' }

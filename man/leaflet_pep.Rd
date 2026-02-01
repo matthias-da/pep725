@@ -32,7 +32,7 @@ selected <- leaflet_pep(wheat)
 }
 }
 \examples{
-\donttest{
+\dontrun{
 # Download synthetic data first
 pep <- pep_download()
 

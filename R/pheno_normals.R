@@ -65,33 +65,36 @@
 #' # Download synthetic data first
 #' pep <- pep_download()
 #'
-#' # Calculate normals for all species and phases by country
-#' normals_all <- pheno_normals(pep)
+#' # Use Swiss subset for faster computation
+#' pep_ch <- pep[country == "Switzerland"]
 #'
-#' # Normals for wheat (Triticum) only, heading phase (60)
-#' wheat_normals <- pheno_normals(pep,
-#'                                species = "Triticum",
+#' # Calculate normals for all species and phases
+#' normals_all <- pheno_normals(pep_ch)
+#'
+#' # Normals for apples, flowering phase (60)
+#' apple_normals <- pheno_normals(pep_ch,
+#'                                species = "Malus",
 #'                                phase_id = 60)
 #'
 #' # Using a pre-filtered subset
-#' wheat <- pep[genus == "Triticum" & phase_id %in% c(60, 100)]
-#' wheat_normals <- pheno_normals(wheat,
-#'                                by = c("country", "phase_id"))
+#' apples <- pep_ch[genus == "Malus" & phase_id %in% c(60, 65)]
+#' apple_normals <- pheno_normals(apples,
+#'                                by = c("species", "phase_id"))
 #'
 #' # Station-level normals for detailed analysis
-#' station_normals <- pheno_normals(pep,
-#'                                  species = "Triticum",
+#' station_normals <- pheno_normals(pep_ch,
+#'                                  species = "Malus",
 #'                                  phase_id = 60,
-#'                                  by = c("s_id", "country"))
+#'                                  by = c("s_id"))
 #'
 #' # Historical reference period
-#' historical <- pheno_normals(pep,
+#' historical <- pheno_normals(pep_ch,
 #'                             period = 1961:1990,
-#'                             species = "Triticum")
+#'                             species = "Malus")
 #'
 #' # Compare two periods
-#' period1 <- pheno_normals(pep, period = 1961:1990, species = "Triticum")
-#' period2 <- pheno_normals(pep, period = 1991:2020, species = "Triticum")
+#' period1 <- pheno_normals(pep_ch, period = 1961:1990, species = "Malus")
+#' period2 <- pheno_normals(pep_ch, period = 1991:2020, species = "Malus")
 #' shift <- period2$mean_doy - period1$mean_doy
 #' }
 #'

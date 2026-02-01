@@ -49,22 +49,29 @@
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
+#'
+#' # Use Alpine subset for faster computation
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#'
 #' subspecies_report(
-#'   pep,
+#'   pep_alpine,
 #'   subspecies_name = c("Malus domestica Api", "Malus domestica Boskoop"),
+#'   subregions = c("Switzerland", "Austria"),
 #'   metric = "all",
 #'   bbch_names = list("65"="Flowering", "87"="Maturity")
 #' )
 #'
 #' subspecies_report(
-#'   pep,
+#'   pep_alpine,
 #'   species_name = "Malus domestica",
+#'   subregions = c("Switzerland", "Austria"),
 #'   metric = c("n_obs","median_doy","completeness")
 #' )
 #'
 #' subspecies_report(
-#'   pep,
+#'   pep_alpine,
 #'   genus_name = "Malus",
+#'   subregions = c("Switzerland", "Austria"),
 #'   metric = "all"
 #' )
 #' }
@@ -171,15 +178,20 @@ subspecies_report <- function(
 #'
 #' @examples
 #' \donttest{
+#' pep <- pep_download()
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#'
 #' summarize_subspecies_availability(
-#'   pep,
+#'   pep_alpine,
 #'   species_name = "Malus domestica",
+#'   subregions = c("Switzerland", "Austria"),
 #'   metric = "all"
 #' )
 #'
 #' summarize_subspecies_availability(
-#'   pep,
+#'   pep_alpine,
 #'   subspecies_name = c("Malus domestica Api", "Malus domestica Boskoop"),
+#'   subregions = c("Switzerland", "Austria"),
 #'   metric = c("n_obs","median_doy")
 #' )
 #' }

@@ -9,7 +9,8 @@ Authors@R:
            )
 Description: Provides comprehensive tools for analyzing phenological data from
     the PEP725 Pan-European Phenology Database (Templ et al. 2018)
-    <doi:10.1007/s00484-018-1512-8> and other European sources. Core analytical
+    <doi:10.1007/s00484-018-1512-8> (Templ et al. 2026)
+    <doi:10.1111/nph.70869> and other European sources. Core analytical
     functions include calculation of phenological normals (climate baselines),
     anomaly detection, elevation and latitude gradient analysis, and spatial
     synchrony assessment. The package supports data import from PEP725 files,
@@ -21,7 +22,7 @@ Description: Provides comprehensive tools for analyzing phenological data from
     assessment tools help identify reliable observation series.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr, patchwork
+Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr
 Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, nlme, purrr, quantreg, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
 Suggests: knitr, rmarkdown, devtools, rnaturalearthdata, pls
 VignetteBuilder: knitr

@@ -59,8 +59,10 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' # Flag outliers
-#' pep_flagged <- flag_outliers(pep)
+#'
+#' # Use Swiss subset for faster outlier detection
+#' pep_ch <- pep[country == "Switzerland"]
+#' pep_flagged <- flag_outliers(pep_ch)
 #'
 #' # Overview of all outliers
 #' plot_outliers(pep_flagged, type = "overview")

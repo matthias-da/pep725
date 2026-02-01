@@ -28,8 +28,11 @@
 #' @seealso \code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
 #'
 #' @examples
-#' \donttest{
-#' agg <- regional_box_ts(species_name = "Triticum aestivum")$pep_agg
+#' \dontrun{
+#' # Requires pep_download() data - see regional_box_ts()
+#' pep <- pep_download()
+#' data(giss)
+#' agg <- regional_box_ts(pep, giss, species_name = "Triticum aestivum")$pep_agg
 #' df <- select_phase(agg, label = "PEP725", sp = "Triticum aestivum", yrmin = 1961)
 #' head(df)
 #' }

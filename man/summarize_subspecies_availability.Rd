@@ -53,15 +53,20 @@ and completeness ratios.
 }
 \examples{
 \donttest{
+pep <- pep_download()
+pep_alpine <- pep[country \%in\% c("Switzerland", "Austria")]
+
 summarize_subspecies_availability(
-  pep,
+  pep_alpine,
   species_name = "Malus domestica",
+  subregions = c("Switzerland", "Austria"),
   metric = "all"
 )
 
 summarize_subspecies_availability(
-  pep,
+  pep_alpine,
   subspecies_name = c("Malus domestica Api", "Malus domestica Boskoop"),
+  subregions = c("Switzerland", "Austria"),
   metric = c("n_obs","median_doy")
 )
 }

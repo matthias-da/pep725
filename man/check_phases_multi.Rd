@@ -35,13 +35,13 @@ at once.
 }
 \examples{
 \donttest{
-# Check multiple species
+# Check multiple species (use subset for speed)
 pep <- pep_download()
-result <- check_phases_multi(pep,
-                             species_list = c("Triticum aestivum",
-                                              "Malus domestica",
+pep_subset <- pep[country \%in\% c("Switzerland", "Austria")]
+result <- check_phases_multi(pep_subset,
+                             species_list = c("Malus domestica",
                                               "Vitis vinifera"),
-                             expected = c(60, 65, 100))
+                             expected = c(60, 65))
 print(result)
 }
 

@@ -21,29 +21,26 @@
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' # Example: aggregated flowering DOY by species
-#' pheno_plot_timeseries(data = pep, color_by = "functional_group",
+#'
+#' # Use Alpine subset for faster computation
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#'
+#' # Example: flowering DOY by functional group
+#' pheno_plot_timeseries(data = pep_alpine[phase_id == 65],
+#'                       color_by = "functional_group",
 #'                       facet_by = NULL, smooth = TRUE)
 #'
-#' # Example 1: all species, colored by functional group
+#' # Example: single species, colored by site
 #' pheno_plot_timeseries(
-#'   data = pep[phase_id == 65],
-#'   color_by = "functional_group",
-#'   smooth = TRUE,
-#'   title = "Flowering (BBCH 65) time series since 1961"
-#' )
-#'
-#' # Example 2: single species, colored by site
-#' pheno_plot_timeseries(
-#'   data = pep[species == "Triticum aestivum" & phase_id == 65],
+#'   data = pep_alpine[species == "Malus domestica" & phase_id == 60],
 #'   color_by = "s_id",
 #'   smooth = TRUE,
-#'   title = "Winter wheat flowering (BBCH 65) across sites"
+#'   title = "Apple flowering (BBCH 60) across sites"
 #' )
 #'
-#' # Example 3: facets by functional group
+#' # Example: facets by functional group
 #' pheno_plot_timeseries(
-#'   data = pep[phase_id == 65],
+#'   data = pep_alpine[phase_id == 65],
 #'   color_by = "species",
 #'   facet_by = "functional_group",
 #'   smooth = TRUE

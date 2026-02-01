@@ -50,40 +50,26 @@ Generates diagnostic plots from processed phenology–climate data. Supports thr
 Use \code{phase_select} to restrict to one phenophase for clearer interpretation or focused analysis.
 }
 \examples{
-\donttest{
-################################
-# NEW: functional_groups:
-d1 <- regional_box_ts(phase = 10, year_min = 1950,
-                                functional_group = "C4_summer_cereals",
-                                pep_for_giss = "near",
-                                lon_min = 8.0,  lon_max = 8.1, # default near Changins
-                                lat_min = 44.7, lat_max = 47.9, # default near Changins)
-)
+\dontrun{
+# Requires pep_download() data - see regional_box_ts()
+pep <- pep_download()
+data(giss)
+
+# Using functional groups:
+d1 <- regional_box_ts(pep, giss, phase = 10, year_min = 1950,
+                      functional_group = "C4_summer_cereals",
+                      pep_for_giss = "near",
+                      lon_min = 8.0,  lon_max = 8.1,
+                      lat_min = 44.7, lat_max = 47.9)
 pC <- pheno_plot(d1, type = "giss_smooth")
 pD <- pheno_plot(d1, type = "giss_sensitivity")
 pC | pD
 
-###############################
 # Without functional groups:
-out <- regional_box_ts(species_name = "Triticum aestivum", phase = 10)
-# GAM smooth for heading only
+out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
 p2 <- pheno_plot(out, type = "giss_smooth", smooth = "gam")
-
-# Robust climate sensitivity estimate
 p3 <- pheno_plot(out, type = "giss_sensitivity")
-
 p2 | p3
-}
-
-\donttest{
-## Another example:
-d1 <- regional_box_ts(phase = 31, year_min = 1950,
-                                pep_for_giss = "near",
-                                lon_min = 4.2,  lon_max = 8.1,
-                                lat_min = 44.7, lat_max = 48.1)
-pC <- pheno_plot(d1, type = "giss_smooth")
-pD <- pheno_plot(d1, type = "giss_sensitivity")
-pC | pD
 }
 
 }

@@ -26,7 +26,9 @@ bar charts.
 }
 \examples{
 \donttest{
-comp <- pep_completeness(pep, by = c("genus", "phase_id"))
+pep <- pep_download()
+pep_ch <- pep[country == "Switzerland"]
+comp <- pep_completeness(pep_ch, by = c("genus", "phase_id"))
 plot(comp, type = "heatmap")
 plot(comp, type = "bar", top = 15)
 }

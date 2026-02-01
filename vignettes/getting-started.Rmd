@@ -36,7 +36,9 @@ of about two weeks represents a significant ecological change.
 ## The PEP725 Database
 
 The [PEP725 Pan European Phenology Database](http://www.pep725.eu/) is one of
-the world's largest collections of plant phenological observations. It contains:
+the world's largest collections of plant phenological observations
+([Templ et al. 2018](https://doi.org/10.1007/s00484-018-1512-8);
+[Templ et al. 2026](https://doi.org/10.1111/nph.70869)). It contains:
 
 - **Over 12 million observations** from across Europe
 - **Records spanning 250+ years** (some stations have data back to the 1750s)

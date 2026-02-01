@@ -74,9 +74,12 @@ phenology-climate analysis. Warnings are issued if phases are missing for
 selected periods.
 }
 \examples{
-\donttest{
+\dontrun{
 pep <- pep_download()
-out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum")
+data(giss)
+data(meteoSwiss)
+out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
+                                       species_name = "Triticum aestivum")
 str(out$ts_tidy)
 gt <- pheno_plot_hh(out, type = "timeseries")
 gt
@@ -85,7 +88,7 @@ gc <- pheno_plot_hh(out, type = "giss_sensitivity")
 gt | gc
 
 # Example for other (selected) coordinates of the PEP data:
-out <- regional_box_ts_heading_harvest(pep, pep_for_giss = "near",
+out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
                         lon_min = 4.2,  lon_max = 8.1,
                         lat_min = 44.7, lat_max = 48.1
 )
@@ -93,7 +96,8 @@ str(out$ts_tidy)
 pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 
 # Example for other year selection
-out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum",
+out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
+                                       species_name = "Triticum aestivum",
                                        year_min = 1980)
 gt <- pheno_plot_hh(out, type = "timeseries")
 gc <- pheno_plot_hh(out, type = "giss_sensitivity")
@@ -101,7 +105,7 @@ gt | gc
 
 # Example to select only nearby stations (more useful that using all PEP station data)
 # Better to select only stations near Changins and for the last 40 years:
-d <- regional_box_ts_heading_harvest(pep, pep_for_giss = "near",
+d <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
                         lon_min = 4.2,  lon_max = 8.1,
                         lat_min = 44.7, lat_max = 48.1,
                         year_min = 1980

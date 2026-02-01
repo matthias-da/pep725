@@ -33,12 +33,8 @@ Required columns:
 \examples{
 \donttest{
 # From imported data
-dt <- pep_import("path/to/data")
+dt <- pep_download()
 pep_data <- new_pep(dt)
-
-# Validation will catch missing columns
-bad_data <- data.table(x = 1:10)
-new_pep(bad_data)  # Error: Missing required columns
 }
 
 }

@@ -43,7 +43,7 @@ anomaly detection, and data quality assessment.
 }
 }
 \examples{
-\donttest{
+\dontrun{
 # Run all demos interactively
 pep725_demo()
 

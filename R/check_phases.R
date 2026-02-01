@@ -52,27 +52,31 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' # Basic check for common phases
-#' check <- check_phases(pep)
 #'
-#' # Check specific phases for wheat
-#' check <- check_phases(pep,
-#'                       expected = c(60, 65, 87, 100),
-#'                       species = "Triticum aestivum")
+#' # Use Swiss subset for faster checking
+#' pep_ch <- pep[country == "Switzerland"]
+#'
+#' # Basic check for common phases
+#' check <- check_phases(pep_ch)
+#'
+#' # Check specific phases for apples
+#' check <- check_phases(pep_ch,
+#'                       expected = c(60, 65, 87),
+#'                       species = "Malus domestica")
 #'
 #' # Check within analysis window
-#' check <- check_phases(pep,
-#'                       expected = c(60, 100),
+#' check <- check_phases(pep_ch,
+#'                       expected = c(60, 65),
 #'                       year_min = 1991,
 #'                       year_max = 2020)
 #'
 #' # Use in pipeline with custom label
-#' wheat_data <- pep[species == "Triticum aestivum"]
-#' check_phases(wheat_data, expected = c(60, 100),
-#'              label = "Wheat analysis")
+#' apple_data <- pep_ch[species == "Malus domestica"]
+#' check_phases(apple_data, expected = c(60, 65),
+#'              label = "Apple analysis")
 #'
 #' # Silent check (no warnings)
-#' result <- check_phases(pep, warn = FALSE)
+#' result <- check_phases(pep_ch, warn = FALSE)
 #' if (!result$complete) {
 #'   # Handle missing phases programmatically
 #' }
@@ -321,13 +325,13 @@ print.phase_check <- function(x, ...) {
 #'
 #' @examples
 #' \donttest{
-#' # Check multiple species
+#' # Check multiple species (use subset for speed)
 #' pep <- pep_download()
-#' result <- check_phases_multi(pep,
-#'                              species_list = c("Triticum aestivum",
-#'                                               "Malus domestica",
+#' pep_subset <- pep[country %in% c("Switzerland", "Austria")]
+#' result <- check_phases_multi(pep_subset,
+#'                              species_list = c("Malus domestica",
 #'                                               "Vitis vinifera"),
-#'                              expected = c(60, 65, 100))
+#'                              expected = c(60, 65))
 #' print(result)
 #' }
 #'

@@ -34,32 +34,26 @@
 #' @seealso \code{\link{regional_box_ts}}, \code{\link[ggplot2]{ggplot}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
 #'
 #' @examples
-#' \donttest{
-#' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
+#' \dontrun{
+#' # Requires pep_download() data - see regional_box_ts_heading_harvest()
+#' pep <- pep_download()
+#' data(giss)
+#' data(meteoSwiss)
+#'
+#' out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
+#'                                        species_name = "Triticum aestivum")
 #' str(out$ts_tidy)
 #' gt <- pheno_plot_hh(out, type = "timeseries")
 #' gt
 #' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 #' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
 #' gt | gc
-#' }
-#' \donttest{
-#' # Example to select only nearby stations (more useful that using all PEP station data)
 #'
-#' # Better to select only stations near Changins and for the last 40 years:
-#' d <- regional_box_ts_heading_harvest(pep_for_giss = "near",
-#'                         lon_min = 4.2,  lon_max = 8.1, # default near Changins
-#'                         lat_min = 44.7, lat_max = 48.1, # default near Changins
-#'                         year_min = 1980 # <- only for the last 40 years
-#' )
-#' # becomes linear!
-#' str(out$ts_tidy)
-#' gt <- pheno_plot_hh(out, type = "timeseries")
-#' gt
-#' pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-#' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-#' pcs <- pheno_plot_hh(d, type = "giss_smooth") # TODO: wrong
-#' pcs | gc
+#' # Select only nearby stations and recent years:
+#' d <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
+#'                         lon_min = 4.2,  lon_max = 8.1,
+#'                         lat_min = 44.7, lat_max = 48.1,
+#'                         year_min = 1980)
 #' pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
 #' }
 #' @author Matthias Templ

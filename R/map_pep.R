@@ -105,7 +105,7 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #' @importFrom stats sd coef lm na.omit
 #' @importFrom sf st_as_sf st_bbox
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' pep <- pep_download()
 #'
 #' # Simple map without Google Maps (no API key needed)
