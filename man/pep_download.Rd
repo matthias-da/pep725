@@ -52,7 +52,7 @@ If you have access to real PEP725 data, you can import it using
 }
 
 \examples{
-\dontrun{
+\donttest{
 # Download synthetic data
 pep <- pep_download()
 

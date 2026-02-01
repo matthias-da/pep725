@@ -95,29 +95,32 @@ geographic context, species biology
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 
-# Detect late-season flowering events
+# Method 1: Detect late-season flowering events (default)
 second <- detect_second_events(pep, phases = c(60, 65))
 print(second)
 summary(second)
-plot(second)
 
-# Focus on very late events (October onwards)
-second_late <- detect_second_events(pep, late_threshold = 275)
+# Plot from 1950 onwards for clearer trends
+plot(second, from_year = 1950)
+plot(second, scale = "relative", from_year = 1950)
 
-# Detect actual repeated observations at same station
+# Method 2: Detect repeated observations at same station
 repeated <- detect_second_events(pep, method = "multiple_per_year")
+print(repeated)
 
-# Combine both methods
+# Method 3: Combine both detection methods
 all_events <- detect_second_events(pep, method = "both")
+summary(all_events)
 
-# Analyze specific species
-apple_second <- detect_second_events(
+# Analyze specific species (apple flowering)
+apple <- detect_second_events(
   pep[species == "Malus domestica"],
   phases = c(60, 65)
 )
+print(apple)
 }
 
 }

@@ -78,29 +78,32 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #'
-#' # Detect late-season flowering events
+#' # Method 1: Detect late-season flowering events (default)
 #' second <- detect_second_events(pep, phases = c(60, 65))
 #' print(second)
 #' summary(second)
-#' plot(second)
 #'
-#' # Focus on very late events (October onwards)
-#' second_late <- detect_second_events(pep, late_threshold = 275)
+#' # Plot from 1950 onwards for clearer trends
+#' plot(second, from_year = 1950)
+#' plot(second, scale = "relative", from_year = 1950)
 #'
-#' # Detect actual repeated observations at same station
+#' # Method 2: Detect repeated observations at same station
 #' repeated <- detect_second_events(pep, method = "multiple_per_year")
+#' print(repeated)
 #'
-#' # Combine both methods
+#' # Method 3: Combine both detection methods
 #' all_events <- detect_second_events(pep, method = "both")
+#' summary(all_events)
 #'
-#' # Analyze specific species
-#' apple_second <- detect_second_events(
+#' # Analyze specific species (apple flowering)
+#' apple <- detect_second_events(
 #'   pep[species == "Malus domestica"],
 #'   phases = c(60, 65)
 #' )
+#' print(apple)
 #' }
 #'
 #' @seealso \code{\link{flag_outliers}} for general outlier detection,
@@ -502,12 +505,16 @@ summary.second_events <- function(object, ...) {
 #'       over time and reveals whether second events are becoming proportionally
 #'       more common.}
 #'   }
+#' @param from_year Integer. If specified, only show data from this year onwards
+#'   in timeline and overview plots. Useful for focusing on recent trends.
+#'   Default is \code{NULL} (show all years).
 #' @param ... Additional arguments
 #' @return A ggplot object (invisibly)
 #' @export
 #' @import ggplot2
 plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "map"),
-                               scale = c("absolute", "relative"), ...) {
+                               scale = c("absolute", "relative"),
+                               from_year = NULL, ...) {
   type <- match.arg(type)
   scale <- match.arg(scale)
 
@@ -516,6 +523,16 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
   if (nrow(events) == 0) {
     message("No events to plot")
     return(invisible(NULL))
+  }
+
+
+  # Filter by from_year if specified
+  if (!is.null(from_year)) {
+    events <- events[year >= from_year]
+    if (nrow(events) == 0) {
+      message("No events to plot after filtering to from_year = ", from_year)
+      return(invisible(NULL))
+    }
   }
 
   if (type == "overview") {
@@ -528,9 +545,19 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
       theme_minimal()
 
     # Prepare data for timeline panel based on scale
-    if (scale == "relative" && !is.null(x$total_by_year)) {
+    # Filter by_year data if from_year specified
+    by_year_filtered <- x$by_year
+    total_by_year_filtered <- x$total_by_year
+    if (!is.null(from_year)) {
+      by_year_filtered <- by_year_filtered[year >= from_year]
+      if (!is.null(total_by_year_filtered)) {
+        total_by_year_filtered <- total_by_year_filtered[year >= from_year]
+      }
+    }
+
+    if (scale == "relative" && !is.null(total_by_year_filtered)) {
       # Merge with total observations to calculate proportion
-      plot_data <- merge(x$by_year, x$total_by_year, by = "year", all.x = TRUE)
+      plot_data <- merge(by_year_filtered, total_by_year_filtered, by = "year", all.x = TRUE)
       plot_data[, proportion := n_events / n_total * 100]  # as percentage
       p2 <- ggplot(plot_data, aes(x = year, y = proportion)) +
         geom_col(fill = "darkred", alpha = 0.7) +
@@ -539,7 +566,7 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
              x = "", y = "% of Total Observations") +
         theme_minimal()
     } else {
-      p2 <- ggplot(x$by_year, aes(x = year, y = n_events)) +
+      p2 <- ggplot(by_year_filtered, aes(x = year, y = n_events)) +
         geom_col(fill = "darkred", alpha = 0.7) +
         geom_smooth(method = "loess", se = FALSE, color = "black", linewidth = 0.8) +
         labs(title = "Second Events Over Time",
@@ -547,10 +574,12 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
         theme_minimal()
     }
 
-    if (nrow(x$by_month) > 0) {
+    # Recalculate monthly distribution from filtered events
+    if (nrow(events) > 0 && "month" %in% names(events)) {
+      by_month_filtered <- events[, .(n_events = .N), by = month][order(month)]
       month_abbr <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-      plot_month <- data.table::copy(x$by_month)
+      plot_month <- data.table::copy(by_month_filtered)
       plot_month[, month_label := month_abbr[month]]
       plot_month[, month_label := factor(month_label, levels = month_abbr)]
       p3 <- ggplot(plot_month, aes(x = month_label, y = n_events)) +
@@ -581,9 +610,19 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
   }
 
   if (type == "timeline") {
-    if (scale == "relative" && !is.null(x$total_by_year)) {
+    # Filter by_year data if from_year specified
+    by_year_filtered <- x$by_year
+    total_by_year_filtered <- x$total_by_year
+    if (!is.null(from_year)) {
+      by_year_filtered <- by_year_filtered[year >= from_year]
+      if (!is.null(total_by_year_filtered)) {
+        total_by_year_filtered <- total_by_year_filtered[year >= from_year]
+      }
+    }
+
+    if (scale == "relative" && !is.null(total_by_year_filtered)) {
       # Merge with total observations to calculate proportion
-      plot_data <- merge(x$by_year, x$total_by_year, by = "year", all.x = TRUE)
+      plot_data <- merge(by_year_filtered, total_by_year_filtered, by = "year", all.x = TRUE)
       plot_data[, proportion := n_events / n_total * 100]  # as percentage
       p <- ggplot(plot_data, aes(x = year, y = proportion)) +
         geom_line(color = "darkred", linewidth = 1) +
@@ -595,7 +634,7 @@ plot.second_events <- function(x, type = c("overview", "timeline", "seasonal", "
              x = "Year", y = "% of Total Observations") +
         theme_minimal()
     } else {
-      p <- ggplot(x$by_year, aes(x = year, y = n_events)) +
+      p <- ggplot(by_year_filtered, aes(x = year, y = n_events)) +
         geom_line(color = "darkred", linewidth = 1) +
         geom_point(color = "darkred", size = 2) +
         geom_smooth(method = "loess", se = TRUE, alpha = 0.2, color = "black") +

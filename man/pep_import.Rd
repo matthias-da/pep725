@@ -36,7 +36,7 @@ format suitable for further phenological analysis, such as sensitivity and trend
 \examples{
 \dontrun{
 # path to all csv files from pep725
-mypath <- "~/workspace25/hail/data/Data_PEP725_all/"
+mypath <- "~/data/Data_PEP725_all/"
 pep_data <- pep_import(path = mypath)
 str(pep_data)
 }

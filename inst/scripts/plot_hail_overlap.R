@@ -90,7 +90,7 @@
 #'
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(hail)
 #' pep <- pep_download()
 #' data(giss)

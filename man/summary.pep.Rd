@@ -25,7 +25,8 @@ Provides a detailed phenological summary of the dataset, including
 breakdowns by species, phase, country, and temporal coverage.
 }
 \examples{
-\dontrun{
+\donttest{
+pep <- pep_download()
 summary(pep)
 summary(pep, by = "phase")
 summary(pep, by = "country")

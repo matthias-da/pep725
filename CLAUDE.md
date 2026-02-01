@@ -57,6 +57,7 @@ Each analysis function returns a classed object with print/summary/plot methods:
 | `pheno_turning` | `pheno_trend_turning()` | Trend turning point detection (Mann-Kendall) |
 | `pep_connectivity` | `check_connectivity()` | Station-year connectivity check |
 | `pep_outliers` | `flag_outliers()` | Outlier detection (30-day rule, MAD, IQR, z-score) |
+| `second_events` | `detect_second_events()` | Second flowering/repeated event detection |
 | `pls_phenology` | `pls_phenology()` | PLS regression for phenology-temperature relationships |
 
 ### Data Flow
@@ -82,6 +83,7 @@ Each analysis function returns a classed object with print/summary/plot methods:
 - `R/calc_daylength.R` - Photoperiod calculations
 - `R/calc_thermal_units.R` - Growing Degree Days (GDD) calculation
 - `R/flag_outliers.R` - Outlier detection using 30-day rule or statistical methods
+- `R/detect_second_events.R` - Second flowering/repeated event detection
 - `R/pls_phenology.R` - Robust PLS analysis for phenology-temperature relationships
 - `R/leaflet_pep.R` - Interactive Shiny map gadget
 - `R/zzz.R` - Package startup, loads auxiliary datasets
@@ -99,14 +101,15 @@ Phenological phases use BBCH codes (e.g., 60=heading/flowering, 65=full flowerin
 ### Examples in Roxygen
 
 All examples that use `pep` data must:
-1. Be wrapped in `\dontrun{}` (since `pep_download()` requires internet)
-2. Call `pep <- pep_download()` BEFORE using the `pep` variable
-3. Use `data(pep_seed)` for small examples that can run without internet
+1. Be wrapped in `\donttest{}` (preferred for CRAN) since `pep_download()` requires internet
+2. Use `\dontrun{}` only for examples that truly cannot run (e.g., require local file paths)
+3. Call `pep <- pep_download()` BEFORE using the `pep` variable
+4. Use `data(pep_seed)` for small examples that can run without internet
 
 Example structure:
 ```r
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' result <- some_function(pep, ...)
 #' }
@@ -134,7 +137,6 @@ Each dataset needs these roxygen tags:
 |---------|-------------|----------|
 | `pep_seed` | Small subset for testing (1,319 rows) | `data/pep_seed.rda` |
 | `giss` | NASA GISS temperature anomalies (1880-2024) | `data/giss.rda` |
-| `hail` | Daily hail probability (Austria, Germany, Switzerland) | `data/hail.rda` |
 | `meteoSwiss` | MeteoSwiss phenology observations | `data/meteoSwiss.rda` |
 
 Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()` and cached locally.
@@ -145,7 +147,10 @@ Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()
 GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 
 ### Known Issues
-- Non-standard files at top level: `CLAUDE.md`, `Rplots.pdf`, `pepperPaper/`
+- Non-standard files at top level: `CLAUDE.md`, `pepperPaper/`
+
+### Excluded Content
+- Hail-related functions moved to `inst/scripts/` (excluded via `.Rbuildignore`)
 
 ### Key Functions by Category
 
@@ -168,11 +173,13 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 - `pep_completeness()` - Coverage assessment
 - `check_phases()` - Phase validation
 - `flag_outliers()` - Outlier detection
-- `plot_outliers()` - Visualize outliers for inspection (detect second flowering, errors)
+- `plot_outliers()` - Visualize outliers for inspection
+- `detect_second_events()` - Detect second flowering/repeated events
+- `plot.second_events()` - Visualize second events (supports `scale = "relative"` for proportional display)
 
 **Visualization:**
 - `pheno_plot()` - General phenology plots
 - `pheno_plot_hh()` - Heading/harvest specific plots
 - `plot_phenology_trends()` - Trend visualization
 - `leaflet_pep()` - Interactive maps
-- `map_pep()` - Static Google Maps
+- `map_pep()` - Static maps (use `background = "none"` for no API key required)

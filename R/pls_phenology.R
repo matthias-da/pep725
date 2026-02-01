@@ -78,11 +78,11 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' through June 2020.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(pep_seed)
 #'
-#' # Create example temperature data
-#' years <- 2000:2015
+#' # Create example temperature data (fewer years for speed)
+#' years <- 2005:2012
 #' temp <- data.frame(
 #'   year = rep(years, each = 365),
 #'   doy = rep(1:365, length(years)),
@@ -90,14 +90,9 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #'   Tmax = rnorm(365 * length(years), mean = 15, sd = 8)
 #' )
 #'
-#' # Run robust PLS analysis
-#' result <- pls_phenology(pep_seed, temp)
-#'
-#' # View VIP scores
-#' plot(result)
-#'
-#' # Use standard PLS
-#' result_std <- pls_phenology(pep_seed, temp, method = "standard")
+#' # Run standard PLS (fast: no CV, fixed components)
+#' result <- pls_phenology(pep_seed, temp, method = "standard", ncomp = 2)
+#' print(result)
 #' }
 #'
 #' @references

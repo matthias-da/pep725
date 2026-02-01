@@ -57,7 +57,7 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' # Flag outliers
 #' pep_flagged <- flag_outliers(pep)

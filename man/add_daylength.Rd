@@ -18,16 +18,10 @@ Adds a daylength column to a phenological dataset based on the
 observation day and station latitude.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 pep <- add_daylength(pep)
-
-# Analyze relationship between phenology and photoperiod
-library(ggplot2)
-ggplot(pep, aes(x = daylength, y = day)) +
-  geom_point(alpha = 0.1) +
-  geom_smooth() +
-  facet_wrap(~phase_id)
+head(pep[, .(day, lat, daylength)])
 }
 
 }

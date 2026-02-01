@@ -38,7 +38,7 @@
 #' @seealso \code{\link{pep_download}}, \code{\link{pep_seed}}, \code{\link{simulate_pep}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Download full synthetic dataset
 #' pep <- pep_download()
 #' summary(pep)
@@ -114,70 +114,4 @@ NULL
 #' plot(giss$year, giss$dT, type = "l", main = "Global Temperature Anomalies (GISS)",
 #'      ylab = "Anomaly (degC)", xlab = "Year")
 "giss"
-
-#' Daily Hail Probability Data for Austria, Germany, and Switzerland
-#'
-#' This dataset contains daily hail probability estimates derived from
-#' convection-permitting climate simulations. It includes mean hail probability,
-#' lower and upper uncertainty bounds, and spatial metadata (number of grid
-#' cells and total area) for each day of the year (DOY), for each country and for
-#' multiple climate scenarios.
-#'
-#' The dataset is provided as a `data.table` / `data.frame` with 4,392 rows
-#' (365–366 DOY × countries × scenarios) and nine variables.
-#'
-#' @format A data frame with 4,392 observations and 9 variables:
-#' \describe{
-#'   \item{Subdomain}{Character. Geographic subdomain identifier
-#'         (e.g., `"Austria"`, `"Switzerland"`, `"Germany"`).}
-#'   \item{DOY}{Integer. Day of year (1–365 or 1–366).}
-#'   \item{mean}{Numeric. Mean daily hail probability across all grid cells
-#'         belonging to the subdomain and scenario.}
-#'   \item{q5}{Numeric. 5th percentile of the daily hail probability distribution
-#'         across grid cells (lower uncertainty bound).}
-#'   \item{q95}{Numeric. 95th percentile of the daily hail probability distribution
-#'         across grid cells (upper uncertainty bound).}
-#'   \item{n_cells}{Integer. Number of model grid cells contributing to the
-#'         aggregated hail probabilities for that subdomain.}
-#'   \item{area}{Numeric. Total area (in km² or model units) covered by the
-#'         grid cells included in the aggregation.}
-#'   \item{Country}{Character. Country code or name used for grouping in
-#'         analyses (e.g., `"Austria"`, `"Germany"`).}
-#'   \item{Scenario}{Character. Climate scenario identifier, typically including
-#'         `"ctrl"` (historical control simulation) and future scenarios.}
-#' }
-#'
-#' @details
-#' The hail probabilities are derived from climate simulations using a
-#' convection-permitting model. The values represent **aggregated hail
-#' occurrence probabilities**, averaged across all cells belonging to each
-#' country’s subdomain.
-#'
-#' This dataset is typically used for:
-#' * climate impact assessments,
-#' * phenology–hail overlap studies,
-#' * agricultural risk modelling,
-#' * scenario comparisons (CTRL vs. PGW/SCEN).
-#'
-#' @seealso
-#' \code{\link{integral}} for integrating hail probabilities over phenological windows.
-#'
-#' @examples
-#' \dontrun{
-#' # Inspect structure
-#' str(hail)
-#'
-#' # Plot mean hail probability for Austria (CTRL)
-#' library(ggplot2)
-#' ggplot(hail[hail$Country == "Austria" & hail$Scenario == "ctrl", ],
-#'        aes(DOY, mean)) +
-#'   geom_line() +
-#'   labs(y = "Mean hail probability", x = "Day of Year")
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name hail
-#' @usage data(hail)
-"hail"
 

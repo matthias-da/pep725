@@ -125,7 +125,7 @@ roughly from -3 to +3 for typical data:
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 
 # Simple map without Google Maps (no API key needed)

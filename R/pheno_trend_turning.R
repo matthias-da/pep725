@@ -50,22 +50,17 @@ utils::globalVariables(c("year", "day", "tau_prog", "tau_retr", "is_turning"))
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' pep <- pep_download()
-#' # Analyze wheat heading trends
-#' wheat <- pep[species == "Triticum aestivum" & phase_id == 60]
-#' turning <- pheno_trend_turning(wheat)
-#' print(turning)
-#' plot(turning)
-#'
-#' # Analyze by country
-#' turning_country <- pheno_trend_turning(pep,
-#'                                         by = c("country", "genus", "phase_id"))
-#' print(turning_country)
-#'
-#' # Simple vector input
+#' \donttest{
+#' # Simple vector input (fast)
 #' doy_series <- c(120, 118, 122, 115, 110, 108, 112, 105, 102, 100)
 #' turning <- pheno_trend_turning(doy_series)
+#' print(turning)
+#'
+#' # Using pep_seed data (no grouping for speed)
+#' data(pep_seed)
+#' wheat <- pep_seed[pep_seed$species == "Triticum aestivum" &
+#'                   pep_seed$phase_id == 60, ]
+#' turning <- pheno_trend_turning(wheat)
 #' }
 #'
 #' @references

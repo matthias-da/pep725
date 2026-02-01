@@ -57,7 +57,7 @@ Global temperature data are taken from the \code{\link{giss}} dataset. Phenologi
 Aggregation and preparation is assumed to be done via \code{\link{regional_box_ts}}.
 }
 \examples{
-\dontrun{
+\donttest{
 out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
 str(out$ts_tidy)
 gt <- pheno_plot_hh(out, type = "timeseries")
@@ -66,7 +66,7 @@ pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
 gc <- pheno_plot_hh(out, type = "giss_sensitivity")
 gt | gc
 }
-\dontrun{
+\donttest{
 # Example to select only nearby stations (more useful that using all PEP station data)
 
 # Better to select only stations near Changins and for the last 40 years:

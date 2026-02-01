@@ -64,24 +64,15 @@ utils::globalVariables(c("year", "day", "s_id", "station", "year_effect",
 #' identify and investigate these.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
-#' # Create combined series for wheat heading
-#' wheat <- pep[species == "Triticum aestivum" & phase_id == 60]
-#' combined <- pheno_combine(wheat)
+#' # Filter to one country for speed (smaller subset)
+#' wheat_de <- pep[species == "Triticum aestivum" &
+#'                 phase_id == 60 & country == "Germany"]
+#'
+#' # Create combined series using fast OLS method
+#' combined <- pheno_combine(wheat_de, method = "ols")
 #' print(combined)
-#' plot(combined)
-#'
-#' # Robust estimation with grouping by country
-#' combined_country <- pheno_combine(pep,
-#'                                    by = c("country", "genus", "phase_id"),
-#'                                    method = "robust")
-#'
-#' # Mixed-effects model
-#' combined_mixed <- pheno_combine(wheat, method = "mixed")
-#'
-#' # Identify outliers (residuals > 30 days)
-#' outliers <- combined$residuals[abs(residual) > 30]
 #' }
 #'
 #' @references
@@ -521,7 +512,8 @@ check_connectivity_internal <- function(dt) {
 #' the disconnected parts.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' pep <- pep_download()
 #' conn <- check_connectivity(pep)
 #' if (!conn$is_connected) {
 #'   warning("Data has ", conn$n_sets, " disconnected sets")

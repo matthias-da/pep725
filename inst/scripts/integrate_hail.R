@@ -27,7 +27,7 @@
 #'   \item{s_scen}{Integrated hail probability for SCEN}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(hail)
 #' data(pep)
 #'
@@ -141,7 +141,7 @@ integral_hail <- function(
 #' results; current implementation uses overall means.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(pep725)
 #' data(pep)
 #' pep <- pep[pep$genus == genus_name, ]

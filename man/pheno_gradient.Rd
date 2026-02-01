@@ -86,7 +86,7 @@ Positive slopes indicate later phenology at higher elevations/latitudes.
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Altitude gradient for wheat heading
 grad_alt <- pheno_gradient(pep,

@@ -34,7 +34,7 @@
 #' @seealso \code{\link{regional_box_ts}}, \code{\link[ggplot2]{ggplot}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' out <- regional_box_ts_heading_harvest(species_name = "Triticum aestivum")
 #' str(out$ts_tidy)
 #' gt <- pheno_plot_hh(out, type = "timeseries")
@@ -43,7 +43,7 @@
 #' gc <- pheno_plot_hh(out, type = "giss_sensitivity")
 #' gt | gc
 #' }
-#' \dontrun{
+#' \donttest{
 #' # Example to select only nearby stations (more useful that using all PEP station data)
 #'
 #' # Better to select only stations near Changins and for the last 40 years:

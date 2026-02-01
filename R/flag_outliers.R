@@ -64,7 +64,7 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(pep_seed)
 #'
 #' # Flag outliers using 30-day rule

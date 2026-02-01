@@ -47,7 +47,7 @@
 #' @seealso \code{\link{pep_import}}, \code{\link{meteoSwiss}}, \code{\link{giss}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum")
 #' str(out$ts_tidy)

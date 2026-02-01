@@ -50,7 +50,7 @@ Generates diagnostic plots from processed phenology–climate data. Supports thr
 Use \code{phase_select} to restrict to one phenophase for clearer interpretation or focused analysis.
 }
 \examples{
-\dontrun{
+\donttest{
 ################################
 # NEW: functional_groups:
 d1 <- regional_box_ts(phase = 10, year_min = 1950,
@@ -75,7 +75,7 @@ p3 <- pheno_plot(out, type = "giss_sensitivity")
 p2 | p3
 }
 
-\dontrun{
+\donttest{
 ## Another example:
 d1 <- regional_box_ts(phase = 31, year_min = 1950,
                                 pep_for_giss = "near",

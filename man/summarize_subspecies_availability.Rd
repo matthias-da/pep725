@@ -52,7 +52,7 @@ observations, station counts, first/last observation years, median DOY,
 and completeness ratios.
 }
 \examples{
-\dontrun{
+\donttest{
 summarize_subspecies_availability(
   pep,
   species_name = "Malus domestica",

@@ -50,7 +50,7 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' # Basic check for common phases
 #' check <- check_phases(pep)
@@ -67,6 +67,7 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #'                       year_max = 2020)
 #'
 #' # Use in pipeline with custom label
+#' wheat_data <- pep[species == "Triticum aestivum"]
 #' check_phases(wheat_data, expected = c(60, 100),
 #'              label = "Wheat analysis")
 #'
@@ -319,8 +320,9 @@ print.phase_check <- function(x, ...) {
 #' @return A \code{data.table} summarizing phase availability per species
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Check multiple species
+#' pep <- pep_download()
 #' result <- check_phases_multi(pep,
 #'                              species_list = c("Triticum aestivum",
 #'                                               "Malus domestica",

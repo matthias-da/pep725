@@ -24,7 +24,7 @@ Simulate synthetic pep data for a given phenology dataset
 keeping station-year-species-phase structure intact
 }
 \examples{
-\dontrun{
+\donttest{
 # Download or load PEP data first
 pep <- pep_download()
 

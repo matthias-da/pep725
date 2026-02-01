@@ -32,7 +32,8 @@ disconnected, the combined series cannot be uniquely estimated across
 the disconnected parts.
 }
 \examples{
-\dontrun{
+\donttest{
+pep <- pep_download()
 conn <- check_connectivity(pep)
 if (!conn$is_connected) {
   warning("Data has ", conn$n_sets, " disconnected sets")

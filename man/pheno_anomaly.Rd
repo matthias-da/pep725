@@ -102,7 +102,7 @@ considered extreme
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Calculate anomalies relative to 1961-1990 baseline
 anomalies <- pheno_anomaly(pep,

@@ -23,7 +23,7 @@
 #' @author Matthias Templ
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' small <- data.table(
 #'   lat = c(48.2, 51.0, 47.5),
 #'   lon = c(16.3, 10.1, 8.5)

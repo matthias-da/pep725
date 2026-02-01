@@ -16,7 +16,7 @@ Invisible \code{TRUE} if cache was cleared, \code{FALSE} otherwise.
 Removes cached synthetic PEP data from the local cache directory.
 }
 \examples{
-\dontrun{
+\donttest{
 # Clear the cache
 pep_cache_clear()
 

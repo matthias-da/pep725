@@ -46,7 +46,7 @@ Provides comprehensive coverage statistics for phenological datasets,
 including temporal, geographical, and species dimensions.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 
 # Full coverage report

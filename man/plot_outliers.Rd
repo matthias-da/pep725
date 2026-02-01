@@ -71,7 +71,7 @@ the main flowering distribution
 }
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Flag outliers
 pep_flagged <- flag_outliers(pep)

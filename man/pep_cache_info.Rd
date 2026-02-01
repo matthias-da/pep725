@@ -13,7 +13,7 @@ A list with cache information, or NULL if no cache exists.
 Returns information about the cached PEP data.
 }
 \examples{
-\dontrun{
+\donttest{
 # Check cache status
 pep_cache_info()
 }

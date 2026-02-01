@@ -16,7 +16,8 @@ Logical; \code{TRUE} if \code{x} is of class \code{pep}.
 Test if Object is a PEP725 Data Object
 }
 \examples{
-\dontrun{
+\donttest{
+pep <- pep_download()
 is.pep(pep)
 is.pep(data.frame(x = 1))
 }

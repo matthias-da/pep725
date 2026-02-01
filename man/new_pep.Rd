@@ -31,7 +31,7 @@ Required columns:
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # From imported data
 dt <- pep_import("path/to/data")
 pep_data <- new_pep(dt)

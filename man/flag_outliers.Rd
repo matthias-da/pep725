@@ -84,7 +84,7 @@ other quality metrics.}
 }
 
 \examples{
-\dontrun{
+\donttest{
 data(pep_seed)
 
 # Flag outliers using 30-day rule

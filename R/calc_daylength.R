@@ -146,16 +146,10 @@ calc_max_daylength <- function(lat) {
 #' @return The input data with an added \code{daylength} column (hours).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' pep <- add_daylength(pep)
-#'
-#' # Analyze relationship between phenology and photoperiod
-#' library(ggplot2)
-#' ggplot(pep, aes(x = daylength, y = day)) +
-#'   geom_point(alpha = 0.1) +
-#'   geom_smooth() +
-#'   facet_wrap(~phase_id)
+#' head(pep[, .(day, lat, daylength)])
 #' }
 #'
 #' @seealso \code{\link{calc_daylength}} for the underlying calculation
@@ -171,7 +165,9 @@ add_daylength <- function(pep) {
   }
 
   # Calculate daylength for each observation
-  pep[, daylength := calc_daylength(day, lat)$daylength]
+  # Use set() to avoid issues with pep class's [ method
+  daylength_vals <- calc_daylength(pep$day, pep$lat)$daylength
+  data.table::set(pep, j = "daylength", value = daylength_vals)
 
   pep
 }

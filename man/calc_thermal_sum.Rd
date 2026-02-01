@@ -52,7 +52,7 @@ This is useful for:
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # Load phenology data
 data(pep_seed)
 

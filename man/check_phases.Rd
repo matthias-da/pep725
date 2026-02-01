@@ -72,7 +72,7 @@ potential issues while still proceeding with available data.
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Basic check for common phases
 check <- check_phases(pep)
@@ -89,6 +89,7 @@ check <- check_phases(pep,
                       year_max = 2020)
 
 # Use in pipeline with custom label
+wheat_data <- pep[species == "Triticum aestivum"]
 check_phases(wheat_data, expected = c(60, 100),
              label = "Wheat analysis")
 

@@ -20,7 +20,8 @@ Invisibly returns \code{x}.
 Displays a concise summary of the PEP725 phenological dataset.
 }
 \examples{
-\dontrun{
+\donttest{
+pep <- pep_download()
 print(pep)
 }
 

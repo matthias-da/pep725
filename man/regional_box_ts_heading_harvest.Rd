@@ -74,7 +74,7 @@ phenology-climate analysis. Warnings are issued if phases are missing for
 selected periods.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 out <- regional_box_ts_heading_harvest(pep, species_name = "Triticum aestivum")
 str(out$ts_tidy)

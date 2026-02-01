@@ -81,7 +81,7 @@ distributions common in phenological data.
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Assess quality for all stations
 quality <- pep_quality(pep)

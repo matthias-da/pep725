@@ -67,7 +67,7 @@ utils::globalVariables(c(
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # From imported data
 #' dt <- pep_import("path/to/data")
 #' pep_data <- new_pep(dt)
@@ -144,7 +144,8 @@ validate_pep <- function(x) {
 #' @return Logical; \code{TRUE} if \code{x} is of class \code{pep}.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' pep <- pep_download()
 #' is.pep(pep)
 #' is.pep(data.frame(x = 1))
 #' }
@@ -184,7 +185,8 @@ as.pep <- function(x, ...) {
 #' @return Invisibly returns \code{x}.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' pep <- pep_download()
 #' print(pep)
 #' }
 #'
@@ -254,7 +256,8 @@ print.pep <- function(x, n = 5, ...) {
 #'   printed to console.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' pep <- pep_download()
 #' summary(pep)
 #' summary(pep, by = "phase")
 #' summary(pep, by = "country")
@@ -392,7 +395,8 @@ summary.pep <- function(object, by = c("species", "phase", "country", "year"),
 #' @return A ggplot object (invisibly).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' pep <- pep_download()
 #' plot(pep)
 #' plot(pep, type = "timeseries")
 #' plot(pep, type = "histogram")
@@ -620,7 +624,7 @@ bbch_description <- function(codes, na.rm = TRUE, sort = TRUE) {
 #'   }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #'
 #' # Full coverage report

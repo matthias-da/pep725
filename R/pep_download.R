@@ -38,7 +38,7 @@
 #' \code{\link{pep_import}} instead.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Download synthetic data
 #' pep <- pep_download()
 #'
@@ -189,7 +189,7 @@ pep_download <- function(url = NULL,
 #' @return Invisible \code{TRUE} if cache was cleared, \code{FALSE} otherwise.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Clear the cache
 #' pep_cache_clear()
 #'
@@ -227,7 +227,7 @@ pep_cache_clear <- function(quiet = FALSE) {
 #' @return A list with cache information, or NULL if no cache exists.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Check cache status
 #' pep_cache_info()
 #' }

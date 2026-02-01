@@ -43,7 +43,7 @@ suitable for testing and examples.
 }
 
 \examples{
-\dontrun{
+\donttest{
 # Download full synthetic dataset
 pep <- pep_download()
 summary(pep)

@@ -210,7 +210,7 @@ calc_thermal_units <- function(tmin,
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load phenology data
 #' data(pep_seed)
 #'

@@ -50,7 +50,7 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' # Calculate synchrony for wheat heading by country and year
 #' sync <- pheno_synchrony(pep,

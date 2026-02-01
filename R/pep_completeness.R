@@ -55,7 +55,7 @@ utils::globalVariables(c("n_obs", "completeness_pct", ".data"))
 #' of 100% means every year in the span has data.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' # Basic completeness by species and phase
 #' comp <- pep_completeness(pep)
@@ -320,7 +320,7 @@ summary.pep_completeness <- function(object, ...) {
 #' @return A ggplot object (invisibly)
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' comp <- pep_completeness(pep, by = c("genus", "phase_id"))
 #' plot(comp, type = "heatmap")
 #' plot(comp, type = "bar", top = 15)

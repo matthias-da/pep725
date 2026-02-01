@@ -25,7 +25,7 @@ Creates visualizations of data completeness, including heatmaps and
 bar charts.
 }
 \examples{
-\dontrun{
+\donttest{
 comp <- pep_completeness(pep, by = c("genus", "phase_id"))
 plot(comp, type = "heatmap")
 plot(comp, type = "bar", top = 15)

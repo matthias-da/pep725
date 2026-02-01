@@ -66,7 +66,7 @@ downstream plotting functions or regression models linking phenology with
 global warming trends.
 }
 \examples{
-\dontrun{
+\donttest{
 # Typical usage for winter wheat heading phase:
 out <- regional_box_ts(species_name = "Triticum aestivum", phase = 10)
 str(out)

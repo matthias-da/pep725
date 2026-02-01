@@ -37,7 +37,7 @@
 #' @seealso \code{\link{pheno_plot}}, \code{\link{pep_download}}, \code{\link{giss}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Typical usage for winter wheat heading phase:
 #' out <- regional_box_ts(species_name = "Triticum aestivum", phase = 10)
 #' str(out)

@@ -34,8 +34,9 @@ A convenience function to check phase availability across multiple species
 at once.
 }
 \examples{
-\dontrun{
+\donttest{
 # Check multiple species
+pep <- pep_download()
 result <- check_phases_multi(pep,
                              species_list = c("Triticum aestivum",
                                               "Malus domestica",

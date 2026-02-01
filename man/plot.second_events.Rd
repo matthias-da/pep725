@@ -8,6 +8,7 @@
   x,
   type = c("overview", "timeline", "seasonal", "map"),
   scale = c("absolute", "relative"),
+  from_year = NULL,
   ...
 )
 }
@@ -24,6 +25,10 @@ observations per year. This accounts for varying data availability
 over time and reveals whether second events are becoming proportionally
 more common.}
 }}
+
+\item{from_year}{Integer. If specified, only show data from this year onwards
+in timeline and overview plots. Useful for focusing on recent trends.
+Default is \code{NULL} (show all years).}
 
 \item{...}{Additional arguments}
 }

@@ -88,7 +88,7 @@ syntax, then pass the subset to the function.
 }
 
 \examples{
-\dontrun{
+\donttest{
 # Download synthetic data first
 pep <- pep_download()
 

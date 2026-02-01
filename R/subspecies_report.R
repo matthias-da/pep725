@@ -47,7 +47,7 @@
 #' @importFrom purrr map
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' subspecies_report(
 #'   pep,
@@ -170,7 +170,7 @@ subspecies_report <- function(
 #' @importFrom stats median
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' summarize_subspecies_availability(
 #'   pep,
 #'   species_name = "Malus domestica",

@@ -68,7 +68,7 @@ Users may specify a \strong{genus}, \strong{species}, or one or more
 completeness, and several optional availability metrics.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 subspecies_report(
   pep,

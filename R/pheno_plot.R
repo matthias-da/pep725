@@ -25,7 +25,7 @@
 #' @seealso \code{\link{regional_box_ts}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ################################
 #' # NEW: functional_groups:
 #' d1 <- regional_box_ts(phase = 10, year_min = 1950,
@@ -50,7 +50,7 @@
 #' p2 | p3
 #' }
 #'
-#' \dontrun{
+#' \donttest{
 #' ## Another example:
 #' d1 <- regional_box_ts(phase = 31, year_min = 1950,
 #'                                 pep_for_giss = "near",

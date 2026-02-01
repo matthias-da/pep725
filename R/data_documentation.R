@@ -43,7 +43,7 @@
 #' str(pep_seed)
 #'
 #' # Use with simulate_pep to create synthetic data
-#' \dontrun{
+#' \donttest{
 #' pep_synthetic <- simulate_pep(pep_seed)
 #' }
 #'

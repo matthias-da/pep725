@@ -86,11 +86,10 @@ A data frame with:
 \description{
 This function computes the mean phenological day-of-year (DOY) for two
 phenophases (e.g. BBCH 65 and 87) for each country, using either a simple
-warming-shift model or a GDD-based model. Output is suitable for use in
-both \code{integral_hail()} and \code{plot_hail_overlap()}.
+warming-shift model or a GDD-based model.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 data(giss)
 

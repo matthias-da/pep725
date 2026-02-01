@@ -9,7 +9,7 @@
 #' @author Matthias Templ
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Download or load PEP data first
 #' pep <- pep_download()
 #'

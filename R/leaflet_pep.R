@@ -21,7 +21,7 @@
 #'
 #' @import leaflet leaflet.extras shiny miniUI
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Download synthetic data first
 #' pep <- pep_download()
 #'

@@ -5,7 +5,6 @@
   # Load small auxiliary datasets into global environment
   utils::data("meteoSwiss", package = pkgname, envir = globalenv())
   utils::data("giss", package = pkgname, envir = globalenv())
-  utils::data("hail", package = pkgname, envir = globalenv())
 
   packageStartupMessage("pep725 loaded.")
  packageStartupMessage("To get phenological data, use:")

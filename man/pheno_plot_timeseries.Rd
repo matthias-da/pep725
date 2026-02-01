@@ -44,7 +44,7 @@ Visualizes phenological day-of-year (DOY) trends over time since 1961.
 Designed for aggregated or site-level phenology data from PEP725.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Example: aggregated flowering DOY by species
 pheno_plot_timeseries(data = pep, color_by = "functional_group",

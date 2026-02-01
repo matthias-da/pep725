@@ -72,7 +72,7 @@ of 100\% means every year in the span has data.
 }
 
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 # Basic completeness by species and phase
 comp <- pep_completeness(pep)

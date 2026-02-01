@@ -22,7 +22,8 @@ A ggplot object (invisibly).
 Provides default visualizations for PEP725 phenological data.
 }
 \examples{
-\dontrun{
+\donttest{
+pep <- pep_download()
 plot(pep)
 plot(pep, type = "timeseries")
 plot(pep, type = "histogram")
