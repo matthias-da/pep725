@@ -136,7 +136,7 @@ print(normals)
 
 ### Understanding the Output Statistics
 
-The function returns several statistics for each group. Here's what they mean
+The function returns several statistics for each group. Here's what these mean
 and when to use each:
 
 | Statistic | Description | When to Use |

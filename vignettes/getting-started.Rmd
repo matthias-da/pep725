@@ -27,27 +27,20 @@ on the timing of recurring biological events such as:
 - **Fruit ripening**: The maturation of fruits
 - **Leaf senescence**: Autumn coloring and leaf fall
 
-These events are highly sensitive to temperature and other environmental
-factors, making phenological records invaluable for understanding how plants
-respond to climate variability and change. A plant that flowered on May 15th
-in 1950 might now flower on May 1st due to warming temperatures - this shift
-of about two weeks represents a significant ecological change.
+These phenological phases are are strongly temperature-dependent and respond sensitively to interannual climate variability as well as long-term climate change. As a result, phenological records provide some of the most direct biological evidence of climate impacts on terrestrial ecosystems.
 
 ## The PEP725 Database
 
 The [PEP725 Pan European Phenology Database](http://www.pep725.eu/) is one of
-the world's largest collections of plant phenological observations
-([Templ et al. 2018](https://doi.org/10.1007/s00484-018-1512-8);
-[Templ et al. 2026](https://doi.org/10.1111/nph.70869)). It contains:
+the world's most comprehensive collections of plant phenological observations. It brings together long-term records from national phenological monitoring networks across Europe into a harmonized and openly accessible research infrastructure (Templ et al. 2018, 2026).
+Key characteristics of PEP725 include:
 
-- **Over 12 million observations** from across Europe
+- **Over 12 million observations** from across over 30 European countries
 - **Records spanning 250+ years** (some stations have data back to the 1750s)
-- **Thousands of monitoring stations** in more than 20 countries
-- **Multiple plant species** including crops, wild plants, and trees
+- **Thousands of monitoring stations** spanning a wide range of elevations
+- **Broad taxonomic coverage** including agricultural crops, fruit trees, wild plant and forest tree species
 
-The database is maintained by a network of national phenological services and
-uses standardized observation protocols, making it ideal for large-scale
-analyses of phenological change.
+Observations in PEP725 are based on standardized phase definitions (largely aligned with BBCH-type schemes) and consistent observation protocols within national networks. This standardization enables comparative analyses across regions, species, and time periods.
 
 ## Why Use the pep725 R Package?
 
@@ -109,14 +102,14 @@ option to use is important for your workflow:
 
 You might wonder why we use synthetic data instead of real observations. The
 original PEP725 database has usage restrictions that prevent redistribution -
-you must register and agree to terms of use. This creates a problem for
+you must register on pep725.eu website the and accept the data use policy. This creates a problem for
 tutorials and examples that need to be reproducible.
 
 **Synthetic data** solves this problem. It is generated to preserve the
 statistical properties of real data:
 
-- Same distributions of flowering dates across seasons
-- Similar correlations between variables (e.g., latitude and flowering date)
+- Same distributions of phenological events across seasons
+- Similar correlations between variables (e.g. latitude and flowering date)
 - Realistic spatial patterns across Europe
 - Comparable year-to-year variability
 
@@ -125,7 +118,7 @@ apply them confidently to real data when you're ready for actual research.
 
 ### Option 1: Download Synthetic Data (Recommended for Learning)
 
-For learning the package, download the pre-generated synthetic dataset:
+To learn the package, download the pre-generated synthetic dataset:
 
 ```{r download, message=FALSE}
 # Download synthetic data (cached locally after first download)
@@ -361,7 +354,7 @@ combine multiple conditions with `&` (and) or `|` (or).
 ## Understanding BBCH Codes
 
 The **BBCH scale** (from Biologische Bundesanstalt, Bundessortenamt und
-CHemische Industrie) is a standardized system for describing plant
+CHemische Industrie; Meier 2018) is a standardized system for describing plant
 developmental stages. It's used worldwide, ensuring that "flowering" means the
 same thing whether observed in Germany or Spain.
 
@@ -370,7 +363,7 @@ same thing whether observed in Germany or Spain.
 BBCH codes are two-digit numbers where:
 
 - The **first digit** (0-9) indicates the principal growth stage
-- The **second digit** (0-9) indicates the secondary stage within that principal stage
+- The **second digit** indicates the secondary stage within that principal stage
 
 | First Digit | Principal Growth Stage |
 |-------------|------------------------|
@@ -396,7 +389,7 @@ codes <- unique(pep$phase_id)
 bbch_description(codes)
 ```
 
-### Commonly Used BBCH Codes in Phenology
+### Commonly Used BBCH Codes in Phenological research
 
 | Code | Stage | What to Look For |
 |------|-------|------------------|
@@ -413,7 +406,7 @@ bbch_description(codes)
 
 ### Filtering by Phenological Phase
 
-When analyzing phenology, you typically focus on specific phases. Here's how:
+When analyzing phenology, you typically focus on specific phenophases. Here's how:
 
 ```{r filter-phase}
 # Get all flowering observations (BBCH 60-69)
@@ -459,8 +452,8 @@ coverage(pep, kind = "temporal", plot = TRUE)
 The temporal plot shows observation density over time. Look for:
 
 - **Gaps**: Years with few or no observations
-- **Trends**: Is coverage increasing or decreasing?
-- **Breakpoints**: Sudden changes (often due to methodology changes)
+- **Trends**: Is data coverage increasing or decreasing over time?
+- **Breakpoints**: Sudden changes (e.g. due to methodology changes)
 
 ```{r coverage-geo}
 # Geographical coverage - which countries have most data
@@ -573,14 +566,6 @@ As you start working with phenological data, keep these points in mind:
 - **Consider sample sizes**: Trends from 5 observations are not reliable
 - **Check spatial coverage**: Trends might differ between regions
 
-### DOY Arithmetic
-
-- **Leap years**: Remember that DOY 60 is February 29 in leap years, March 1
-  otherwise
-- **Cross-year comparisons**: Be careful comparing autumn phenology (DOY ~300)
-  with spring (DOY ~100)
-- **Averaging DOY**: Mean DOY is only meaningful within a phase; don't average
-  flowering with harvest!
 
 ### Species Considerations
 
