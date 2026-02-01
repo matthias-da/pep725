@@ -106,7 +106,6 @@ through June 2020.
 }
 
 \examples{
-\donttest{
 data(pep_seed)
 
 # Create example temperature data (fewer years for speed)
@@ -121,7 +120,6 @@ temp <- data.frame(
 # Run standard PLS (fast: no CV, fixed components)
 result <- pls_phenology(pep_seed, temp, method = "standard", ncomp = 2)
 print(result)
-}
 
 }
 \references{

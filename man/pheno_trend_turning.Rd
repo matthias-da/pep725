@@ -61,7 +61,6 @@ is considered statistically significant.
 }
 
 \examples{
-\donttest{
 # Simple vector input (fast)
 doy_series <- c(120, 118, 122, 115, 110, 108, 112, 105, 102, 100)
 turning <- pheno_trend_turning(doy_series)
@@ -72,7 +71,6 @@ data(pep_seed)
 wheat <- pep_seed[pep_seed$species == "Triticum aestivum" &
                   pep_seed$phase_id == 60, ]
 turning <- pheno_trend_turning(wheat)
-}
 
 }
 \references{

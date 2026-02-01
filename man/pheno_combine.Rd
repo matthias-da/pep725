@@ -86,13 +86,17 @@ identify and investigate these.
 \examples{
 \donttest{
 pep <- pep_download()
-# Filter to one country for speed (smaller subset)
-wheat_de <- pep[species == "Triticum aestivum" &
-                phase_id == 60 & country == "Germany"]
 
-# Create combined series using fast OLS method
-combined <- pheno_combine(wheat_de, method = "ols")
+# Apple flowering in Switzerland (small, fast subset)
+apple_ch <- pep[species == "Malus domestica" &
+                phase_id == 60 & country == "Switzerland"]
+
+# Create combined series using OLS
+combined <- pheno_combine(apple_ch, method = "ols")
 print(combined)
+
+# Identify potential outliers (residuals > 30 days)
+outliers <- combined$residuals[abs(residual) > 30]
 }
 
 }

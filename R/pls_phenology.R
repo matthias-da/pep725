@@ -78,7 +78,6 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' through June 2020.
 #'
 #' @examples
-#' \donttest{
 #' data(pep_seed)
 #'
 #' # Create example temperature data (fewer years for speed)
@@ -93,7 +92,6 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' # Run standard PLS (fast: no CV, fixed components)
 #' result <- pls_phenology(pep_seed, temp, method = "standard", ncomp = 2)
 #' print(result)
-#' }
 #'
 #' @references
 #' Luedeling E, Gassner A (2012). Partial Least Squares Regression for
