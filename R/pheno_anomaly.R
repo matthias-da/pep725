@@ -71,29 +71,24 @@
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
+#'
+#' # Filter to one country for speed, analyze wheat heading
+#' wheat_de <- pep[country == "Germany" & species == "Triticum aestivum"]
+#'
 #' # Calculate anomalies relative to 1961-1990 baseline
-#' anomalies <- pheno_anomaly(pep,
+#' anomalies <- pheno_anomaly(wheat_de,
 #'                            baseline_period = 1961:1990,
-#'                            species = "Triticum",
 #'                            phase_id = 60)
+#' print(anomalies)
 #'
 #' # Find extreme early years
 #' extreme_early <- anomalies[is_extreme == TRUE & direction == "early"]
 #'
-#' # Using pre-computed normals
-#' normals <- pheno_normals(pep, period = 1961:1990, species = "Triticum")
-#' anomalies <- pheno_anomaly(pep, species = "Triticum", normals = normals)
-#'
-#' # Classical (mean/SD) approach
-#' anomalies_classical <- pheno_anomaly(pep,
-#'                                      species = "Triticum",
-#'                                      robust = FALSE)
-#'
-#' # Anomalies for specific target years
-#' recent <- pheno_anomaly(pep,
+#' # Anomalies for recent years only
+#' recent <- pheno_anomaly(wheat_de,
 #'                         baseline_period = 1961:1990,
-#'                         target_years = 2010:2020,
-#'                         species = "Triticum")
+#'                         target_years = 2000:2020,
+#'                         phase_id = 60)
 #' }
 #'
 #' @seealso
