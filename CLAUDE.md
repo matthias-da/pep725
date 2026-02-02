@@ -102,18 +102,48 @@ Phenological phases use BBCH codes (e.g., 60=heading/flowering, 65=full flowerin
 
 All examples that use `pep` data must:
 1. Be wrapped in `\donttest{}` (preferred for CRAN) since `pep_download()` requires internet
-2. Use `\dontrun{}` only for examples that truly cannot run (e.g., require local file paths)
+2. Use `\dontrun{}` for interactive or very slow examples (see below)
 3. Call `pep <- pep_download()` BEFORE using the `pep` variable
 4. Use `data(pep_seed)` for small examples that can run without internet
+5. **Use geographic subsets** for faster computation (critical for R CMD check --run-donttest)
 
-Example structure:
+### When to Use `\dontrun{}` vs `\donttest{}`
+
+Use **`\dontrun{}`** for:
+- Interactive functions: `leaflet_pep()`, `pep725_demo()`
+- Functions requiring API keys: `map_pep()` with Google Maps
+- Complex pipelines: `regional_box_ts()`, `regional_box_ts_heading_harvest()`, `pheno_plot()`, `pheno_plot_hh()`
+- Simulation: `simulate_pep()` (slow on full dataset)
+
+Use **`\donttest{}`** with subsets for all other examples.
+
+### Example Structure with Subsetting
+
 ```r
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' result <- some_function(pep, ...)
+#'
+#' # Use Swiss/Austrian subset for faster computation
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#'
+#' # Now run the analysis on the subset
+#' result <- some_function(pep_alpine, ...)
 #' }
 ```
+
+### Synthetic Data Notes
+
+**Country names** in synthetic data (NOT "Germany"):
+- `"Germany-North"`, `"Germany-South"`, `"Switzerland"`, `"Austria"`
+
+**Well-covered species** for examples:
+- `"Malus domestica"` - good coverage in Switzerland/Austria
+- `"Vitis vinifera"` - good coverage in Alpine countries
+- Avoid `"Triticum aestivum"` with Germany filter (use Germany-North/Germany-South)
+
+**Available columns** (no `functional_group`):
+- `s_id`, `lon`, `lat`, `alt`, `genus`, `species`, `subspecies`, `phase_id`, `year`, `day`, `country`
 
 ### Cross-References
 
@@ -178,8 +208,15 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 - `plot.second_events()` - Visualize second events (supports `scale = "relative"` for proportional display)
 
 **Visualization:**
-- `pheno_plot()` - General phenology plots
-- `pheno_plot_hh()` - Heading/harvest specific plots
-- `plot_phenology_trends()` - Trend visualization
-- `leaflet_pep()` - Interactive maps
-- `map_pep()` - Static maps (use `background = "none"` for no API key required)
+- `pheno_plot()` - General phenology plots (uses `\dontrun{}` - depends on regional_box_ts)
+- `pheno_plot_hh()` - Heading/harvest specific plots (uses `\dontrun{}`)
+- `pheno_plot_timeseries()` - Time series plots
+- `leaflet_pep()` - Interactive maps (uses `\dontrun{}` - interactive Shiny gadget)
+- `map_pep()` - Static maps (uses `\dontrun{}` - can require API key)
+
+**Regional Analysis (all use `\dontrun{}`):**
+- `regional_box_ts()` - Regional phenology compilation
+- `regional_box_ts_heading_harvest()` - Heading/harvest regional analysis
+
+**Demo/Interactive (use `\dontrun{}`):**
+- `pep725_demo()` - Interactive package demonstration

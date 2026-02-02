@@ -50,9 +50,9 @@ pep <- pep_download()
 # Use Alpine subset for faster computation
 pep_alpine <- pep[country \%in\% c("Switzerland", "Austria")]
 
-# Example: flowering DOY by functional group
+# Example: flowering DOY by genus
 pheno_plot_timeseries(data = pep_alpine[phase_id == 65],
-                      color_by = "functional_group",
+                      color_by = "genus",
                       facet_by = NULL, smooth = TRUE)
 
 # Example: single species, colored by site
@@ -63,11 +63,11 @@ pheno_plot_timeseries(
   title = "Apple flowering (BBCH 60) across sites"
 )
 
-# Example: facets by functional group
+# Example: facets by genus
 pheno_plot_timeseries(
   data = pep_alpine[phase_id == 65],
   color_by = "species",
-  facet_by = "functional_group",
+  facet_by = "genus",
   smooth = TRUE
 )
 }
