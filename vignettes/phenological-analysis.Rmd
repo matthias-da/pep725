@@ -410,23 +410,27 @@ summary(quality)
 With many stations to assess, visual inspection is essential. The `plot()` method
 provides an overview of quality metrics:
 
-```{r quality-plot, fig.height=7}
-# Overview plot: grade distribution, completeness histogram, and scatter
-plot(quality)
+```{r quality-plot, fig.height=5, fig.width=11}
+# Overview plot: grade distribution + station map (requires pep for coordinates)
+plot(quality, pep = wheat)
 ```
 
 **Reading the plot:**
 
-- **Top left**: Grade distribution shows how many stations fall into each category
-- **Top right**: Completeness histogram reveals the distribution of data coverage
-- **Bottom**: Scatter plot shows the relationship between completeness and outlier
-  percentage, colored by grade
+- **Left panel**: Grade distribution shows how many stations fall into each category
+- **Right panel**: Map shows station locations colored by their quality grade,
+  revealing spatial patterns in data quality
 
 You can also generate individual plots:
 
 ```{r quality-plot-grades, fig.height=4}
-# Just the grade distribution
+# Just the grade distribution (no pep data needed)
 plot(quality, which = "grades")
+```
+
+```{r quality-plot-map, fig.height=5}
+# Just the map of station quality
+plot(quality, which = "map", pep = wheat)
 ```
 
 ### Filtering Data by Quality

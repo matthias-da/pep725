@@ -4,36 +4,41 @@
 \alias{plot.pep_quality}
 \title{Plot Method for Data Quality Assessment}
 \usage{
-\method{plot}{pep_quality}(
-  x,
-  which = c("overview", "grades", "completeness", "scatter"),
-  title = NULL,
-  ...
-)
+\method{plot}{pep_quality}(x, which = c("overview", "grades", "map"), pep = NULL, title = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{pep_quality} object.}
 
 \item{which}{Character. Type of plot to produce:
 \itemize{
-\item \code{"overview"} (default): Multi-panel overview with grade
-distribution, completeness histogram, and completeness vs outliers
+\item \code{"overview"} (default): Two-panel overview with grade
+distribution and station quality map (requires \code{pep} argument)
 \item \code{"grades"}: Bar chart of quality grade distribution only
-\item \code{"completeness"}: Histogram of completeness percentages only
-\item \code{"scatter"}: Scatter plot of completeness vs outlier percentage
+\item \code{"map"}: Map of station locations colored by quality grade
+(requires \code{pep} argument for coordinates)
 }}
+
+\item{pep}{Optional \code{pep} object providing station coordinates (lon, lat).
+Required for \code{which = "map"} or \code{which = "overview"}.}
 
 \item{title}{Optional character string for the plot title.}
 
 \item{...}{Additional arguments (unused).}
 }
 \value{
-A ggplot object (invisibly for \code{which = "overview"}).
+A ggplot object (invisibly).
 }
 \description{
-Creates a multi-panel visualization of phenological data quality metrics,
-including grade distribution, completeness histogram, and the relationship
-between completeness and outlier percentage.
+Creates visualizations of phenological data quality metrics, including
+grade distribution and a map of station quality.
+}
+\details{
+For the map visualization, the function:
+\itemize{
+\item Aggregates quality to one grade per station (worst grade if multiple phases)
+\item Uses country borders from the \code{rnaturalearth} package
+\item Colors stations by quality grade (A=green, B=light green, C=orange, D=red)
+}
 }
 \examples{
 \donttest{
@@ -43,13 +48,14 @@ pep <- pep_download()
 pep_ch <- pep[country == "Switzerland"]
 quality <- pep_quality(pep_ch, by = c("s_id", "phase_id"))
 
-# Overview plot (default)
-plot(quality)
-
-# Individual plot types
+# Grade distribution only (no pep data needed)
 plot(quality, which = "grades")
-plot(quality, which = "completeness")
-plot(quality, which = "scatter")
+
+# Map of station quality (requires pep for coordinates)
+plot(quality, which = "map", pep = pep_ch)
+
+# Overview: grades + map
+plot(quality, pep = pep_ch)
 }
 
 }

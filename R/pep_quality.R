@@ -408,23 +408,32 @@ summary.pep_quality <- function(object, ...) {
 
 #' Plot Method for Data Quality Assessment
 #'
-#' Creates a multi-panel visualization of phenological data quality metrics,
-#' including grade distribution, completeness histogram, and the relationship
-#' between completeness and outlier percentage.
+#' Creates visualizations of phenological data quality metrics, including
+#' grade distribution and a map of station quality.
 #'
 #' @param x A \code{pep_quality} object.
 #' @param which Character. Type of plot to produce:
 #'   \itemize{
-#'     \item \code{"overview"} (default): Multi-panel overview with grade
-#'       distribution, completeness histogram, and completeness vs outliers
+#'     \item \code{"overview"} (default): Two-panel overview with grade
+#'       distribution and station quality map (requires \code{pep} argument)
 #'     \item \code{"grades"}: Bar chart of quality grade distribution only
-#'     \item \code{"completeness"}: Histogram of completeness percentages only
-#'     \item \code{"scatter"}: Scatter plot of completeness vs outlier percentage
+#'     \item \code{"map"}: Map of station locations colored by quality grade
+#'       (requires \code{pep} argument for coordinates)
 #'   }
+#' @param pep Optional \code{pep} object providing station coordinates (lon, lat).
+#'   Required for \code{which = "map"} or \code{which = "overview"}.
 #' @param title Optional character string for the plot title.
 #' @param ... Additional arguments (unused).
 #'
-#' @return A ggplot object (invisibly for \code{which = "overview"}).
+#' @return A ggplot object (invisibly).
+#'
+#' @details
+#' For the map visualization, the function:
+#' \itemize{
+#'   \item Aggregates quality to one grade per station (worst grade if multiple phases)
+#'   \item Uses country borders from the \code{rnaturalearth} package
+#'   \item Colors stations by quality grade (A=green, B=light green, C=orange, D=red)
+#' }
 #'
 #' @examples
 #' \donttest{
@@ -434,19 +443,20 @@ summary.pep_quality <- function(object, ...) {
 #' pep_ch <- pep[country == "Switzerland"]
 #' quality <- pep_quality(pep_ch, by = c("s_id", "phase_id"))
 #'
-#' # Overview plot (default)
-#' plot(quality)
-#'
-#' # Individual plot types
+#' # Grade distribution only (no pep data needed)
 #' plot(quality, which = "grades")
-#' plot(quality, which = "completeness")
-#' plot(quality, which = "scatter")
+#'
+#' # Map of station quality (requires pep for coordinates)
+#' plot(quality, which = "map", pep = pep_ch)
+#'
+#' # Overview: grades + map
+#' plot(quality, pep = pep_ch)
 #' }
 #'
 #' @author Matthias Templ
 #' @export
-plot.pep_quality <- function(x, which = c("overview", "grades", "completeness", "scatter"),
-                              title = NULL, ...) {
+plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
+                              pep = NULL, title = NULL, ...) {
   which <- match.arg(which)
 
   # Define grade colors (green to red spectrum)
@@ -473,62 +483,115 @@ plot.pep_quality <- function(x, which = c("overview", "grades", "completeness", 
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank())
   }
 
-  # Completeness histogram
-  plot_completeness <- function() {
-    ggplot2::ggplot(plot_data, ggplot2::aes(x = completeness_pct, fill = quality_grade)) +
-      ggplot2::geom_histogram(binwidth = 5, boundary = 0, color = "white", linewidth = 0.2) +
-      ggplot2::scale_fill_manual(values = grade_colors, name = "Grade") +
-      ggplot2::scale_x_continuous(breaks = seq(0, 100, 20), limits = c(0, 105)) +
-      ggplot2::labs(x = "Completeness (%)", y = "Count",
-                    title = "Completeness Distribution") +
-      ggplot2::theme_minimal()
-  }
+  # Map of station quality
+  plot_map <- function() {
+    if (is.null(pep)) {
+      stop("'pep' argument required for map visualization (provides station coordinates)",
+           call. = FALSE)
+    }
 
-  # Scatter plot: completeness vs outlier percentage
-  plot_scatter <- function() {
-    ggplot2::ggplot(plot_data, ggplot2::aes(x = completeness_pct, y = outlier_pct,
-                                             color = quality_grade)) +
-      ggplot2::geom_point(alpha = 0.6, size = 1.5) +
-      ggplot2::scale_color_manual(values = grade_colors, name = "Grade") +
-      ggplot2::scale_x_continuous(breaks = seq(0, 100, 20)) +
-      ggplot2::labs(x = "Completeness (%)", y = "Outliers (%)",
-                    title = "Completeness vs Outlier Percentage") +
-      ggplot2::theme_minimal()
+    # Check for required columns
+    if (!all(c("s_id", "lon", "lat") %in% names(pep))) {
+      stop("'pep' must contain columns: s_id, lon, lat", call. = FALSE)
+    }
+
+    # Get unique station coordinates
+    stations <- unique(data.table::as.data.table(pep)[, .(s_id, lon, lat)])
+
+    # Aggregate quality to station level (worst grade per station)
+    # Convert grade to numeric for aggregation, then back
+    grade_numeric <- c("A" = 1, "B" = 2, "C" = 3, "D" = 4)
+    plot_data[, grade_num := grade_numeric[as.character(quality_grade)]]
+
+    station_quality <- plot_data[, .(
+      worst_grade_num = max(grade_num, na.rm = TRUE),
+      n_phases = .N
+    ), by = s_id]
+
+    station_quality[, quality_grade := factor(
+      names(grade_numeric)[worst_grade_num],
+      levels = c("A", "B", "C", "D")
+    )]
+
+    # Merge with coordinates
+    map_data <- merge(station_quality, stations, by = "s_id", all.x = TRUE)
+    map_data <- map_data[!is.na(lon) & !is.na(lat)]
+
+    if (nrow(map_data) == 0) {
+      stop("No stations with valid coordinates found", call. = FALSE)
+    }
+
+    # Get country borders from rnaturalearth
+    world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+    # Determine map extent from data (with padding)
+    lon_range <- range(map_data$lon, na.rm = TRUE)
+    lat_range <- range(map_data$lat, na.rm = TRUE)
+    lon_pad <- diff(lon_range) * 0.1
+    lat_pad <- diff(lat_range) * 0.1
+
+    # Create map
+    ggplot2::ggplot() +
+      ggplot2::geom_sf(data = world, fill = "gray95", color = "gray70", linewidth = 0.2) +
+      ggplot2::geom_point(
+        data = map_data,
+        ggplot2::aes(x = lon, y = lat, color = quality_grade),
+        size = 1.5, alpha = 0.7
+      ) +
+      ggplot2::scale_color_manual(values = grade_colors, name = "Grade", drop = FALSE) +
+      ggplot2::coord_sf(
+        xlim = c(lon_range[1] - lon_pad, lon_range[2] + lon_pad),
+        ylim = c(lat_range[1] - lat_pad, lat_range[2] + lat_pad),
+        expand = FALSE
+      ) +
+      ggplot2::labs(
+        title = "Station Quality Map",
+        subtitle = sprintf("%d stations", nrow(map_data)),
+        x = "Longitude", y = "Latitude"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        panel.grid = ggplot2::element_line(color = "gray90"),
+        legend.position = "right"
+      )
   }
 
   # Generate requested plot type
- if (which == "grades") {
+  if (which == "grades") {
     p <- plot_grades()
     if (!is.null(title)) p <- p + ggplot2::labs(title = title)
     print(p)
     return(invisible(p))
   }
 
-  if (which == "completeness") {
-    p <- plot_completeness()
+  if (which == "map") {
+    p <- plot_map()
     if (!is.null(title)) p <- p + ggplot2::labs(title = title)
     print(p)
     return(invisible(p))
   }
 
-  if (which == "scatter") {
-    p <- plot_scatter()
+  # Overview: grades + map side by side
+  if (is.null(pep)) {
+    message("Note: 'pep' argument not provided. Showing grades only.")
+    message("For overview with map, use: plot(quality, pep = your_pep_data)")
+    p <- plot_grades()
     if (!is.null(title)) p <- p + ggplot2::labs(title = title)
     print(p)
     return(invisible(p))
   }
 
-  # Overview: combine all three plots
   p1 <- plot_grades()
-  p2 <- plot_completeness()
-  p3 <- plot_scatter()
+  p2 <- plot_map()
 
   # Use patchwork to combine
-  combined <- (p1 | p2) / p3 +
+  combined <- p1 + p2 +
     patchwork::plot_annotation(
       title = if (!is.null(title)) title else "Data Quality Overview",
-      subtitle = sprintf("Total groups: %d", nrow(x))
-    )
+      subtitle = sprintf("Total groups: %d | Stations: %d",
+                         nrow(x), length(unique(plot_data$s_id)))
+    ) +
+    patchwork::plot_layout(widths = c(1, 2))
 
   print(combined)
   invisible(combined)
