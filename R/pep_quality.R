@@ -404,3 +404,132 @@ summary.pep_quality <- function(object, ...) {
     mean_outlier_pct = mean(object$outlier_pct, na.rm = TRUE)
   ))
 }
+
+
+#' Plot Method for Data Quality Assessment
+#'
+#' Creates a multi-panel visualization of phenological data quality metrics,
+#' including grade distribution, completeness histogram, and the relationship
+#' between completeness and outlier percentage.
+#'
+#' @param x A \code{pep_quality} object.
+#' @param which Character. Type of plot to produce:
+#'   \itemize{
+#'     \item \code{"overview"} (default): Multi-panel overview with grade
+#'       distribution, completeness histogram, and completeness vs outliers
+#'     \item \code{"grades"}: Bar chart of quality grade distribution only
+#'     \item \code{"completeness"}: Histogram of completeness percentages only
+#'     \item \code{"scatter"}: Scatter plot of completeness vs outlier percentage
+#'   }
+#' @param title Optional character string for the plot title.
+#' @param ... Additional arguments (unused).
+#'
+#' @return A ggplot object (invisibly for \code{which = "overview"}).
+#'
+#' @examples
+#' \donttest{
+#' pep <- pep_download()
+#'
+#' # Assess quality for Swiss stations
+#' pep_ch <- pep[country == "Switzerland"]
+#' quality <- pep_quality(pep_ch, by = c("s_id", "phase_id"))
+#'
+#' # Overview plot (default)
+#' plot(quality)
+#'
+#' # Individual plot types
+#' plot(quality, which = "grades")
+#' plot(quality, which = "completeness")
+#' plot(quality, which = "scatter")
+#' }
+#'
+#' @author Matthias Templ
+#' @export
+plot.pep_quality <- function(x, which = c("overview", "grades", "completeness", "scatter"),
+                              title = NULL, ...) {
+  which <- match.arg(which)
+
+  # Define grade colors (green to red spectrum)
+  grade_colors <- c("A" = "#2E7D32", "B" = "#7CB342", "C" = "#FFA726", "D" = "#D32F2F")
+
+  # Ensure quality_grade is a factor with correct order
+  plot_data <- data.table::as.data.table(x)
+  plot_data[, quality_grade := factor(quality_grade, levels = c("A", "B", "C", "D"))]
+
+  # Grade distribution bar chart
+  plot_grades <- function() {
+    grade_counts <- plot_data[, .N, by = quality_grade]
+    grade_counts[, pct := 100 * N / sum(N)]
+
+    ggplot2::ggplot(grade_counts, ggplot2::aes(x = quality_grade, y = N, fill = quality_grade)) +
+      ggplot2::geom_col(show.legend = FALSE) +
+      ggplot2::geom_text(ggplot2::aes(label = sprintf("%d\n(%.0f%%)", N, pct)),
+                         vjust = -0.2, size = 3) +
+      ggplot2::scale_fill_manual(values = grade_colors) +
+      ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.15))) +
+      ggplot2::labs(x = "Quality Grade", y = "Number of Groups",
+                    title = "Quality Grade Distribution") +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank())
+  }
+
+  # Completeness histogram
+  plot_completeness <- function() {
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = completeness_pct, fill = quality_grade)) +
+      ggplot2::geom_histogram(binwidth = 5, boundary = 0, color = "white", linewidth = 0.2) +
+      ggplot2::scale_fill_manual(values = grade_colors, name = "Grade") +
+      ggplot2::scale_x_continuous(breaks = seq(0, 100, 20), limits = c(0, 105)) +
+      ggplot2::labs(x = "Completeness (%)", y = "Count",
+                    title = "Completeness Distribution") +
+      ggplot2::theme_minimal()
+  }
+
+  # Scatter plot: completeness vs outlier percentage
+  plot_scatter <- function() {
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = completeness_pct, y = outlier_pct,
+                                             color = quality_grade)) +
+      ggplot2::geom_point(alpha = 0.6, size = 1.5) +
+      ggplot2::scale_color_manual(values = grade_colors, name = "Grade") +
+      ggplot2::scale_x_continuous(breaks = seq(0, 100, 20)) +
+      ggplot2::labs(x = "Completeness (%)", y = "Outliers (%)",
+                    title = "Completeness vs Outlier Percentage") +
+      ggplot2::theme_minimal()
+  }
+
+  # Generate requested plot type
+ if (which == "grades") {
+    p <- plot_grades()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  if (which == "completeness") {
+    p <- plot_completeness()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  if (which == "scatter") {
+    p <- plot_scatter()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  # Overview: combine all three plots
+  p1 <- plot_grades()
+  p2 <- plot_completeness()
+  p3 <- plot_scatter()
+
+  # Use patchwork to combine
+  combined <- (p1 | p2) / p3 +
+    patchwork::plot_annotation(
+      title = if (!is.null(title)) title else "Data Quality Overview",
+      subtitle = sprintf("Total groups: %d", nrow(x))
+    )
+
+  print(combined)
+  invisible(combined)
+}

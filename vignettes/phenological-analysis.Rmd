@@ -350,38 +350,6 @@ The **classical method** (`robust = FALSE`) uses the mean as the baseline and th
 - **Classical**: Only if you've already cleaned outliers, or for comparison
   with older literature that used classical methods.
 
-### Using Pre-computed Normals
-
-For large datasets or repeated analyses, it is often inefficient to recompute phenological normals each time. Instead, normals can be calculated once for a chosen reference period and then reused for multiple years or subsets of the data:
-
-```{r anomalies-precomputed}
-# Step 1: Compute normals once (slow for large data)
-baseline <- pheno_normals(
-  pep,
-  period = 1990:2010,
-  species = "Malus",
-  by = c("country", "phase_id"),
-  min_years = 10
-)
-baseline
-
-# Step 2: Use normals for anomaly calculations (fast)
-# Important: the 'by' parameter must match what was used in pheno_normals()
-anomalies_2015 <- pheno_anomaly(
-  pep[year == 2015],
-  by = c("country", "phase_id"),
-  normals = baseline
-)
-anomalies_2015
-
-anomalies_2016 <- pheno_anomaly(
-  pep[year == 2016],
-  by = c("country", "phase_id"),
-  normals = baseline
-)
-anomalies_2016
-```
-
 ## Part 3: Data Quality Assessment
 
 ### Why Quality Matters
@@ -435,6 +403,30 @@ The function assigns letter grades based on thresholds:
 ```{r quality-summary}
 # Summary of quality across all stations
 summary(quality)
+```
+
+### Visualizing Quality Assessment
+
+With many stations to assess, visual inspection is essential. The `plot()` method
+provides an overview of quality metrics:
+
+```{r quality-plot, fig.height=7}
+# Overview plot: grade distribution, completeness histogram, and scatter
+plot(quality)
+```
+
+**Reading the plot:**
+
+- **Top left**: Grade distribution shows how many stations fall into each category
+- **Top right**: Completeness histogram reveals the distribution of data coverage
+- **Bottom**: Scatter plot shows the relationship between completeness and outlier
+  percentage, colored by grade
+
+You can also generate individual plots:
+
+```{r quality-plot-grades, fig.height=4}
+# Just the grade distribution
+plot(quality, which = "grades")
 ```
 
 ### Filtering Data by Quality

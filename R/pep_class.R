@@ -37,7 +37,9 @@ utils::globalVariables(c(
   "sd_doy", "se", "series", "significant", "slope", "station_mean_doy",
   "subspecies", "tau", "thermal_sum", "tmp_end_ctrl", "tmp_end_scen",
   "tmp_start_ctrl", "tmp_start_scen", "total", "value", "var_value", "x", "y",
-  "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score"
+  "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score",
+  # pep_quality plot variables
+  "quality_grade", "pct", "completeness_pct", "outlier_pct"
 ))
 
 # =============================================================================
