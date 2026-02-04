@@ -422,6 +422,10 @@ summary.pep_quality <- function(object, ...) {
 #'   }
 #' @param pep Optional \code{pep} object providing station coordinates (lon, lat).
 #'   Required for \code{which = "map"} or \code{which = "overview"}.
+#' @param show_grades Character vector of grades to display on the map.
+#'   Default is \code{c("A", "B", "C", "D")} (all grades). Use e.g.
+#'   \code{show_grades = "D"} to show only poor-quality stations.
+#' @param alpha Numeric. Transparency of points on the map (0-1). Default is 0.6.
 #' @param title Optional character string for the plot title.
 #' @param ... Additional arguments (unused).
 #'
@@ -432,7 +436,7 @@ summary.pep_quality <- function(object, ...) {
 #' \itemize{
 #'   \item Aggregates quality to one grade per station (worst grade if multiple phases)
 #'   \item Uses country borders from the \code{rnaturalearth} package
-#'   \item Colors stations by quality grade (A=green, B=light green, C=orange, D=red)
+#'   \item Uses colorblind-friendly colors (blue=A, cyan=B, orange=C, vermillion=D)
 #' }
 #'
 #' @examples
@@ -449,6 +453,12 @@ summary.pep_quality <- function(object, ...) {
 #' # Map of station quality (requires pep for coordinates)
 #' plot(quality, which = "map", pep = pep_ch)
 #'
+#' # Map showing only poor-quality stations
+#' plot(quality, which = "map", pep = pep_ch, show_grades = "D")
+#'
+#' # Map showing problematic stations (C and D grades)
+#' plot(quality, which = "map", pep = pep_ch, show_grades = c("C", "D"))
+#'
 #' # Overview: grades + map
 #' plot(quality, pep = pep_ch)
 #' }
@@ -456,11 +466,17 @@ summary.pep_quality <- function(object, ...) {
 #' @author Matthias Templ
 #' @export
 plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
-                              pep = NULL, title = NULL, ...) {
+                              pep = NULL, show_grades = c("A", "B", "C", "D"),
+                              alpha = 0.6, title = NULL, ...) {
   which <- match.arg(which)
 
-  # Define grade colors (green to red spectrum)
-  grade_colors <- c("A" = "#2E7D32", "B" = "#7CB342", "C" = "#FFA726", "D" = "#D32F2F")
+  # Validate show_grades
+
+  show_grades <- match.arg(show_grades, c("A", "B", "C", "D"), several.ok = TRUE)
+
+  # Colorblind-friendly palette (Okabe-Ito inspired)
+  # Blue for best, vermillion for worst - distinguishable for most color vision types
+  grade_colors <- c("A" = "#0072B2", "B" = "#56B4E9", "C" = "#E69F00", "D" = "#D55E00")
 
   # Ensure quality_grade is a factor with correct order
   plot_data <- data.table::as.data.table(x)
@@ -517,8 +533,12 @@ plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
     map_data <- merge(station_quality, stations, by = "s_id", all.x = TRUE)
     map_data <- map_data[!is.na(lon) & !is.na(lat)]
 
+    # Filter to selected grades
+    map_data <- map_data[quality_grade %in% show_grades]
+
     if (nrow(map_data) == 0) {
-      stop("No stations with valid coordinates found", call. = FALSE)
+      stop("No stations with valid coordinates found for grades: ",
+           paste(show_grades, collapse = ", "), call. = FALSE)
     }
 
     # Get country borders from rnaturalearth
@@ -530,13 +550,17 @@ plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
     lon_pad <- diff(lon_range) * 0.1
     lat_pad <- diff(lat_range) * 0.1
 
+    # Build subtitle
+    grade_str <- if (length(show_grades) == 4) "all grades" else paste("Grade", paste(show_grades, collapse = ", "))
+    subtitle <- sprintf("%d stations (%s)", nrow(map_data), grade_str)
+
     # Create map
     ggplot2::ggplot() +
       ggplot2::geom_sf(data = world, fill = "gray95", color = "gray70", linewidth = 0.2) +
       ggplot2::geom_point(
         data = map_data,
         ggplot2::aes(x = lon, y = lat, color = quality_grade),
-        size = 1.5, alpha = 0.7
+        size = 2, alpha = alpha
       ) +
       ggplot2::scale_color_manual(values = grade_colors, name = "Grade", drop = FALSE) +
       ggplot2::coord_sf(
@@ -546,7 +570,7 @@ plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
       ) +
       ggplot2::labs(
         title = "Station Quality Map",
-        subtitle = sprintf("%d stations", nrow(map_data)),
+        subtitle = subtitle,
         x = "Longitude", y = "Latitude"
       ) +
       ggplot2::theme_minimal() +

@@ -4,7 +4,15 @@
 \alias{plot.pep_quality}
 \title{Plot Method for Data Quality Assessment}
 \usage{
-\method{plot}{pep_quality}(x, which = c("overview", "grades", "map"), pep = NULL, title = NULL, ...)
+\method{plot}{pep_quality}(
+  x,
+  which = c("overview", "grades", "map"),
+  pep = NULL,
+  show_grades = c("A", "B", "C", "D"),
+  alpha = 0.6,
+  title = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{pep_quality} object.}
@@ -20,6 +28,12 @@ distribution and station quality map (requires \code{pep} argument)
 
 \item{pep}{Optional \code{pep} object providing station coordinates (lon, lat).
 Required for \code{which = "map"} or \code{which = "overview"}.}
+
+\item{show_grades}{Character vector of grades to display on the map.
+Default is \code{c("A", "B", "C", "D")} (all grades). Use e.g.
+\code{show_grades = "D"} to show only poor-quality stations.}
+
+\item{alpha}{Numeric. Transparency of points on the map (0-1). Default is 0.6.}
 
 \item{title}{Optional character string for the plot title.}
 
@@ -37,7 +51,7 @@ For the map visualization, the function:
 \itemize{
 \item Aggregates quality to one grade per station (worst grade if multiple phases)
 \item Uses country borders from the \code{rnaturalearth} package
-\item Colors stations by quality grade (A=green, B=light green, C=orange, D=red)
+\item Uses colorblind-friendly colors (blue=A, cyan=B, orange=C, vermillion=D)
 }
 }
 \examples{
@@ -53,6 +67,12 @@ plot(quality, which = "grades")
 
 # Map of station quality (requires pep for coordinates)
 plot(quality, which = "map", pep = pep_ch)
+
+# Map showing only poor-quality stations
+plot(quality, which = "map", pep = pep_ch, show_grades = "D")
+
+# Map showing problematic stations (C and D grades)
+plot(quality, which = "map", pep = pep_ch, show_grades = c("C", "D"))
 
 # Overview: grades + map
 plot(quality, pep = pep_ch)
