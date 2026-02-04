@@ -79,17 +79,17 @@ phases (heading, flowering, harvest) that are routinely monitored.
 
 ### What are Phenological Normals?
 
-Just as meteorologists use "climate normals" (30-year averages of temperature
-and precipitation), phenologists use **phenological normals** - long-term
-averages of when biological events occur.
+In climatology, "climate normals" are defined as 30-year averages of temperature
+or precipitation used to characterise typical climatic conditions.
+By analogy, we propose the term **phenological normals** to describe long-term
+averages of the timing of recurring biological events.
 
 **Why are normals important?**
 
-1. **Baseline for comparison**: You can't say "flowering was early this year"
-   without knowing when it normally occurs
-2. **Detecting change**: Comparing normals from different periods (e.g.,
-   1961-1990 vs. 1991-2020) reveals long-term shifts
-3. **Spatial patterns**: Normals vary by location, revealing geographic patterns
+1. **Baseline for comparison**: Describing an event as “early” or “late” is only meaningful relative to when it typically occurs.
+2. **Detecting change**: Comparing normals from different reference periods (e.g.,
+   1961-1990 vs. 1991-2020) highlights long-term shifts in phenological timing
+3. **Spatial patterns**: Normals vary across regions, reflecting differences in climate, latitude and elevation
 4. **Model validation**: Phenological models predict normals; observations
    validate them
 
@@ -230,8 +230,7 @@ if (nrow(period1) > 0 && nrow(period2) > 0) {
 ```
 
 **Ecological interpretation**: A shift of -5 days (earlier) over 30 years
-corresponds to about 1.7 days per decade - a commonly observed rate of
-phenological advance in response to climate warming.
+corresponds to about 1.7 days per decade.
 
 ## Part 2: Phenological Anomalies
 
@@ -365,8 +364,7 @@ two approaches:
 
 ### Using Pre-computed Normals
 
-For large datasets or repeated analyses, you can compute normals once and
-reuse them:
+For large datasets or repeated analyses, it is often inefficient to recompute phenological normals each time. Instead, normals can be calculated once for a chosen reference period and then reused for multiple years or subsets of the data:
 
 ```{r anomalies-precomputed, eval = FALSE}
 # Step 1: Compute normals once (slow for large data)
@@ -738,8 +736,7 @@ You now understand the core analytical functions. Continue to:
 - **Spatial Phenological Patterns**: How does phenology vary with elevation
   and latitude? Use `pheno_gradient()` and `pheno_synchrony()`.
 
-- **Data Quality & Irregular Events**: How to detect outliers and identify
-  potential second flowering events.
+- **Data Quality & Irregular Events**: How to detect outliers and identify irregular events.
 
 ## Session Info
 

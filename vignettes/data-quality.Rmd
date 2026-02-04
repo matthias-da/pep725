@@ -26,18 +26,16 @@ observations.
 
 ### The Data Quality Challenge
 
-Phenological datasets, including PEP725, are collected by many observers across
-decades. This introduces several types of issues:
+Long-term phenological datasets such as PEP725 are compiled from many observers over decades. This richness enables large-scale analyses, but it also introduces data quality challenges that need to be assessed:
 
 | Issue Type | Examples | Consequence if Ignored |
 |------------|----------|------------------------|
-| **Recording errors** | Typos (DOY 150 instead of 105), wrong year | Outliers bias statistics |
-| **Identification errors** | Similar species confused | Inconsistent time series |
-| **Protocol changes** | Definition of "flowering" changed | Artificial trends |
-| **Biological anomalies** | Second flowering, climate extremes | May be scientifically interesting! |
+| **Recording errors** | Typographical errors (DOY 150 instead of 105), incorrect year | Outliers bias statistics |
+| **Identification errors** | Confusion between morphologically similar species | Inconsistent or mixed time series |
+| **Protocol changes** | Changes in the definition of phenological phases over time | Artificial shifts or trends |
+| **Biological anomalies** | Irregular phenological events as a result of climate extremes | May represent real biological signals |
 
-**The key insight**: Not all unusual observations are errors. Some represent
-genuine biological phenomena that deserve study rather than deletion.
+The following sections introduce practical tools in pep725 package for diagnosing and handling these issues in a transparent and reproducible way.
 
 ### What You'll Learn
 
@@ -267,15 +265,6 @@ plot_outliers(outliers, type = "map")
 - Clustered outliers in one region? Might indicate local data quality issues
 - Outliers at network edges? Might be at environmental limits
 - Random scatter? Suggests individual observation errors
-
-### Customizing Visualizations
-
-Focus on specific aspects:
-
-```{r plot-custom, fig.height=5}
-# Focus on very late events (potential second flowering)
-plot_outliers(outliers, type = "seasonal", late_threshold = 250)
-```
 
 ---
 
