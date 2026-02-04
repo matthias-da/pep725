@@ -338,23 +338,11 @@ summary(anomalies)
 
 Phenological data often contains outliers - observations that are clearly
 erroneous or affected by unusual local conditions. The anomaly function offers
-two approaches:
+two approaches.
 
-```{r anomalies-methods-explain}
-# The function supports two methods:
+The **robust method** (`robust = TRUE`, default and recommended) uses the median as the baseline and the MAD (median absolute deviation) for standardization. This approach is less affected by outliers and should be preferred in most situations.
 
-# 1. ROBUST method (default, recommended)
-#    - Uses MEDIAN as the baseline
-#    - Uses MAD (median absolute deviation) for standardization
-#    - Less affected by outliers
-#    anomalies_robust <- pheno_anomaly(pep, species = "Triticum", robust = TRUE)
-
-# 2. CLASSICAL method
-#    - Uses MEAN as the baseline
-#    - Uses SD (standard deviation) for standardization
-#    - More affected by outliers
-#    anomalies_classical <- pheno_anomaly(pep, species = "Triticum", robust = FALSE)
-```
+The **classical method** (`robust = FALSE`) uses the mean as the baseline and the standard deviation (SD) for standardization. This approach is more affected by outliers and should only be used if you have already cleaned outliers from your data, or for comparison with older literature that used classical methods.
 
 **When to use each:**
 
@@ -366,26 +354,32 @@ two approaches:
 
 For large datasets or repeated analyses, it is often inefficient to recompute phenological normals each time. Instead, normals can be calculated once for a chosen reference period and then reused for multiple years or subsets of the data:
 
-```{r anomalies-precomputed, eval = FALSE}
+```{r anomalies-precomputed}
 # Step 1: Compute normals once (slow for large data)
 baseline <- pheno_normals(
   pep,
   period = 1990:2010,
-  species = "Triticum aestivum",
+  species = "Malus",
   by = c("country", "phase_id"),
   min_years = 10
 )
+baseline
 
 # Step 2: Use normals for anomaly calculations (fast)
+# Important: the 'by' parameter must match what was used in pheno_normals()
 anomalies_2015 <- pheno_anomaly(
   pep[year == 2015],
-  normals = baseline  # Pass pre-computed normals
+  by = c("country", "phase_id"),
+  normals = baseline
 )
+anomalies_2015
 
 anomalies_2016 <- pheno_anomaly(
   pep[year == 2016],
-  normals = baseline  # Reuse same normals
+  by = c("country", "phase_id"),
+  normals = baseline
 )
+anomalies_2016
 ```
 
 ## Part 3: Data Quality Assessment
