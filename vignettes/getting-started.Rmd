@@ -1,6 +1,7 @@
 ---
 title: "Getting Started with pep725"
 output: rmarkdown::html_vignette
+bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Getting Started with pep725}
   %\VignetteEngine{knitr::rmarkdown}
@@ -32,8 +33,8 @@ These phenological phases are are strongly temperature-dependent and respond sen
 ## The PEP725 Database
 
 The [PEP725 Pan European Phenology Database](http://www.pep725.eu/) is one of
-the world's most comprehensive collections of plant phenological observations. It brings together long-term records from national phenological monitoring networks across Europe into a harmonized and openly accessible research infrastructure (Templ et al. 2018, 2026).
-Key characteristics of PEP725 include:
+the world's most comprehensive collections of plant phenological observations. It brings together long-term records from national phenological monitoring networks across Europe into a harmonized and openly accessible research infrastructure.
+Key characteristics of PEP725 include [@templ2018; @templ2026]:
 
 - **Over 12 million observations** from across over 30 European countries
 - **Records spanning 250+ years** (some stations have data back to the 1750s)
@@ -353,8 +354,8 @@ combine multiple conditions with `&` (and) or `|` (or).
 
 ## Understanding BBCH Codes
 
-The **BBCH scale** (from Biologische Bundesanstalt, Bundessortenamt und
-CHemische Industrie; Meier 2018) is a standardized system for describing plant
+The **BBCH scale** [from Biologische Bundesanstalt, Bundessortenamt und
+CHemische Industrie; @meier2018] is a standardized system for describing plant
 developmental stages. It's used worldwide, ensuring that "flowering" means the
 same thing whether observed in Germany or Spain.
 
@@ -619,3 +620,5 @@ For reproducibility, here's the R environment used for this vignette:
 ```{r session}
 sessionInfo()
 ```
+
+## References
