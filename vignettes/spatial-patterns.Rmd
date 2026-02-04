@@ -117,14 +117,14 @@ Understanding phenological gradients is valuable for several reasons:
    
 ## Altitudinal Gradient Analysis
 
-Let's calculate the elevational gradient for wheat flowering:
+Let's calculate the elevational gradient for apple flowering:
 
 ```{r gradient-altitude}
-# Calculate elevational gradient for wheat flowering
+# Calculate elevational gradient for apple flowering
 grad_alt <- pheno_gradient(
   pep = pep,
   variable = "alt",
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   method = "robust"
 )
@@ -138,7 +138,7 @@ print(grad_alt)
 |-----------|---------|-------------|
 | `pep` | Input data | Your phenological dataset |
 | `variable` | Environmental gradient | `"alt"` for elevation, `"lat"` for latitude |
-| `species` | Species to analyze | Must match exactly (e.g., "Triticum aestivum") |
+| `species` | Species to analyze | Must match exactly (e.g., "Malus domestica") |
 | `phase_id` | BBCH phase code | 60 = flowering |
 | `method` | Regression method | `"robust"` recommended for phenological data |
 
@@ -169,7 +169,7 @@ The same function works for latitude gradients:
 grad_lat <- pheno_gradient(
   pep = pep,
   variable = "lat",
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   method = "robust"
 )
@@ -185,12 +185,12 @@ right method matters because phenological data often contains outliers.
 ```{r gradient-methods}
 # Robust regression (default) - handles outliers
 grad_robust <- pheno_gradient(pep, variable = "alt",
-                              species = "Triticum aestivum",
+                              species = "Malus domestica",
                               phase_id = 60, method = "robust")
 
 # Ordinary least squares
 grad_ols <- pheno_gradient(pep, variable = "alt",
-                           species = "Triticum aestivum",
+                           species = "Malus domestica",
                            phase_id = 60, method = "ols")
 
 cat("Robust slope:", round(grad_robust$summary$slope, 2), "days/100m\n")
@@ -221,7 +221,7 @@ Estimating gradients separately for different regions:
 grad_by_country <- pheno_gradient(
   pep = pep,
   variable = "alt",
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   by = "country",
   method = "robust"
@@ -298,7 +298,7 @@ variability:
 # Calculate synchrony by country and year
 sync <- pheno_synchrony(
   pep = pep,
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   by = c("country", "year"),
   min_stations = 3
@@ -401,7 +401,7 @@ For exploratory analyses or descriptive summaries, synchrony can be calculated w
 ```{r synchrony-simple}
 sync_simple <- pheno_synchrony(
   pep = pep,
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   by = c("country", "year"),
   min_stations = 3,
@@ -432,7 +432,7 @@ Gradients describe systematic spatial shifts (e.g. with elevation or latitude), 
 # 1. Understand elevation gradient
 gradient <- pheno_gradient(
   pep, variable = "alt",
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60
 )
 
@@ -443,7 +443,7 @@ cat("  R-squared:", round(gradient$summary$r_squared, 3), "\n\n")
 # 2. Assess spatial synchrony
 synchrony <- pheno_synchrony(
   pep,
-  species = "Triticum aestivum",
+  species = "Malus domestica",
   phase_id = 60,
   min_stations = 3
 )
@@ -528,11 +528,11 @@ coordinates and metadata for all selected stations, which can be then directly r
 
 ```{r leaflet-filtered, eval=FALSE}
 # Filter to a specific species for faster loading (recommended)
-wheat <- pep[species == "Triticum aestivum"]
-selected <- leaflet_pep(wheat, label_col = "s_id")
+apple <- pep[species == "Malus domestica"]
+selected <- leaflet_pep(apple, label_col = "s_id")
 
 # Use selected stations for focused analysis
-wheat_subset <- wheat[s_id %in% selected$s_id]
+apple_subset <- apple[s_id %in% selected$s_id]
 ```
 
 **Why filter first?** The full PEP725 dataset contains millions of observations.
@@ -665,17 +665,17 @@ A typical workflow integrates mapping with spatial analysis in such a workflow:
 
 ```{r mapping-workflow, eval=FALSE}
 # 1. Explore stations interactively
-selected <- leaflet_pep(pep[genus == "Triticum"])
+selected <- leaflet_pep(pep[genus == "Malus"])
 
 # 2. Subset data to selected region
 pep_region <- pep[s_id %in% selected$s_id]
 
 # 3. Analyze gradients in the selected region
 gradient <- pheno_gradient(pep_region, variable = "alt",
-                           species = "Triticum aestivum", phase_id = 60)
+                           species = "Malus domestica", phase_id = 60)
 
 # 4. Assess synchrony
-synchrony <- pheno_synchrony(pep_region, species = "Triticum aestivum",
+synchrony <- pheno_synchrony(pep_region, species = "Malus domestica",
                               phase_id = 60)
 
 # 5. Create publication map of the region (no API needed)

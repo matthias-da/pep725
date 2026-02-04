@@ -59,21 +59,21 @@ library(pep725)
 # Download the synthetic dataset
 pep <- pep_download()
 
-# For this vignette, we'll focus on wheat (Triticum aestivum)
+# For this vignette, we'll focus on apple (Malus domestica)
 # This is one of the best-represented species in PEP725
-wheat <- pep[species == "Triticum aestivum"]
+apple <- pep[species == "Malus domestica"]
 
-# Quick overview of our wheat data
-cat("Wheat observations:", nrow(wheat), "\n")
-cat("Year range:", min(wheat$year), "-", max(wheat$year), "\n")
-cat("Countries:", length(unique(wheat$country)), "\n")
-cat("Stations:", length(unique(wheat$s_id)), "\n")
-cat("Phases recorded:", paste(sort(unique(wheat$phase_id)), collapse = ", "), "\n")
+# Quick overview of our apple data
+cat("Apple observations:", nrow(apple), "\n")
+cat("Year range:", min(apple$year), "-", max(apple$year), "\n")
+cat("Countries:", length(unique(apple$country)), "\n")
+cat("Stations:", length(unique(apple$s_id)), "\n")
+cat("Phases recorded:", paste(sort(unique(apple$phase_id)), collapse = ", "), "\n")
 ```
 
-**Why wheat?** *Triticum aestivum* (common wheat) is well-represented in the
-database because of its agricultural importance. It has clear phenological
-phases (heading, flowering, harvest) that are routinely monitored.
+**Why apple?** *Malus domestica* (domestic apple) is one of the best-represented
+species in the database with excellent coverage across Europe. It has clear phenological
+phases (bud burst, flowering, fruit development) that are routinely monitored.
 
 ## Part 1: Phenological Normals
 
@@ -110,13 +110,13 @@ to a 1991-2020 baseline (because the recent period already includes warming).
 
 ### Calculating Normals with pheno_normals()
 
-Let's calculate normals for wheat:
+Let's calculate normals for apple:
 
 ```{r normals-basic}
-# Calculate normals for wheat across countries and phases
+# Calculate normals for apple across countries and phases
 # Using 1990-2015 for illustration (ensures enough data in synthetic dataset)
 normals <- pheno_normals(
-  pep = wheat,
+  pep = apple,
   period = 1990:2015,
   by = c("country", "phase_id"),
   min_years = 10
@@ -165,11 +165,11 @@ summary(normals)
 Often you want normals for a specific phenological phase:
 
 ```{r normals-filtered}
-# Normals for wheat heading (BBCH 60) only
+# Normals for apple flowering (BBCH 60) only
 heading_normals <- pheno_normals(
   pep = pep,                          # Can use full dataset
   period = 1990:2015,
-  species = "Triticum aestivum",      # Filter by species
+  species = "Malus domestica",         # Filter by species
   phase_id = 60,                      # Filter by phase (heading)
   by = "country",                     # Group only by country
   min_years = 5                       # Lower threshold for more countries
@@ -196,7 +196,7 @@ A powerful application is comparing normals between periods to detect shifts:
 period1 <- pheno_normals(
   pep,
   period = 1961:1990,
-  species = "Triticum",
+  species = "Malus",
   phase_id = 60,
   by = "country",
   min_years = 10
@@ -206,7 +206,7 @@ period1 <- pheno_normals(
 period2 <- pheno_normals(
   pep,
   period = 1991:2020,
-  species = "Triticum",
+  species = "Malus",
   phase_id = 60,
   by = "country",
   min_years = 10
@@ -263,10 +263,10 @@ The anomaly can be expressed in:
 ### Calculating Anomalies with pheno_anomaly()
 
 ```{r anomalies-basic}
-# Calculate anomalies for wheat
+# Calculate anomalies for apple
 # Using 1990-2010 as baseline period
 anomalies <- pheno_anomaly(
-  pep = wheat,
+  pep = apple,
   baseline_period = 1990:2010,
   by = c("country", "phase_id"),
   min_years = 5
@@ -376,7 +376,7 @@ The `pep_quality()` function assesses three dimensions:
 ```{r quality-basic}
 # Assess quality at the station level
 quality <- pep_quality(
-  pep = wheat,
+  pep = apple,
   by = c("s_id", "phase_id")
 )
 
@@ -412,7 +412,7 @@ provides an overview of quality metrics:
 
 ```{r quality-plot, fig.height=5, fig.width=11}
 # Overview plot: grade distribution + station map (requires pep for coordinates)
-plot(quality, pep = wheat)
+plot(quality, pep = apple)
 ```
 
 **Reading the plot:**
@@ -430,7 +430,7 @@ plot(quality, which = "grades")
 
 ```{r quality-plot-map, fig.height=5}
 # Just the map of station quality
-plot(quality, which = "map", pep = wheat)
+plot(quality, which = "map", pep = apple)
 ```
 
 ### Filtering Data by Quality
@@ -450,11 +450,11 @@ cat("\nHigh quality (A or B):", nrow(high_quality), "of", nrow(quality),
 # Filter original data to these stations
 if (nrow(high_quality) > 0) {
   good_stations <- unique(high_quality$s_id)
-  wheat_hq <- wheat[s_id %in% good_stations]
+  apple_hq <- apple[s_id %in% good_stations]
 
-  cat("\nOriginal wheat observations:", nrow(wheat), "\n")
-  cat("After quality filter:", nrow(wheat_hq),
-      "(", round(100 * nrow(wheat_hq) / nrow(wheat), 1), "%)\n")
+  cat("\nOriginal apple observations:", nrow(apple), "\n")
+  cat("After quality filter:", nrow(apple_hq),
+      "(", round(100 * nrow(apple_hq) / nrow(apple), 1), "%)\n")
 }
 ```
 
@@ -480,7 +480,7 @@ Now let's put it all together in a realistic workflow:
 cat("=== STEP 1: Data Quality Assessment ===\n\n")
 
 # Assess quality
-quality <- pep_quality(wheat, by = c("s_id", "phase_id"))
+quality <- pep_quality(apple, by = c("s_id", "phase_id"))
 cat("Quality grades:\n")
 print(table(quality$quality_grade))
 
@@ -488,17 +488,17 @@ cat("\n=== STEP 2: Filter to Good Quality Data ===\n\n")
 
 # Keep grades A, B, and C (exclude only grade D)
 good_stations <- quality[quality_grade %in% c("A", "B", "C"), s_id]
-wheat_clean <- wheat[s_id %in% good_stations]
+apple_clean <- apple[s_id %in% good_stations]
 
-cat("Original observations:", nrow(wheat), "\n")
-cat("After quality filter:", nrow(wheat_clean), "\n")
-cat("Retained:", round(100 * nrow(wheat_clean) / nrow(wheat), 1), "%\n")
+cat("Original observations:", nrow(apple), "\n")
+cat("After quality filter:", nrow(apple_clean), "\n")
+cat("Retained:", round(100 * nrow(apple_clean) / nrow(apple), 1), "%\n")
 
 cat("\n=== STEP 3: Calculate Baseline Normals ===\n\n")
 
-if (nrow(wheat_clean) > 0) {
+if (nrow(apple_clean) > 0) {
   normals <- pheno_normals(
-    wheat_clean,
+    apple_clean,
     period = 1990:2010,
     by = c("country", "phase_id"),
     min_years = 5
@@ -511,7 +511,7 @@ if (nrow(wheat_clean) > 0) {
   cat("\n=== STEP 4: Calculate Anomalies ===\n\n")
 
   anomalies <- pheno_anomaly(
-    wheat_clean,
+    apple_clean,
     baseline_period = 1990:2010,
     by = c("country", "phase_id"),
     min_years = 5
@@ -570,23 +570,23 @@ The `pheno_plot_timeseries()` function creates publication-ready time series:
 
 ```{r timeseries-basic, fig.height=5}
 # Prepare aggregated data for visualization
-wheat_annual <- wheat[, .(
+apple_annual <- apple[, .(
   day = mean(day, na.rm = TRUE),
   n = .N
 ), by = .(year, species, phase_id)]
 
 # Add human-readable phase labels
-wheat_annual[, phase := factor(phase_id,
+apple_annual[, phase := factor(phase_id,
   levels = c(60, 65, 100),
   labels = c("Heading", "Flowering", "Harvest"))]
 
 # Remove rows where phase mapping failed
-wheat_annual <- wheat_annual[!is.na(phase)]
+apple_annual <- apple_annual[!is.na(phase)]
 
 # Plot time series with trend lines
-if (nrow(wheat_annual) > 0) {
+if (nrow(apple_annual) > 0) {
   pheno_plot_timeseries(
-    wheat_annual,
+    apple_annual,
     color_by = "phase",
     smooth = TRUE,
     title = "Wheat Phenology Trends"
@@ -608,11 +608,11 @@ The `pheno_trend_turning()` function uses the sequential Mann-Kendall test to
 detect such changes:
 
 ```{r trends-turning, fig.height=5}
-# Get wheat heading data
-wheat_heading <- pep[species == "Triticum aestivum" & phase_id == 60]
+# Get apple flowering data
+apple_flowering <- pep[species == "Malus domestica" & phase_id == 60]
 
 # Detect turning points
-turning <- pheno_trend_turning(wheat_heading, min_years = 10)
+turning <- pheno_trend_turning(apple_flowering, min_years = 10)
 print(turning)
 
 # Visualize the analysis
@@ -632,7 +632,7 @@ For a single trend value, use `kendall_tau()`:
 
 ```{r kendall-simple}
 # Aggregate to annual means
-annual_doy <- wheat_heading[, .(
+annual_doy <- apple_flowering[, .(
   mean_doy = mean(day, na.rm = TRUE)
 ), by = year][order(year)]
 
@@ -672,7 +672,7 @@ like global temperature anomalies:
 regional_data <- regional_box_ts(
   pep = pep,
   giss = giss,  # Global temperature anomalies
-  species_name = "Triticum aestivum",
+  species_name = "Malus domestica",
   year_min = 1961
 )
 

@@ -241,8 +241,8 @@ developmental stage.
 | `s_id` | **Station identifier** - A unique code for each monitoring location | "AT0001" |
 | `lon`, `lat` | **Geographic coordinates** - Longitude and latitude in decimal degrees | 15.5, 48.2 |
 | `alt` | **Altitude** - Elevation above sea level in meters | 350 |
-| `genus` | **Plant genus** - The genus name (first part of scientific name) | "Triticum" |
-| `species` | **Full species name** - Genus + specific epithet | "Triticum aestivum" |
+| `genus` | **Plant genus** - The genus name (first part of scientific name) | "Malus" |
+| `species` | **Full species name** - Genus + specific epithet | "Malus domestica" |
 | `phase_id` | **BBCH code** - Standardized phenological stage (explained below) | 60 |
 | `year` | **Observation year** | 2015 |
 | `day` | **Day of year (DOY)** - The day when the phase was observed (1-365) | 145 |
@@ -335,10 +335,10 @@ You'll often want to focus on specific subsets of the data. The package
 preserves the `pep` class when you subset, so all methods continue to work:
 
 ```{r subset}
-# Filter to wheat data using data.table syntax
+# Filter to apple data using data.table syntax
 # The syntax is: dataset[row_filter, column_selection]
-wheat <- pep[species == "Triticum aestivum"]
-print(wheat)
+apple <- pep[species == "Malus domestica"]
+print(apple)
 
 # Filter by year range
 recent <- pep[year >= 2000 & year <= 2015]
@@ -497,22 +497,22 @@ observations.
 ## Your First Analysis: Tracking Flowering Trends
 
 Let's put everything together with a simple but meaningful analysis: tracking
-how wheat flowering dates have changed over time.
+how apple flowering dates have changed over time.
 
 ```{r quick-analysis}
-# Step 1: Filter to wheat flowering (BBCH 60 = heading/first flowers)
-wheat_flowering <- pep[species == "Triticum aestivum" & phase_id == 60]
+# Step 1: Filter to apple flowering (BBCH 60 = first flowers)
+apple_flowering <- pep[species == "Malus domestica" & phase_id == 60]
 
-cat("Wheat flowering observations:", nrow(wheat_flowering), "\n")
-cat("Year range:", min(wheat_flowering$year), "-", max(wheat_flowering$year), "\n")
-cat("Countries:", length(unique(wheat_flowering$country)), "\n")
+cat("Apple flowering observations:", nrow(apple_flowering), "\n")
+cat("Year range:", min(apple_flowering$year), "-", max(apple_flowering$year), "\n")
+cat("Countries:", length(unique(apple_flowering$country)), "\n")
 
 # Step 2: Calculate annual mean DOY
 # The data.table syntax here means:
 #   - Group by year
 #   - Calculate mean DOY and count observations
 #   - Order by year
-annual_mean <- wheat_flowering[, .(
+annual_mean <- apple_flowering[, .(
   mean_doy = mean(day, na.rm = TRUE),
   n_obs = .N
 ), by = year][order(year)]
@@ -530,7 +530,7 @@ if (nrow(annual_mean) > 1) {
        type = "b",  # Both points and lines
        xlab = "Year",
        ylab = "Mean Day of Year",
-       main = "Wheat Flowering Date Over Time",
+       main = "Apple Flowering Date Over Time",
        pch = 19,    # Solid circles
        col = "steelblue")
 
@@ -563,14 +563,14 @@ As you start working with phenological data, keep these points in mind:
 ### Data Quality Matters
 
 - **Always check for outliers**: A flowering date of DOY 300 (late October) for
-  wheat is almost certainly an error
+  apple is almost certainly an error
 - **Consider sample sizes**: Trends from 5 observations are not reliable
 - **Check spatial coverage**: Trends might differ between regions
 
 
 ### Species Considerations
 
-- **Check taxonomy**: "Triticum" might include multiple wheat species
+- **Check taxonomy**: "Malus" might include multiple apple species
 - **Consider subspecies**: Some records have subspecies/variety information
 - **Wild vs. cultivated**: Agricultural species may behave differently than
   wild populations
