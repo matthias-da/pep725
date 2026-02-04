@@ -1,5 +1,5 @@
 ---
-title: 'pepper: An R package for synthetic and climate-sensitive phenology analysis based on the PEP725 network'
+title: 'pep725: An R package for synthetic and climate-sensitive phenology analysis based on the PEP725 network'
 tags:
   - R
   - phenology
