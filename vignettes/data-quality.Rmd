@@ -521,18 +521,18 @@ expected BBCH phase codes are present in your data.
 **Common questions this helps answer:**
 
 - Does my dataset have flowering observations (phase 60)?
-- Are heading and harvest phases both available for wheat?
+- Are flowering and fruit maturity phases both available for apple?
 - Which phases are missing for my species of interest?
 
 ## Checking Phase Presence
 
 ```{r check-basic}
-# Check if expected phases are present for wheat
-wheat <- pep[species == "Triticum aestivum"]
+# Check if expected phases are present for apple
+apple <- pep[species == "Malus domestica"]
 
 phase_check <- check_phases(
-  pep = wheat,
-  expected = c(60, 65, 100)  # heading, flowering, harvest
+  pep = apple,
+  expected = c(60, 65, 87)  # flowering, full flowering, fruit maturity
 )
 
 print(phase_check)
@@ -558,8 +558,8 @@ To check phase presence across multiple species at once:
 # Check phases for multiple species
 multi_check <- check_phases_multi(
   pep = pep,
-  species_list = c("Triticum aestivum", "Malus domestica"),
-  expected = c(60, 65, 100)
+  species_list = c("Malus domestica", "Vitis vinifera"),
+  expected = c(60, 65, 87)
 )
 
 print(multi_check)

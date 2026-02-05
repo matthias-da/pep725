@@ -37,7 +37,9 @@ utils::globalVariables(c(
   "sd_doy", "se", "series", "significant", "slope", "station_mean_doy",
   "subspecies", "tau", "thermal_sum", "tmp_end_ctrl", "tmp_end_scen",
   "tmp_start_ctrl", "tmp_start_scen", "total", "value", "var_value", "x", "y",
-  "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score"
+  "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score",
+  # pep_quality plot variables
+  "quality_grade", "pct", "completeness_pct", "outlier_pct"
 ))
 
 # =============================================================================
@@ -899,10 +901,25 @@ plot.pep_coverage <- function(x, ...) {
 
   # Temporal plot
   if (!is.null(x$temporal)) {
-    p_temporal <- ggplot2::ggplot(x$temporal$obs_by_year,
+    plot_data <- data.table::copy(x$temporal$obs_by_year)
+
+    # Add missing years with n_obs = 0 to show gaps
+    if (x$temporal$n_gaps > 0) {
+      missing_dt <- data.table::data.table(
+        year = x$temporal$missing_years,
+        n_obs = 0L,
+        n_stations = 0L,
+        n_species = 0L
+      )
+      plot_data <- rbind(plot_data, missing_dt)[order(year)]
+    }
+
+    p_temporal <- ggplot2::ggplot(plot_data,
                                    ggplot2::aes(x = year, y = n_obs)) +
       ggplot2::geom_line(color = "steelblue") +
-      ggplot2::geom_point(color = "steelblue", size = 1) +
+      ggplot2::geom_point(ggplot2::aes(color = n_obs == 0), size = 1.5) +
+      ggplot2::scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "red"),
+                                   guide = "none") +
       ggplot2::labs(title = "Temporal Coverage",
                     x = "Year", y = "Number of Observations") +
       ggplot2::theme_minimal()

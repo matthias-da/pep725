@@ -404,3 +404,219 @@ summary.pep_quality <- function(object, ...) {
     mean_outlier_pct = mean(object$outlier_pct, na.rm = TRUE)
   ))
 }
+
+
+#' Plot Method for Data Quality Assessment
+#'
+#' Creates visualizations of phenological data quality metrics, including
+#' grade distribution and a map of station quality.
+#'
+#' @param x A \code{pep_quality} object.
+#' @param which Character. Type of plot to produce:
+#'   \itemize{
+#'     \item \code{"overview"} (default): Two-panel overview with grade
+#'       distribution and station quality map (requires \code{pep} argument)
+#'     \item \code{"grades"}: Bar chart of quality grade distribution only
+#'     \item \code{"map"}: Map of station locations colored by quality grade
+#'       (requires \code{pep} argument for coordinates)
+#'   }
+#' @param pep Optional \code{pep} object providing station coordinates (lon, lat).
+#'   Required for \code{which = "map"} or \code{which = "overview"}.
+#' @param show_grades Character vector of grades to display on the map.
+#'   Default is \code{c("A", "B", "C", "D")} (all grades). Use e.g.
+#'   \code{show_grades = "D"} to show only poor-quality stations.
+#' @param alpha Numeric. Transparency of points on the map (0-1). Default is 0.6.
+#' @param title Optional character string for the plot title.
+#' @param ... Additional arguments (unused).
+#'
+#' @return A ggplot object (invisibly).
+#'
+#' @details
+#' For the map visualization, the function:
+#' \itemize{
+#'   \item Aggregates quality to one grade per station (worst grade if multiple phases)
+#'   \item Uses country borders from the \code{rnaturalearth} package
+#'   \item Uses colorblind-friendly colors (blue=A, cyan=B, orange=C, vermillion=D)
+#' }
+#'
+#' @examples
+#' \donttest{
+#' pep <- pep_download()
+#'
+#' # Assess quality for Swiss stations
+#' pep_ch <- pep[country == "Switzerland"]
+#' quality <- pep_quality(pep_ch, by = c("s_id", "phase_id"))
+#'
+#' # Grade distribution only (no pep data needed)
+#' plot(quality, which = "grades")
+#'
+#' # Map of station quality (requires pep for coordinates)
+#' plot(quality, which = "map", pep = pep_ch)
+#'
+#' # Map showing only poor-quality stations
+#' plot(quality, which = "map", pep = pep_ch, show_grades = "D")
+#'
+#' # Map showing problematic stations (C and D grades)
+#' plot(quality, which = "map", pep = pep_ch, show_grades = c("C", "D"))
+#'
+#' # Overview: grades + map
+#' plot(quality, pep = pep_ch)
+#' }
+#'
+#' @author Matthias Templ
+#' @export
+plot.pep_quality <- function(x, which = c("overview", "grades", "map"),
+                              pep = NULL, show_grades = c("A", "B", "C", "D"),
+                              alpha = 0.6, title = NULL, ...) {
+  which <- match.arg(which)
+
+  # Validate show_grades
+
+  show_grades <- match.arg(show_grades, c("A", "B", "C", "D"), several.ok = TRUE)
+
+  # Colorblind-friendly palette (Okabe-Ito inspired)
+  # Blue for best, vermillion for worst - distinguishable for most color vision types
+  grade_colors <- c("A" = "#0072B2", "B" = "#56B4E9", "C" = "#E69F00", "D" = "#D55E00")
+
+  # Ensure quality_grade is a factor with correct order
+  plot_data <- data.table::as.data.table(x)
+  plot_data[, quality_grade := factor(quality_grade, levels = c("A", "B", "C", "D"))]
+
+  # Grade distribution bar chart
+  plot_grades <- function() {
+    grade_counts <- plot_data[, .N, by = quality_grade]
+    grade_counts[, pct := 100 * N / sum(N)]
+
+    ggplot2::ggplot(grade_counts, ggplot2::aes(x = quality_grade, y = N, fill = quality_grade)) +
+      ggplot2::geom_col(show.legend = FALSE) +
+      ggplot2::geom_text(ggplot2::aes(label = sprintf("%d\n(%.0f%%)", N, pct)),
+                         vjust = -0.2, size = 3) +
+      ggplot2::scale_fill_manual(values = grade_colors) +
+      ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.15))) +
+      ggplot2::labs(x = "Quality Grade", y = "Number of Groups",
+                    title = "Quality Grade Distribution") +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank())
+  }
+
+  # Map of station quality
+  plot_map <- function() {
+    if (is.null(pep)) {
+      stop("'pep' argument required for map visualization (provides station coordinates)",
+           call. = FALSE)
+    }
+
+    # Check for required columns
+    if (!all(c("s_id", "lon", "lat") %in% names(pep))) {
+      stop("'pep' must contain columns: s_id, lon, lat", call. = FALSE)
+    }
+
+    # Get unique station coordinates
+    stations <- unique(data.table::as.data.table(pep)[, .(s_id, lon, lat)])
+
+    # Aggregate quality to station level (worst grade per station)
+    # Convert grade to numeric for aggregation, then back
+    grade_numeric <- c("A" = 1, "B" = 2, "C" = 3, "D" = 4)
+    plot_data[, grade_num := grade_numeric[as.character(quality_grade)]]
+
+    station_quality <- plot_data[, .(
+      worst_grade_num = max(grade_num, na.rm = TRUE),
+      n_phases = .N
+    ), by = s_id]
+
+    station_quality[, quality_grade := factor(
+      names(grade_numeric)[worst_grade_num],
+      levels = c("A", "B", "C", "D")
+    )]
+
+    # Merge with coordinates
+    map_data <- merge(station_quality, stations, by = "s_id", all.x = TRUE)
+    map_data <- map_data[!is.na(lon) & !is.na(lat)]
+
+    # Filter to selected grades
+    map_data <- map_data[quality_grade %in% show_grades]
+
+    if (nrow(map_data) == 0) {
+      stop("No stations with valid coordinates found for grades: ",
+           paste(show_grades, collapse = ", "), call. = FALSE)
+    }
+
+    # Get country borders from rnaturalearth
+    world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+
+    # Determine map extent from data (with padding)
+    lon_range <- range(map_data$lon, na.rm = TRUE)
+    lat_range <- range(map_data$lat, na.rm = TRUE)
+    lon_pad <- diff(lon_range) * 0.1
+    lat_pad <- diff(lat_range) * 0.1
+
+    # Build subtitle
+    grade_str <- if (length(show_grades) == 4) "all grades" else paste("Grade", paste(show_grades, collapse = ", "))
+    subtitle <- sprintf("%d stations (%s)", nrow(map_data), grade_str)
+
+    # Create map
+    ggplot2::ggplot() +
+      ggplot2::geom_sf(data = world, fill = "gray95", color = "gray70", linewidth = 0.2) +
+      ggplot2::geom_point(
+        data = map_data,
+        ggplot2::aes(x = lon, y = lat, color = quality_grade),
+        size = 2, alpha = alpha
+      ) +
+      ggplot2::scale_color_manual(values = grade_colors, name = "Grade", drop = FALSE) +
+      ggplot2::coord_sf(
+        xlim = c(lon_range[1] - lon_pad, lon_range[2] + lon_pad),
+        ylim = c(lat_range[1] - lat_pad, lat_range[2] + lat_pad),
+        expand = FALSE
+      ) +
+      ggplot2::labs(
+        title = "Station Quality Map",
+        subtitle = subtitle,
+        x = "Longitude", y = "Latitude"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        panel.grid = ggplot2::element_line(color = "gray90"),
+        legend.position = "right"
+      )
+  }
+
+  # Generate requested plot type
+  if (which == "grades") {
+    p <- plot_grades()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  if (which == "map") {
+    p <- plot_map()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  # Overview: grades + map side by side
+  if (is.null(pep)) {
+    message("Note: 'pep' argument not provided. Showing grades only.")
+    message("For overview with map, use: plot(quality, pep = your_pep_data)")
+    p <- plot_grades()
+    if (!is.null(title)) p <- p + ggplot2::labs(title = title)
+    print(p)
+    return(invisible(p))
+  }
+
+  p1 <- plot_grades()
+  p2 <- plot_map()
+
+  # Use patchwork to combine
+  combined <- p1 + p2 +
+    patchwork::plot_annotation(
+      title = if (!is.null(title)) title else "Data Quality Overview",
+      subtitle = sprintf("Total groups: %d | Stations: %d",
+                         nrow(x), length(unique(plot_data$s_id)))
+    ) +
+    patchwork::plot_layout(widths = c(1, 2))
+
+  print(combined)
+  invisible(combined)
+}

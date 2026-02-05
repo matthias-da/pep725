@@ -419,8 +419,18 @@ print.pheno_anomaly <- function(x, n = 10, ...) {
 
   cat(strrep("-", 50), "\n\n")
 
-  # Print as data.table
-  print(data.table::as.data.table(x)[1:min(n, nrow(x))])
+
+  # Print as data.table, with NA values listed last
+  print_dt <- data.table::as.data.table(x)
+  # Order by: 1) NA in grouping columns (e.g. country), 2) NA in anomaly_days
+  na_cols <- intersect(c("country", "genus", "species"), names(print_dt))
+  if (length(na_cols) > 0) {
+    has_na_group <- rowSums(is.na(print_dt[, ..na_cols])) > 0
+    print_dt <- print_dt[order(has_na_group, is.na(anomaly_days))]
+  } else {
+    print_dt <- print_dt[order(is.na(anomaly_days))]
+  }
+  print(print_dt[1:min(n, nrow(print_dt))])
 
   if (nrow(x) > n) {
     cat(sprintf("\n... and %d more rows\n", nrow(x) - n))
