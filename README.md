@@ -9,6 +9,13 @@ PEP725 Pan-European Phenological Data Analysis
 
 **pep725** is an R package for analyzing phenological data from the [PEP725 Pan-European Phenology Database](http://www.pep725.eu/) and other European observational sources. It provides tools for data exploration, quality assessment, climatological baseline calculation, trend analysis, and visualization of phenology-climate relationships.
 
+## Citation
+
+If you use this R package, please cite:
+Templ and Templ (2026). pep725: An R package for Pan-European Phenological Data Analysis. *The Journal of Open Source Software*, under review. 
+Until it gets published, please cite:
+Templ et al. (2018). Pan European Phenological database (PEP725): a single point of access for European data. Int. J. Biometeorology, 62(6): 1109-1113. doi:10.1007/s00484-018-1512-8
+
 ## Features
 
 **Data Access:**
@@ -155,14 +162,6 @@ vignette("spatial-patterns", package = "pep725")
   ggmap::register_google(key = "your_api_key")
   ```
 
-## Citation
-
-If you use this package, please cite:
-
-Templ et al. (2018). Phenological patterns of flowering across biogeographical
-regions of Europe. *International Journal of Biometeorology*, 62, 1347-1358.
-doi:10.1007/s00484-018-1512-8
-
 ## License
 
 GPL-3
@@ -171,6 +170,9 @@ GPL-3
 
 - Matthias Templ (maintainer)
 - Barbara Templ
+
+## Acknowledgements
+Dr. Barbara Templ was supported by the Berner Nachwuchsförderung (BNF) program of the University of Bern for developing the **pep725** R package.
 
 ## Links
 
