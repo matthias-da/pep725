@@ -41,7 +41,7 @@ Key characteristics of PEP725 include [@templ2018; @templ2026]:
 - **Thousands of monitoring stations** spanning a wide range of elevations
 - **Broad taxonomic coverage** including agricultural crops, fruit trees, wild plant and forest tree species
 
-Observations in PEP725 are based on standardized phase definitions (largely aligned with BBCH-type schemes) and consistent observation protocols within national networks. This standardization enables comparative analyses across regions, species, and time periods.
+Observations in PEP725 are based on standardized phase definitions (largely aligned with BBCH-type schemes) and consistent observation protocols within national networks. This standardization enables comparative analyses across regions, species, and time periods, thus addresses key data integration and reusability challenges commonly encountered in large, heterogeneous phenological datasets [@templ2025].
 
 ## Why Use the pep725 R Package?
 
@@ -60,6 +60,7 @@ The **pep725** package addresses these challenges by providing:
 - Functions for calculating phenological normals and anomalies
 - Spatial analysis (gradients, synchrony)
 - Publication-ready visualizations
+
 
 ## Installation
 
