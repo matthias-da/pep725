@@ -76,7 +76,7 @@ jobs:
 
 ### 4. Create CODE_OF_CONDUCT.md
 
-- [ ] Create `CODE_OF_CONDUCT.md` using Contributor Covenant: https://www.contributor-covenant.org/version/2/1/code_of_conduct/
+- [x] Create `CODE_OF_CONDUCT.md` using Contributor Covenant: https://www.contributor-covenant.org/version/2/1/code_of_conduct/
 
 ---
 
@@ -192,7 +192,7 @@ Current: ~773 words (limit: 750-1750)
 | testthat tests | ❌ Not started | High |
 | GitHub Actions CI | ⚠️ Created locally, needs PAT update to push | High |
 | CONTRIBUTING.md | ✅ Done | High |
-| CODE_OF_CONDUCT.md | ❌ Not started | Medium |
+| CODE_OF_CONDUCT.md | ✅ Done | Medium |
 | Paper format (paper.md) | ❌ Not started | Medium |
 | Paper date format | ✅ Done | Low |
 | JOSS PDF workflow | ⚠️ Created locally, needs PAT update to push | Medium |
