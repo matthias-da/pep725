@@ -1,7 +1,7 @@
 # pep725
 
 <p align="center">
-  <img src="pep725_logo_cpt.png" alt="pep725 logo" width="180"/>
+  <img src="presentations/pep725_logo_cpt.png" alt="pep725 logo" width="180"/>
 </p>
 
 
