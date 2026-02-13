@@ -42,10 +42,9 @@ The following sections introduce practical tools in pep725 package for diagnosin
 | Section | Topic | Key Functions |
 |---------|-------|---------------|
 | Part 1 | Detecting statistical outliers | `flag_outliers()`, `plot_outliers()` |
-| Part 2 | Second flowering and repeated events | `detect_second_events()` |
-| Part 3 | Temporal coverage and completeness | `pep_completeness()` |
-| Part 4 | Phase presence validation | `check_phases()` |
-| Part 5 | Integrated workflow | Combining all approaches |
+| Part 2 | Temporal coverage and completeness | `pep_completeness()` |
+| Part 3 | Phase presence validation | `check_phases()` |
+| Part 4 | Integrated workflow | Combining all approaches |
 
 ### Prerequisites
 
@@ -88,8 +87,8 @@ pattern. In phenological data, outliers may indicate:
    - Very warm winter causing early flowering
    - Late frost delaying spring phenology
 
-3. **Second flowering** or other repeated phenological events
-   - Plants flowering again in autumn after spring flowering
+3. **Second flowering** or other abnormal phenological events
+   - Plants flowering again in autumn/winter after spring flowering
    - Increasingly observed with climate change
 
 **The challenge**: You can't simply delete all outliers. Some are errors, but
@@ -292,149 +291,7 @@ plot_outliers(outliers, type = "map")
 
 ---
 
-# Part 2: Detecting Second Flowering Events
-
-## What is Second Flowering?
-
-**Second flowering** (also called "second bloom" or "re-flowering") occurs when
-plants flower again after their normal flowering period, typically in autumn
-after spring flowering. This phenomenon has several causes:
-
-```
-Normal flowering pattern:
-
-Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec
-                    [FLOWERING]
-
-Second flowering pattern:
-
-Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec
-                    [FLOWERING]              [FLOWERING]
-                                                  ↑
-                                          Second event!
-```
-
-### Causes of Second Flowering
-
-| Cause | Mechanism | Example |
-|-------|-----------|---------|
-| **Warm autumn** | Accumulated heat breaks dormancy | Indian summer in October |
-| **Drought stress release** | Rain after drought triggers flowering | Late summer rains |
-| **Climate disruption** | Normal seasonal cues disrupted | Warm September following hot summer |
-| **Species-specific** | Some species naturally flower twice | Some Rosaceae species |
-
-### Why Study Second Flowering?
-
-Second flowering is increasingly observed across Europe and may indicate:
-
-1. **Climate change impacts**: Changing seasonal temperature patterns
-2. **Ecosystem disruption**: Mismatches between plants and pollinators
-3. **Plant stress indicators**: Response to unusual conditions
-4. **Agricultural implications**: Impacts on fruit set and resource allocation
-
-## Detection Methods
-
-The `detect_second_events()` function uses two complementary approaches:
-
-### Method 1: Late Season Detection
-
-Identifies observations occurring after the expected flowering window:
-
-```{r second-methods}
-# Method 1: Late season detection (events after expected window)
-late_events <- detect_second_events(
-  pep = flowering,
-  phases = c(60, 65),
-  method = "late_season",
-  late_threshold = 250  # After September 7 (DOY 250)
-)
-
-print(late_events)
-```
-
-**Understanding the `late_threshold` parameter:**
-
-| DOY | Date | Interpretation |
-|-----|------|----------------|
-| 220 | August 8 | Strict - catches more events |
-| 250 | September 7 | Moderate (recommended) |
-| 280 | October 7 | Conservative - only very late events |
-
-### Method 2: Multiple Observations Per Year
-
-Identifies stations that report the same phase twice in one year:
-
-```{r second-multiple, eval=FALSE}
-# Method 2: Multiple observations per year at same station
-multiple_events <- detect_second_events(
-  pep = flowering,
-  method = "multiple_per_year",
-  gap_threshold = 60  # At least 60 days between observations
-)
-
-# Method 3: Both methods combined (most comprehensive)
-all_events <- detect_second_events(
-  pep = flowering,
-  method = "both"
-)
-```
-
-**The `gap_threshold` parameter:**
-
-This ensures that "multiple events" are truly separate flowering periods, not
-just re-observations of the same event. A 60-day gap ensures the plant had time
-to finish the first flowering and initiate a new one.
-
-## Interpreting Results
-
-```{r second-summary}
-summary(late_events)
-```
-
-## Visualizing Second Events
-
-### Overview of Detected Events
-
-```{r second-plot, fig.height=5}
-# Overview of detected events
-plot(late_events, type = "overview")
-```
-
-### Timeline View
-
-```{r second-timeline, fig.height=5}
-# Timeline showing when events occur
-plot(late_events, type = "timeline")
-```
-
-## Assessing Confidence
-
-Not all detected events are truly second flowering. Use these criteria to
-assess confidence:
-
-| Confidence Level | Criteria | Action |
-|------------------|----------|--------|
-| **High** | Same station reports phase twice with 60+ day gap | Likely real - include in analysis |
-| **Medium** | Single late observation clearly outside normal window | Plausible - verify if possible |
-| **Low / Uncertain** | Isolated observation, near boundary | Could be error - investigate further |
-
-### Filtering by Confidence
-
-```{r second-filter}
-# Focus on high-confidence events (large z-scores indicate very unusual timing)
-if (nrow(late_events$events) > 0) {
-  high_conf <- late_events$events[abs(z_score) > 5]
-  cat("High-confidence events (|z| > 5):", nrow(high_conf), "\n")
-  if (nrow(high_conf) > 0) {
-    print(high_conf[1:min(5, nrow(high_conf)),
-                    .(species, year, day, z_score)])
-  }
-}
-```
-
----
-
-# Part 3: Data Completeness
+# Part 2: Data Completeness
 
 ## Why Check Completeness?
 
@@ -636,19 +493,7 @@ plot_outliers(outliers, type = "overview")   # How many, which species?
 plot_outliers(outliers, type = "seasonal")   # When in the year?
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 4: Investigate late-season outliers for second events
-# ══════════════════════════════════════════════════════════════════════════════
-# Why: Late outliers may be second flowering, not errors
-
-second <- detect_second_events(
-  pep_filtered[phase_id %in% c(60, 65)],
-  late_threshold = 250
-)
-
-cat("Detected", nrow(second$events), "potential second flowering events\n")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# STEP 5: Make informed decisions about exclusion
+# STEP 4: Make informed decisions about exclusion
 # ══════════════════════════════════════════════════════════════════════════════
 # Key principle: Document your decisions!
 
@@ -658,13 +503,8 @@ pep_strict <- outliers[is_outlier == FALSE]
 # Option B: Moderate cleaning (keep moderate outliers)
 pep_moderate <- outliers[is_outlier == FALSE | abs(deviation) < 60]
 
-# Option C: Keep second flowering events for separate analysis
-second_events_ids <- second$events$obs_id
-pep_main <- outliers[!obs_id %in% second_events_ids & is_outlier == FALSE]
-pep_second <- outliers[obs_id %in% second_events_ids]
-
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 6: Proceed with analysis on cleaned data
+# STEP 5: Proceed with analysis on cleaned data
 # ══════════════════════════════════════════════════════════════════════════════
 
 normals <- pheno_normals(pep_moderate, period = 1991:2020)
@@ -684,7 +524,7 @@ Data Quality Control:
 
 3. Outlier disposition:
    - Excluded: Z observations with deviations > 60 days (likely errors)
-   - Retained: W observations identified as potential second flowering
+   - Retained: W observations identified as abnormal events (e.g second flowering)
 
 4. Phase validation: Checked for sequence violations in [species list]
    (identified V cases for manual review)
@@ -700,7 +540,7 @@ Data Quality Control:
    than z-scores. The MAD method is generally recommended.
 
 2. **Check seasonally**: Late-season outliers (DOY > 250) may be biologically
-   meaningful second flowering events rather than errors.
+   meaningful events (e.g. second flowering) rather than errors.
 
 3. **Verify extremes**: For observations with very large deviations (> 60 days),
    try to check original data sources or contact data providers.
@@ -711,7 +551,7 @@ Data Quality Control:
 5. **Don't delete automatically**: Human judgment is needed to distinguish
    errors from genuine unusual events.
 
-## For Second Flowering Detection
+## For Abnormal Event Detection
 
 1. **Consider species biology**: Some species (e.g., certain Rosaceae) are more
    prone to second flowering than others.
@@ -719,14 +559,14 @@ Data Quality Control:
 2. **Check geographic patterns**: If multiple nearby stations report late events
    in the same year, this suggests a real regional phenomenon.
 
-3. **Look at weather context**: Link unusual events to temperature anomalies -
-   warm autumn weather is a common trigger.
+3. **Look at weather context**: Link abnormal events to weather extremes -
+   drought is a common trigger.
 
 4. **Distinguish from errors**: Very isolated observations (single station,
-   single year) need verification before treating as second flowering.
+   single year) need verification before treating them as e.g. second flowering.
 
-5. **Keep for separate analysis**: Second flowering events are scientifically
-   interesting - don't just delete them!
+5. **Keep for separate analysis**: Abnormal phenological events are scientifically
+   interesting (proof of climate change) - don't just delete them!
 
 ## For Completeness Assessment
 
@@ -763,7 +603,6 @@ This vignette covered data quality tools for phenological analysis:
 |----------|---------|------------|
 | `flag_outliers()` | Identify unusual observations | `is_outlier` flag, `deviation` in days |
 | `plot_outliers()` | Visualize outlier patterns | Four plot types: overview, seasonal, detail, map |
-| `detect_second_events()` | Find potential second flowering | List of candidate events with confidence |
 | `pep_completeness()` | Assess temporal coverage | Completeness %, gaps, year range |
 | `check_phases()` | Check phase presence | Missing phases, observation counts |
 
@@ -773,7 +612,7 @@ This vignette covered data quality tools for phenological analysis:
    affects the validity of all downstream analyses.
 
 2. **Not all outliers are errors** - some represent genuine biological phenomena
-   like second flowering that deserve study.
+   like second flowering that deserve further study.
 
 3. **Document your decisions** - quality control choices should be transparent
    and reproducible.

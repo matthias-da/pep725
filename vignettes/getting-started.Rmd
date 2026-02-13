@@ -99,6 +99,7 @@ option to use is important for your workflow:
 | **2. Seed dataset** | Quick offline tests, minimal examples | ~1,300 rows | No |
 | **3. Generate synthetic data** | Creating shareable versions of your data | Variable | No |
 | **4. Import real PEP725 data** | Actual research and publications | ~7.24M rows | For initial download |
+| **5. Use your own phenological data** | Regional networks, field trials, citizen science datasets | Variable | No |
 
 ### Why Synthetic Data?
 
@@ -200,7 +201,24 @@ The `pep_import()` function automatically cleans and formats the data:
 - Removes problematic columns
 - Optionally adds country names based on coordinates
 
----
+
+### Option 5: Use Your Own Plant phenological Data
+
+Although **pep725** is designed around the structure and conventions of the PEP725 database, it is not limited to PEP725 data.
+
+If your dataset consists of station-based phenological observations with:
+
+- spatial coordinates (longitude and latitude),
+- observation year,
+- species identifiers,
+- phenophase identifiers,
+- and day-of-year (DOY) information,
+
+you can use most of the functionality in **pep725** with minimal adaptation.
+
+The key requirement is a *PEP725-like tabular structure* — one row per observation. This structure can usually be achieved with straightforward preprocessing (e.g., renaming columns and ensuring consistent DOY formatting).
+
+
 
 > **Important Note for Research**
 >
@@ -211,7 +229,7 @@ The `pep_import()` function automatically cleans and formats the data:
 > at [pep725.eu](http://www.pep725.eu/), simply replace `pep_download()` with
 > `pep_import("your/data/path/")`. All the analysis techniques work identically.
 
----
+
 
 ## Understanding the Data Structure
 
@@ -652,7 +670,6 @@ Ensure your data is reliable and investigate unusual observations:
 
 - `flag_outliers()` - Identify suspicious observations
 - `plot_outliers()` - Visualize outliers in context
-- `detect_second_events()` - Find potential second flowering events
 
 ## Getting Help
 

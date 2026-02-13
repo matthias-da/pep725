@@ -760,7 +760,7 @@ You now understand the core analytical functions. Continue to:
 - **Spatial Phenological Patterns**: How does phenology vary with elevation
   and latitude? Use `pheno_gradient()` and `pheno_synchrony()`.
 
-- **Data Quality & Irregular Events**: How to detect outliers and identify irregular events.
+- **Data Quality & Irregular Events**: How to detect outliers and identify abnormal events.
 
 ## Session Info
 
