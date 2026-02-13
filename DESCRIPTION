@@ -24,9 +24,9 @@ Description: Provides comprehensive tools for analyzing phenological data from
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr
-Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, nlme, purrr, quantreg, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: hail, knitr, rmarkdown, devtools, rnaturalearthdata, pls, testthat (>= 3.0.0)
+Depends: R (>= 4.1), data.table, ggplot2
+Imports: dplyr, mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, patchwork, purrr, robustbase, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Suggests: hail, knitr, nlme, quantreg, rmarkdown, devtools, rnaturalearthdata, pls, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

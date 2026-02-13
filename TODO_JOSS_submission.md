@@ -276,8 +276,8 @@ Comprehensive code, documentation, and vignette review (2026-02-13).
 
 ### B. Package Structure Issues
 
-- [ ] **Depends → Imports**: `dplyr`, `robustbase`, and `patchwork` are in `Depends` but should be in `Imports` (CRAN policy: only R and base packages in Depends unless re-export is needed)
-- [ ] **Imports → Suggests**: `nlme` and `quantreg` are in `Imports` but used only in `pheno_combine()` — move to `Suggests` with `requireNamespace()` checks
+- [x] **Depends → Imports**: Moved `dplyr`, `robustbase`, and `patchwork` from `Depends` to `Imports` (all calls already namespace-qualified)
+- [x] **Imports → Suggests**: Moved `nlme` and `quantreg` to `Suggests` (already had `requireNamespace()` guards and `::` calls)
 - [ ] **Heavy interactive deps in Imports**: `shiny`, `miniUI`, `leaflet`, `leaflet.extras` are in `Imports` but only used by `leaflet_pep()` — consider moving to `Suggests`
 - [ ] **`.Rbuildignore` incomplete**: Add `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`, `.github/` (partially overlaps with R CMD check NOTEs above)
 - [ ] **Test coverage ~10%**: 95 tests cover 5 core functions; no tests for `pep_import()`, `simulate_pep()`, `pheno_combine()`, `pheno_trend_turning()`, `pls_phenology()`, `flag_outliers()`, `detect_second_events()`, `check_phases()`, `pep_completeness()`, visualization functions
