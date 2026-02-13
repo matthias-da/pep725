@@ -1,3 +1,5 @@
+utils::globalVariables(c("a"))
+
 #' Compute CTRL and SCEN Phenology Day-of-Year Values
 #'
 #' This function computes the mean phenological day-of-year (DOY) for two

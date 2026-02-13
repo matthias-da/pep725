@@ -25,8 +25,8 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.1), data.table, ggplot2
-Imports: dplyr, mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, patchwork, purrr, robustbase, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: hail, knitr, nlme, quantreg, rmarkdown, devtools, rnaturalearthdata, pls, testthat (>= 3.0.0)
+Imports: dplyr, mgcv, ggmap, methods, patchwork, purrr, robustbase, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Suggests: hail, knitr, leaflet, leaflet.extras, miniUI, nlme, quantreg, rmarkdown, devtools, rnaturalearthdata, pls, shiny, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

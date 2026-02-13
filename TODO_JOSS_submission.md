@@ -278,7 +278,7 @@ Comprehensive code, documentation, and vignette review (2026-02-13).
 
 - [x] **Depends → Imports**: Moved `dplyr`, `robustbase`, and `patchwork` from `Depends` to `Imports` (all calls already namespace-qualified)
 - [x] **Imports → Suggests**: Moved `nlme` and `quantreg` to `Suggests` (already had `requireNamespace()` guards and `::` calls)
-- [ ] **Heavy interactive deps in Imports**: `shiny`, `miniUI`, `leaflet`, `leaflet.extras` are in `Imports` but only used by `leaflet_pep()` — consider moving to `Suggests`
+- [x] **Heavy interactive deps to Suggests**: Moved `shiny`, `miniUI`, `leaflet`, `leaflet.extras` to `Suggests`; namespace-qualified all calls in `leaflet_pep.R`; added proper error message when missing
 - [ ] **`.Rbuildignore` incomplete**: Add `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`, `.github/` (partially overlaps with R CMD check NOTEs above)
 - [ ] **Test coverage ~10%**: 95 tests cover 5 core functions; no tests for `pep_import()`, `simulate_pep()`, `pheno_combine()`, `pheno_trend_turning()`, `pls_phenology()`, `flag_outliers()`, `detect_second_events()`, `check_phases()`, `pep_completeness()`, visualization functions
 - [ ] **BBCH lookup table duplicated 4×**: `bbch_description()` in `pep_class.R`, plus copies in `pep_import.R`, `simulate_pep.R`, `pep_download.R`. Consolidate to a single internal dataset or function.

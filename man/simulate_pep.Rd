@@ -34,12 +34,9 @@ pep_ch <- pep[country == "Switzerland"]
 # Generate synthetic data
 pep_synth <- simulate_pep(pep_ch)
 
-# Use with analysis functions (grapevine has longest records)
-# Load GISS data from hail package
-data(giss, package = "hail")
-out <- regional_box_ts(pep = pep_synth, giss = giss,
-                       species_name = "Vitis vinifera",
-                       phase = 65)
+# Use with analysis functions
+normals <- pheno_normals(pep_synth, period = 1990:2015,
+                         by = c("country", "phase_id"))
 }
 }
 \author{

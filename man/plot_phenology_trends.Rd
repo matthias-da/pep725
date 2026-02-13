@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_phenology_trends.R
 \name{plot_phenology_trends}
 \alias{plot_phenology_trends}
-\title{Plot Robust Phenological Trends With GISS-Based Climate Forcing}
+\title{Plot Robust Phenological Trends}
 \usage{
 plot_phenology_trends(
   pep,
@@ -17,7 +17,7 @@ plot_phenology_trends(
   calib_years = 1991:2020,
   pred_years = NULL,
   subregions = c("Austria", "Germany-North", "Germany-South", "Switzerland"),
-  giss_data,
+  giss_data = NULL,
   layout = c("country_phase", "phase_country"),
   title = NULL
 )
@@ -56,10 +56,8 @@ Default is \code{1990:2090}.}
 \item{subregions}{Character vector of country names to include
 (default: DACH region).}
 
-\item{giss_data}{A data frame with at least \code{year} and either \code{Tgl}
-(absolute temperature) or \code{dT} (anomaly). If \code{dT} is supplied,
-the function automatically constructs \code{Tgl = dT + 14}.
-Load from hail package: \code{data(giss, package = "hail")}.}
+\item{giss_data}{Deprecated. Previously used for climate data integration;
+now ignored. For climate sensitivity analysis, use the \pkg{hail} package.}
 
 \item{layout}{Either \code{"country_phase"} (default) or \code{"phase_country"}
 to control facet arrangement.}
@@ -73,11 +71,6 @@ A \code{ggplot} object.
 \description{
 This function visualizes long-term phenological trends for one genus or species,
 using robust MM-regression (\code{robustbase::lmrob}) applied to mean annual DOYs.
-Phenological observations are merged with global mean temperature anomalies
-from NASA GISS to compute climate-driven trends using the model:
-\deqn{DOY = a + b \cdot T_{\mathrm{gl}}}
-where \eqn{T_{\mathrm{gl}}} is the global mean surface temperature
-(absolute temperature reconstructed as anomaly + 14 degC).
 }
 \details{
 The function produces a faceted panel plot showing:
@@ -92,9 +85,8 @@ The function performs the following steps:
 \enumerate{
 \item Filter PEP data by species, phases, regions, years.
 \item Aggregate DOYs by year-country-phase.
-\item Merge with GISS global temperature anomalies.
-\item Fit robust regression \eqn{DOY ~ Tgl} over the calibration window.
-\item Predict past and future trends using historical and PGW-temperature.
+\item Fit robust regression \eqn{DOY \sim year} over the calibration window.
+\item Predict past and future trends.
 \item Draw ribbon (IQR), annual means, trend lines, climate windows.
 \item Facet by country or by phase.
 }
@@ -104,12 +96,7 @@ outliers and non-normality, and therefore ideal for phenological time series.
 }
 \examples{
 \dontrun{
-# Load PEP and prepare DOY
 pep <- pep_download()
-colnames(pep)[colnames(pep) == "day"] <- "DOY"
-
-# Load GISS data from hail package
-data(giss, package = "hail")
 
 # Grapevine (Vitis vinifera) - longest historical records
 # phases BBCH 65 (flowering) & 81 (veraison), DACH only:
@@ -117,7 +104,6 @@ plot_phenology_trends(
   pep,
   species_name = "Vitis vinifera",
   phases = c(65, 81),
-  giss_data = giss,
   layout = "country_phase"
 )
 
@@ -126,7 +112,6 @@ plot_phenology_trends(
   pep,
   species_name = "Vitis vinifera",
   phases = c(65, 81),
-  giss_data = giss,
   layout = "phase_country"
 )
 
@@ -134,8 +119,7 @@ plot_phenology_trends(
 plot_phenology_trends(
   pep,
   genus_name = "Vitis",
-  phases = c(65, 81),
-  giss_data = giss
+  phases = c(65, 81)
 )
 }
 }

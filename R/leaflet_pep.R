@@ -19,7 +19,6 @@
 #' selected <- leaflet_pep(wheat)
 #' }
 #'
-#' @import leaflet leaflet.extras shiny miniUI
 #' @examples
 #' \dontrun{
 #' # Download synthetic data first
@@ -40,10 +39,13 @@
 #' @author Matthias Templ
 #' @export
 leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
-  requireNamespace("shiny")
-  requireNamespace("miniUI")
-  requireNamespace("leaflet")
-  requireNamespace("leaflet.extras")
+  pkgs <- c("shiny", "miniUI", "leaflet", "leaflet.extras")
+  missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
+  if (length(missing) > 0) {
+    stop("Package(s) ", paste(missing, collapse = ", "),
+         " required for leaflet_pep(). Install with: install.packages(c(",
+         paste0('"', missing, '"', collapse = ", "), "))", call. = FALSE)
+  }
 
   if (!all(c("lon", "lat") %in% names(pep))) stop("pep must contain 'lon' and 'lat' columns.")
 
@@ -131,7 +133,7 @@ leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
 
   # Server
   server <- function(input, output, session) {
-    values <- reactiveValues(
+    values <- shiny::reactiveValues(
       selected_points = data.frame(),
       map_ready = FALSE
     )
@@ -162,21 +164,21 @@ leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
     })
 
     # Hide loading screen when map is ready
-    observe({
+    shiny::observe({
       if (values$map_ready) {
         shiny::removeUI(selector = "#loading-screen", immediate = TRUE)
       }
     })
 
     # Individual point click
-    observeEvent(input$map_marker_click, {
+    shiny::observeEvent(input$map_marker_click, {
       click <- input$map_marker_click
       pt <- pep[abs(pep$lon - click$lng) < 1e-6 & abs(pep$lat - click$lat) < 1e-6, ]
       values$selected_points <- unique(rbind(values$selected_points, pt))
     })
 
     # Polygon/rectangle selection
-    observeEvent(input$map_draw_new_feature, {
+    shiny::observeEvent(input$map_draw_new_feature, {
       feat <- input$map_draw_new_feature
       if (feat$geometry$type %in% c("Polygon", "Rectangle")) {
         coords <- feat$geometry$coordinates[[1]]
@@ -191,13 +193,13 @@ leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
     })
 
     # Done button
-    observeEvent(input$done, {
-      stopApp(values$selected_points)
+    shiny::observeEvent(input$done, {
+      shiny::stopApp(values$selected_points)
     })
 
     # Cancel button
-    observeEvent(input$cancel, {
-      stopApp(NULL)
+    shiny::observeEvent(input$cancel, {
+      shiny::stopApp(NULL)
     })
   }
 
