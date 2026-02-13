@@ -10,19 +10,19 @@
 
 ### 1. Add Automated Tests
 
-- [ ] Create testthat tests for core functions
+- [x] Create testthat tests for core functions (95 tests, all passing)
 
-**Files to create:**
-- [ ] `tests/testthat.R` - test runner
-- [ ] `tests/testthat/test-pep_class.R` - test pep class constructor/validation
-- [ ] `tests/testthat/test-pheno_normals.R` - test normals calculation
-- [ ] `tests/testthat/test-pheno_anomaly.R` - test anomaly detection
-- [ ] `tests/testthat/test-pheno_gradient.R` - test gradient analysis
-- [ ] `tests/testthat/test-pep_quality.R` - test quality assessment
+**Files created:**
+- [x] `tests/testthat.R` - test runner
+- [x] `tests/testthat/test-pep_class.R` - test pep class constructor/validation (17 tests)
+- [x] `tests/testthat/test-pheno_normals.R` - test normals calculation (10 tests)
+- [x] `tests/testthat/test-pheno_anomaly.R` - test anomaly detection (10 tests)
+- [x] `tests/testthat/test-pheno_gradient.R` - test gradient analysis (10 tests)
+- [x] `tests/testthat/test-pep_quality.R` - test quality assessment (12 tests)
 
 **DESCRIPTION updates:**
-- [ ] Add `testthat (>= 3.0.0)` to Suggests
-- [ ] Add `Config/testthat/edition: 3`
+- [x] Add `testthat (>= 3.0.0)` to Suggests
+- [x] Add `Config/testthat/edition: 3`
 
 ### 2. Add GitHub Actions CI Workflow
 
@@ -199,7 +199,7 @@ Current: ~896 body words (limit: 750-1750)
 | Item | Status | Priority |
 |------|--------|----------|
 | 6-month development history | ⏳ Waiting (July 2026) | Blocker |
-| testthat tests | ❌ Not started | High |
+| testthat tests | ✅ Done (95 tests passing) | High |
 | GitHub Actions CI | ⚠️ Created locally, needs PAT update to push | High |
 | CONTRIBUTING.md | ✅ Done | High |
 | CODE_OF_CONDUCT.md | ✅ Done | Medium |
