@@ -208,11 +208,36 @@ plot_giss_sensitivity(out)
 
 ## Current Status
 
+### JOSS Submission
+- **Paper location**: `pep725_JOSS-Paper/JOSS_packagePaper.Rmd`
+- **TODO tracker**: `TODO_JOSS_submission.md` - comprehensive checklist of remaining tasks
+- **Submission timeline**: July 2026 (requires 6 months public development history)
+- **Key pending items**:
+  - Add testthat tests
+  - Push GitHub Actions workflows (needs PAT with `workflow` scope)
+  - Create CODE_OF_CONDUCT.md
+  - Fix `opedal2024advancing` reference (wrong DOI)
+  - Co-author review (Barbara Templ)
+
+### GitHub Actions (local only - need PAT workflow scope to push)
+- `.github/workflows/R-CMD-check.yaml` - R CMD check on macOS/Ubuntu with R release/devel
+- `.github/workflows/draft-pdf.yaml` - JOSS paper PDF compilation
+
 ### License
 GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 
+### R CMD Check NOTEs (to fix)
+- Add `.github`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper`, `CLAUDE.md` to `.Rbuildignore`
+- Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
+- Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
+- Add global variable binding for `..na_cols` in `print.pheno_anomaly()`
+
 ### Known Issues
-- Non-standard files at top level: `CLAUDE.md`, `pepperPaper/`
+- Non-standard files at top level: `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`
+
+### Community Files
+- `CONTRIBUTING.md` - Contribution guidelines (bug reports, PRs, code style)
+- `CODE_OF_CONDUCT.md` - Contributor Covenant (TODO: create)
 
 ### Companion Package
 - Climate sensitivity analysis (GISS data, `plot_giss_smooth()`, `plot_giss_sensitivity()`) moved to **hail** package
