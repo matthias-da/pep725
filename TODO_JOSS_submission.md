@@ -27,7 +27,7 @@
 ### 2. Add GitHub Actions CI Workflow
 
 - [x] Create `.github/workflows/R-CMD-check.yaml` (created locally)
-- [ ] **Update GitHub PAT to include `workflow` scope** - Required to push workflow files
+- [x] **Update GitHub PAT to include `workflow` scope** - Required to push workflow files
   - Go to GitHub → Settings → Developer settings → Personal access tokens
   - Edit token and add `workflow` scope
   - Then run: `git add .github/workflows/ && git commit -m "Add CI workflows" && git push`
@@ -111,11 +111,10 @@ jobs:
   - [ ] Verify PEP725 statistics are current (13 million obs, 30 countries, 265 species, 46 phenophases)
   - Note: statistics cite @templ2018pep725 and @templetal2026a — check against the 2026 paper
 
-- [ ] **Research impact statement**: Strengthen with specifics
-  - [ ] Add concrete examples of publications using pep725
-  - [ ] Mention specific research projects or collaborations
-  - Currently mentions @templetal2026a and adoption in "climate impact studies, ecological analyses, and teaching"
-  - Funding (BNF/Bern) and WSL support are already in Acknowledgements
+- [x] **Research impact statement**: Strengthened with specifics
+  - [x] Added concrete examples: Fu et al. (2015) Nature, Menzel et al. (2020) GCB
+  - [x] Referenced PEP725 publication impact (115 papers, 17 Nature, 2 Science) from @templetal2026a
+  - [x] Added fu2015declining and menzel2020climate to paper.bib
 
 ### Paper Technical Checks
 
@@ -211,7 +210,7 @@ Current: ~896 body words (limit: 750-1750)
 | **Paper Content** | | |
 | Example usage decision | ❓ Needs decision | Medium |
 | Add figures to paper | ❓ Needs decision | Medium |
-| Research impact specifics | ❌ Not started | Medium |
+| Research impact specifics | ✅ Done (Fu 2015, Menzel 2020) | Medium |
 | Logo image check | ✅ Verified (exists) | Low |
 | Bibliography DOI verification | ✅ All 11 DOIs valid (except opedal) | Low |
 | CRAN pkg version check | ❌ Not verified (5 refs) | Low |
