@@ -18,7 +18,7 @@
 #' @param path path to the folder containing PEP725 CSV files (default is \code{"data/Data_PEP725_all/"}).
 #' @param flags Logical indicating whether the pep data contains quality control flags (default is \code{FALSE}).
 #' @param add_country Logical indicating whether to add country information based on station coordinates (default is \code{TRUE}).
-#' @return A \code{data.table} containing the combined and preprocessed PEP725 data.
+#' @return A \code{\link{new_pep}{pep}} object (extends \code{data.table}) containing the combined and preprocessed PEP725 data.
 #' @importFrom rnaturalearth ne_countries
 #' @importFrom sf st_make_valid st_as_sf st_transform st_join st_agr st_agr<-
 #' @seealso \code{\link[data.table]{fread}}, \code{\link[data.table]{rbindlist}}

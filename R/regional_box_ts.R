@@ -1,10 +1,16 @@
 #' Compile Regional Phenology Data and Climate Sensitivity Inputs
 #'
-#' Extracts and aggregates phenological observations for a selected species and phenological phase from the PEP725 dataset (globally and spatially filtered), and links them with global temperature anomalies (GISS data). This function supports flexible phase selection and comparative regional-global climate impact studies.
+#' Extracts and aggregates phenological observations for a selected species and
+#' phenological phase from the PEP725 dataset (globally and spatially filtered).
+#' Optionally links them with global temperature anomalies (GISS data) for
+#' climate impact studies.
 #'
-#' @param pep A data.table containing the full PEP725 dataset, typically loaded at package startup. Must include at least columns: \code{species}, \code{year}, \code{phase_id}, \code{day}, \code{lat}, \code{lon}. Defaults to a global object \code{pep} from the parent environment.
-#' @param giss A data.table with GISS global temperature anomalies, containing columns
-#'   \code{year}, \code{dT}, and \code{dT_sm}. Load from hail package: \code{data(giss, package = "hail")}.
+#' @param pep A data.table containing the full PEP725 dataset. Must include at
+#'   least columns: \code{species}, \code{year}, \code{phase_id}, \code{day},
+#'   \code{lat}, \code{lon}.
+#' @param giss Optional. A data.table with GISS global temperature anomalies,
+#'   containing columns \code{year}, \code{dT}, and \code{dT_sm}. If \code{NULL},
+#'   GISS-related outputs are omitted.
 #' @param lon_min Minimum longitude for spatial filtering of PEP data (default is \code{4.2})
 #' @param lon_max Maximum longitude for spatial filtering of PEP data (default is \code{8.1})
 #' @param lat_min Minimum latitude for spatial filtering of PEP data (default is \code{44.7})
@@ -12,16 +18,20 @@
 #' @param species_name Character name of the species to be extracted (default is \code{"Triticum aestivum"})
 #' @param functional_group Character. Optional functional group name to filter by (e.g., "C4_summer_cereals"). If provided, overwrites species_name filtering.
 #' @param year_min Minimum year to include in all outputs (default is \code{1961})
-#' @param pep_for_giss Selects which PEP data subset to use for merging with GISS data. Either \code{"near"} (box-filtered) or \code{"aggregated"} (global).
+#' @param pep_for_giss Selects which PEP data subset to use for merging with GISS
+#'   data. Either \code{"near"} (box-filtered) or \code{"aggregated"} (global).
+#'   Ignored if \code{giss} is \code{NULL}.
 #' @param phase Integer or vector of phase_id(s) to extract (default is \code{60} = Heading). Named phase mappings are applied.
 #'
 #' @return A named list with the following elements:
 #' \describe{
 #'   \item{\code{pep_agg}}{Global (non-spatially filtered) PEP725 time series for the selected phase(s)}
 #'   \item{\code{pep_cgi}}{Spatially filtered PEP725 time series based on lat/lon bounding box}
-#'   \item{\code{giss}}{Processed GISS global temperature anomaly data from the given year onwards}
-#'   \item{\code{pep_giss}}{Merged data frame of PEP phenology (from selected source) and GISS anomalies}
-#'   \item{\code{species}}{Character species name used for filtering (echoed)}
+#'   \item{\code{giss}}{Processed GISS global temperature anomaly data (if provided)}
+#'   \item{\code{pep_giss}}{Merged data frame of PEP phenology and GISS anomalies (if provided)}
+#'   \item{\code{species}}{Character species name used for filtering}
+#'   \item{\code{functional_group}}{Functional group if specified, otherwise \code{NA}}
+#'   \item{\code{phase}}{Integer phase ID(s) used for filtering}
 #' }
 #'
 #' @details
@@ -31,34 +41,28 @@
 #' descriptive names and warns if expected phenological phase are missing
 #' in the selected data.
 #'
-#' For climate sensitivity analyses, this output is designed to be used in
-#' downstream plotting functions or regression models linking phenology with
-#' global warming trends.
+#' If GISS data is provided, temperature anomalies are merged with the selected
+#' PEP time series to support phenology-climate analysis.
 #'
-#' @seealso \code{\link{pheno_plot}}, \code{\link{pep_download}},
-#'   \code{hail::giss}, \code{hail::plot_giss_smooth}, \code{hail::plot_giss_sensitivity}
+#' @seealso \code{\link{pheno_plot}}, \code{\link{pep_download}}
 #'
 #' @examples
 #' \dontrun{
-#' # Typical usage for winter wheat heading phase:
 #' pep <- pep_download()
 #'
-#' # Load GISS data from hail package
-#' data(giss, package = "hail")
-#'
-#' out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
+#' # PEP data only
+#' out <- regional_box_ts(pep, species_name = "Triticum aestivum", phase = 60)
 #' str(out)
 #'
-#' # For climate sensitivity plots, use hail package:
-#' # hail::plot_giss_smooth(out)
-#' # hail::plot_giss_sensitivity(out)
+#' # With GISS temperature anomalies
+#' # out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 60)
 #' }
 #'
 #' @author Matthias Templ
 #' @export
 regional_box_ts <- function(
     pep,
-    giss,
+    giss = NULL,
     lon_min = 4.2, lon_max = 8.1,
     lat_min = 44.7, lat_max = 48.1,
     species_name = "Triticum aestivum",
@@ -75,11 +79,6 @@ regional_box_ts <- function(
 
 
   pep_for_giss <- match.arg(pep_for_giss)
-  if(pep_for_giss == "near") {
-    message("Using PEP725 data limited to the provided lon/lat coordinates")
-  } else {
-    message("Using ALL PEP725 data for GISS comparison.\nNote: lon/lat filtering is ignored in this case.")
-  }
 
   # pep_species <- pep[species %in% species_name]
 
@@ -211,14 +210,18 @@ regional_box_ts <- function(
     warning("No matching records found near Changins for functional group: ", functional_group, call. = FALSE)
   }
 
-  # --- GISS subset and merge ----------------------------------------------
-  giss <- giss[year >= year_min, .(year, dTgl = dT, Tgl = dT + 14)][order(year)]
-  pep_sel <- switch(pep_for_giss, aggregated = pep_agg, near = pep_cgi)
-  pep_giss <- merge(pep_sel, giss, by = "year")
-  attr(pep_giss, "pep_source") <- pep_for_giss
+  # --- GISS subset and merge (optional) ------------------------------------
+  giss_out <- NULL
+  pep_giss <- NULL
+  if (!is.null(giss)) {
+    giss_out <- giss[year >= year_min, .(year, dTgl = dT, Tgl = dT + 14)][order(year)]
+    pep_sel <- switch(pep_for_giss, aggregated = pep_agg, near = pep_cgi)
+    pep_giss <- merge(pep_sel, giss_out, by = "year")
+    attr(pep_giss, "pep_source") <- pep_for_giss
 
-  if (nrow(pep_giss) == 0L) {
-    warning("No GISS merge possible (pep_giss is empty) -- check date/region/phase", call. = FALSE)
+    if (nrow(pep_giss) == 0L) {
+      warning("No GISS merge possible (pep_giss is empty) -- check date/region/phase", call. = FALSE)
+    }
   }
 
 
@@ -232,7 +235,7 @@ regional_box_ts <- function(
   list(
     pep_agg  = pep_agg,
     pep_cgi  = pep_cgi,
-    giss     = giss,
+    giss     = giss_out,
     pep_giss = pep_giss,
     species = if (is.null(functional_group)) species_name else NA_character_,
     functional_group = if (!is.null(functional_group)) functional_group else NA_character_,

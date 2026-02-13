@@ -25,14 +25,14 @@ get_phenology_doys(
 )
 }
 \arguments{
-\item{pep}{A data frame containing PEP725 phenology data, including columns
-\code{country}, \code{day}, \code{year}, \code{phase_id}, and \code{genus}.}
+\item{pep}{A data frame containing PEP725 phenology observations, including
+columns \code{country}, \code{day}, \code{year}, \code{phase_id}, and \code{genus}.}
 
-\item{phase1}{Integer. First phenophase (e.g., 65).}
+\item{phase1}{Integer. First phenophase (e.g. 65).}
 
-\item{phase2}{Integer. Second phenophase (e.g., 87).}
+\item{phase2}{Integer. Second phenophase (e.g. 87).}
 
-\item{genus_name}{Character. Genus to filter (e.g., "Malus").}
+\item{genus_name}{Character. Genus to filter (e.g. "Malus").}
 
 \item{phenology_method}{Either \code{"simple_shift"} or \code{"gdd_cmip6"}.}
 
@@ -42,25 +42,25 @@ get_phenology_doys(
 
 \item{calib_years}{Integer vector. Years for calibration period (default 1991:2020).}
 
-\item{scen_warming}{Numeric. Warming (degC) for simple shift model.}
+\item{scen_warming}{Numeric. Warming in degC (simple shift model).}
 
-\item{shift_per_deg}{Numeric. Shift in DOY per degC warming.}
+\item{shift_per_deg}{Numeric. DOY shift per degC (simple shift).}
 
-\item{cmip6_tas}{Optional named list with daily temperature time series
-(one numeric vector per country) for GDD phenology.}
+\item{cmip6_tas}{Optional list of daily temperature vectors--only required
+if using \code{"gdd_cmip6"}.}
 
-\item{gdd_base}{Numeric. Base temperature for GDD accumulation.}
+\item{gdd_base}{Numeric. Base temperature for GDD model.}
 
-\item{gdd_threshold1}{Numeric. GDD threshold for phenophase 1.}
+\item{gdd_threshold1}{Numeric. GDD threshold for phase1.}
 
-\item{gdd_threshold2}{Numeric. GDD threshold for phenophase 2.}
+\item{gdd_threshold2}{Numeric. GDD threshold for phase2.}
 
 \item{regions}{Character vector. Countries/regions to include. If NULL, all are used.}
 
 \item{delta_Tgl}{Numeric. Global temperature change (degC) for scenario.}
 
-\item{giss_data}{Data frame with GISS temperature data. Required for robust_shift method.
-Load from hail package: \code{data(giss, package = "hail")}.}
+\item{giss_data}{Data frame with GISS temperature data (columns: \code{year},
+\code{dT} or \code{Tgl}). Required for robust_shift method.}
 }
 \value{
 A data frame containing:
@@ -69,20 +69,6 @@ A data frame containing:
 \item{doy_end_ctrl}{End DOY for CTRL period}
 \item{doy_start_scen}{Start DOY for SCEN period}
 \item{doy_end_scen}{End DOY for SCEN period}
-
-Compute CTRL and SCEN Phenology Day-of-Year Values
-
-This function computes the mean phenological day-of-year (DOY) for two
-phenophases (e.g., BBCH 65 and BBCH 87) for each country. The calculation
-can use a simple warming-shift model or a GDD-based model using CMIP6 daily
-temperature time series.
-
-A data frame with:
-\item{Country}{Country name}
-\item{doy_start_ctrl}{Phase1 DOY (CTRL)}
-\item{doy_end_ctrl}{Phase2 DOY (CTRL)}
-\item{doy_start_scen}{Phase1 DOY (SCEN)}
-\item{doy_end_scen}{Phase2 DOY (SCEN)}
 }
 \description{
 This function computes the mean phenological day-of-year (DOY) for two
@@ -92,9 +78,6 @@ warming-shift model or a GDD-based model.
 \examples{
 \donttest{
 pep <- pep_download()
-
-# Load GISS data from hail package
-data(giss, package = "hail")
 
 # Use Alpine subset for faster computation
 regions <- c("Austria", "Switzerland")
@@ -110,18 +93,6 @@ d1 <- get_phenology_doys(
   phenology_method = 'simple_shift'
 )
 d1
-
-# Robust shift method
-d2 <- get_phenology_doys(
-  pep = pep_alpine,
-  phase1 = 65,
-  phase2 = 87,
-  genus_name = "Malus",
-  phenology_method = "robust_shift",
-  giss_data = giss,
-  regions = regions
-)
-d2
 }
 
 }

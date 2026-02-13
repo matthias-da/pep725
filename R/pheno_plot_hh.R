@@ -1,7 +1,7 @@
 #' Plot Phenological Time Series for Heading and Harvest
 #'
 #' Visualizes phenological time series for heading and harvest phases,
-#' comparing data from multiple sources (PEP725, MeteoSwiss observations).
+#' comparing aggregated and spatially filtered PEP725 data.
 #'
 #' @param data_list A named list returned by \code{\link{regional_box_ts_heading_harvest}},
 #'   containing \code{ts_tidy}.
@@ -16,27 +16,16 @@
 #' This function shows DOY trends by phase and data source across years,
 #' with month labels on the y-axis for easier interpretation.
 #'
-#' For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
-#' functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
-#'
 #' @importFrom ggplot2 ggplot aes geom_line facet_grid labs theme_bw theme scale_linetype_manual scale_y_continuous
 #'
-#' @seealso \code{\link{regional_box_ts_heading_harvest}}, \code{hail::plot_giss_smooth},
-#'   \code{hail::plot_giss_sensitivity}
+#' @seealso \code{\link{regional_box_ts_heading_harvest}}
 #'
 #' @examples
 #' \dontrun{
-#' # Requires pep_download() data - see regional_box_ts_heading_harvest()
 #' pep <- pep_download()
-#' data(meteoSwiss)
-#'
-#' # For GISS-based plots, load hail package:
-#' # library(hail)
-#' # data(giss)
-#' # out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss)
-#' # pheno_plot_hh(out)  # timeseries
-#' # hail::plot_giss_smooth(out, month_scale = TRUE)
-#' # hail::plot_giss_sensitivity(out, month_scale = TRUE)
+#' out <- regional_box_ts_heading_harvest(pep,
+#'          species_name = "Triticum aestivum")
+#' pheno_plot_hh(out)
 #' }
 #' @author Matthias Templ
 #' @export
@@ -72,14 +61,9 @@ pheno_plot_hh <- function(
     geom_line(aes(linetype = source), linewidth = linewidth, alpha = alpha_lines, na.rm = TRUE) +
     facet_grid(phase ~ panel, scales = "free_y") +
     month_scale +
-    labs(x = "", y = NULL, title = "Heading/Harvest phenology: PEP725 vs observations") +
+    labs(x = "", y = NULL, title = "Heading/Harvest phenology") +
     theme_bw() +
-    theme(legend.position = "top") +
-    scale_linetype_manual(values = c(
-      "Obs. Changins (MeteoCH)"   = "dashed",
-      "PEP725 (aggregated)"       = "solid",
-      "PEP725 (near Changins)"    = "solid"
-    ))
+    theme(legend.position = "top")
 
   return(p)
 }

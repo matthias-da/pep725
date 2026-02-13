@@ -218,9 +218,9 @@ Current: ~896 body words (limit: 750-1750)
 | Co-author review (Barbara) | ❌ Not started | High |
 | **Package Review** | | |
 | Critical bugs (4) | ✅ All fixed | **High** |
-| Package structure (6) | ❌ Not fixed | **High** |
-| Documentation fixes (6) | ❌ Not fixed | Medium |
-| Vignette fixes (5) | ❌ Not fixed | Medium |
+| Package structure (6) | ✅ All fixed | **High** |
+| Documentation fixes (6) | ✅ All fixed | Medium |
+| Vignette fixes (5) | ⚠️ Partially fixed | Medium |
 | Code quality (5) | ❌ Not fixed | Low |
 | Consistency (2) | ❌ Not fixed | Low |
 
@@ -285,17 +285,17 @@ Comprehensive code, documentation, and vignette review (2026-02-13).
 
 ### C. Documentation Issues
 
-- [ ] **`pheno_timeseries.R`** — `@param` says "DOY" but code uses column `day`; clarify terminology
-- [ ] **`pep_import.R`** — `@return` says "data.table" but actually returns a `pep` object
-- [ ] **`regional_box_ts.R`** — `@return` lists `ts_tidy` column that doesn't exist in the output
-- [ ] **`get_phenological_doys.R`** — Duplicate roxygen block (two `@title` entries)
-- [ ] **`R/dataSets.R`** — `pep_seed` uses `NULL` instead of `"pep_seed"` as the documented object name
-- [ ] **`R/dataSets.R`** — `pep_synth` is documented but no `pep_synth.rda` file exists in `data/`; remove the documentation or add the dataset
+- [x] **`pheno_timeseries.R`** — Fixed `@param`: "DOY" → "day" (day-of-year)
+- [x] **`pep_import.R`** — Fixed `@return`: "data.table" → "pep object"
+- [x] **`regional_box_ts.R`** — Fixed `@return`: added missing `functional_group` and `phase` fields (no `ts_tidy` was listed)
+- [x] **`get_phenological_doys.R`** — Removed duplicate roxygen block (second title/params/return)
+- [x] **`R/dataSets.R`** — `pep_seed` uses `NULL` correctly (standard pattern with LazyData); no change needed
+- [x] **`R/dataSets.R`** — Removed `pep_synth` documentation (no `pep_synth.rda` exists)
 
 ### D. Vignette Issues
 
 - [ ] **`phenological-analysis.Rmd`** — Copy-paste error: text says "Wheat" but code uses `"Malus domestica"` (Apple)
-- [ ] **`phenological-analysis.Rmd`** — Claims `giss` dataset is included in pep725; it's in the **hail** companion package
+- [x] **`phenological-analysis.Rmd`** — Removed hail/GISS references; updated to PEP-only workflow
 - [ ] **`data-quality.Rmd`** — References `obs_id` column which doesn't exist in the `pep` class
 - [ ] **`spatial-patterns.Rmd`** — Minor typos to fix (check after Barbara's review of new Expected Values section)
 - [ ] **`getting-started.Rmd`** — Review for consistency with updated README

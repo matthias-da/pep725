@@ -57,7 +57,7 @@ Default is \code{1990:2090}.}
 (default: DACH region).}
 
 \item{giss_data}{Deprecated. Previously used for climate data integration;
-now ignored. For climate sensitivity analysis, use the \pkg{hail} package.}
+now ignored.}
 
 \item{layout}{Either \code{"country_phase"} (default) or \code{"phase_country"}
 to control facet arrangement.}

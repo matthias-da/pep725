@@ -145,7 +145,6 @@ pep_subset <- pep[s_id %in% selected$s_id]
 | Dataset | Description |
 |---------|-------------|
 | `pep_seed` | Small seed dataset for quick tests (1,319 rows) |
-| `meteoSwiss` | MeteoSwiss phenological observations (historical heading/harvest) |
 
 ## Vignettes
 

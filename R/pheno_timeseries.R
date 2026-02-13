@@ -3,7 +3,7 @@
 #' Visualizes phenological day-of-year (DOY) trends over time since 1961.
 #' Designed for aggregated or site-level phenology data from PEP725.
 #'
-#' @param data A data.frame or data.table containing at least `year`, `DOY`, and one grouping variable
+#' @param data A data.frame or data.table containing at least `year`, `day` (day-of-year), and one grouping variable
 #'             (e.g. `species`, `phase`, or `functional_group`).
 #' @param color_by Character. Column name used for color grouping (default = "species").
 #' @param facet_by Character or NULL. Optional column name for faceting (e.g. "functional_group").

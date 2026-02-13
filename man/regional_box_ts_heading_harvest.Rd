@@ -2,12 +2,11 @@
 % Please edit documentation in R/regional_box_ts_heading_harvest.R
 \name{regional_box_ts_heading_harvest}
 \alias{regional_box_ts_heading_harvest}
-\title{Compile Regional Phenological and Climate Time Series}
+\title{Compile Regional Phenological Time Series for Heading and Harvest}
 \usage{
 regional_box_ts_heading_harvest(
   pep,
-  giss,
-  meteoSwiss = get("meteoSwiss", envir = parent.frame()),
+  giss = NULL,
   lon_min = 4.2,
   lon_max = 8.1,
   lat_min = 44.7,
@@ -18,14 +17,11 @@ regional_box_ts_heading_harvest(
 )
 }
 \arguments{
-\item{pep}{A data.table containing PEP725 phenological data. Defaults to
-object from parent environment.}
+\item{pep}{A data.table containing PEP725 phenological data.}
 
-\item{giss}{A data.table with GISS global temperature anomalies, containing columns
-\code{year}, \code{dT}, and \code{dT_sm}. Load from hail package: \code{data(giss, package = "hail")}.}
-
-\item{meteoSwiss}{A data.table with MeteoSwiss phenological observations.
-Defaults to object from parent environment.}
+\item{giss}{Optional. A data.table with GISS global temperature anomalies
+(\code{year}, \code{dT}, \code{dT_sm}). If \code{NULL}, GISS-related
+outputs are omitted.}
 
 \item{lon_min}{Minimum longitude for bounding box filter (default is 4.2)}
 
@@ -42,33 +38,29 @@ Defaults to object from parent environment.}
 
 \item{pep_for_giss}{Which PEP725 dataset to use for merging with GISS climate
 anomalies. Either \code{"aggregated"} (global) or \code{"near"} (spatially
-filtered near Changins)}
+filtered). Ignored if \code{giss} is \code{NULL}.}
 }
 \value{
 A named list with the following elements:
 \describe{
-\item{\code{ts_tidy}}{Long-format time series combining PEP725 and
-MeteoSwiss data, with consistent phase and source labeling}
+\item{\code{ts_tidy}}{Long-format time series with consistent phase and source labeling}
 \item{\code{pep_agg}}{Aggregated PEP725 time series (global species-level)}
 \item{\code{pep_cgi}}{Spatially filtered PEP725 time series (based on
 lat/lon box)}
-\item{\code{giss}}{GISS global temperature anomalies for matching years}
-\item{\code{pep_giss}}{PEP time series (aggregated or filtered) merged with
-GISS anomalies}
+\item{\code{giss}}{GISS global temperature anomalies (if provided)}
+\item{\code{pep_giss}}{PEP time series merged with GISS anomalies (if provided)}
+\item{\code{species}}{Species name used for filtering}
 }
 }
 \description{
-Generates a collection of harmonized phenological time series for a specified
-species and spatial region, using data from multiple sources: PEP725
-(aggregated and filtered), MeteoSwiss observations, and GISS global
-temperature anomalies. This function supports comparative analysis across
-data sources and climate-sensitivity studies.
+Generates harmonized phenological time series for heading (BBCH 60) and
+harvest (BBCH 100) phases of a specified species and spatial region.
+Optionally integrates GISS climate data for climate-sensitivity studies.
 }
 \details{
 This function filters the PEP725 dataset by species and optionally by spatial
 box. It aggregates phenological phases (Heading = 60, Harvest = 100) and
-computes mean day-of-year (DOY) per year. MeteoSwiss observations are
-transformed to tidy format and included for regional comparison. GISS
+computes mean day-of-year (DOY) per year. If GISS data is provided,
 temperature anomalies are merged with the selected PEP time series to support
 phenology-climate analysis. Warnings are issued if phases are missing for
 selected periods.
@@ -76,26 +68,18 @@ selected periods.
 \examples{
 \dontrun{
 pep <- pep_download()
-data(meteoSwiss)
 
-# Load GISS data from hail package
-data(giss, package = "hail")
-
-out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
-                                       species_name = "Triticum aestivum")
-str(out$ts_tidy)
-
-# Time series plot
+# PEP data only
+out <- regional_box_ts_heading_harvest(pep,
+         species_name = "Triticum aestivum")
 pheno_plot_hh(out)
 
-# For climate sensitivity plots, use hail package:
-# hail::plot_giss_smooth(out, month_scale = TRUE)
-# hail::plot_giss_sensitivity(out, month_scale = TRUE)
+# With GISS temperature anomalies
+# out <- regional_box_ts_heading_harvest(pep, giss = giss)
 }
 }
 \seealso{
-\code{\link{pep_import}}, \code{\link{meteoSwiss}},
-\code{hail::giss}, \code{hail::plot_giss_smooth}, \code{hail::plot_giss_sensitivity}
+\code{\link{pep_import}}, \code{\link{pheno_plot_hh}}
 }
 \author{
 Matthias Templ

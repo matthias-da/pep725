@@ -698,23 +698,18 @@ if (tau < -2.58) {
 ### Linking Phenology to Climate
 
 For advanced analysis, you can link phenological timing to climate variables
-like global temperature anomalies:
+like global temperature anomalies using `regional_box_ts()`:
 
 ```{r regional-climate, eval=FALSE}
-# Compile regional data with GISS temperature anomalies
-# The 'giss' dataset is loaded automatically with the package
+# Compile regional data (PEP725 only)
 regional_data <- regional_box_ts(
   pep = pep,
-  giss = giss,  # Global temperature anomalies
   species_name = "Malus domestica",
   year_min = 1961
 )
 
-# Plot DOY against temperature with smoothing
-pheno_plot(regional_data, type = "giss_smooth", smooth = "gam")
-
-# Estimate climate sensitivity (days per degree warming)
-pheno_plot(regional_data, type = "giss_sensitivity")
+# Visualize time series
+pheno_plot(regional_data)
 ```
 
 **Climate sensitivity** tells you how many days earlier (or later) phenology

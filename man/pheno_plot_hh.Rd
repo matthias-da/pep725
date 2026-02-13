@@ -27,33 +27,22 @@ A \code{ggplot} object.
 }
 \description{
 Visualizes phenological time series for heading and harvest phases,
-comparing data from multiple sources (PEP725, MeteoSwiss observations).
+comparing aggregated and spatially filtered PEP725 data.
 }
 \details{
 This function shows DOY trends by phase and data source across years,
 with month labels on the y-axis for easier interpretation.
-
-For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
-functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
 }
 \examples{
 \dontrun{
-# Requires pep_download() data - see regional_box_ts_heading_harvest()
 pep <- pep_download()
-data(meteoSwiss)
-
-# For GISS-based plots, load hail package:
-# library(hail)
-# data(giss)
-# out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss)
-# pheno_plot_hh(out)  # timeseries
-# hail::plot_giss_smooth(out, month_scale = TRUE)
-# hail::plot_giss_sensitivity(out, month_scale = TRUE)
+out <- regional_box_ts_heading_harvest(pep,
+         species_name = "Triticum aestivum")
+pheno_plot_hh(out)
 }
 }
 \seealso{
-\code{\link{regional_box_ts_heading_harvest}}, \code{hail::plot_giss_smooth},
-\code{hail::plot_giss_sensitivity}
+\code{\link{regional_box_ts_heading_harvest}}
 }
 \author{
 Matthias Templ

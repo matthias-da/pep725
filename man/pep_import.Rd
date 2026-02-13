@@ -14,7 +14,7 @@ pep_import(path = "data/Data_PEP725_all", flags = FALSE, add_country = TRUE)
 \item{add_country}{Logical indicating whether to add country information based on station coordinates (default is \code{TRUE}).}
 }
 \value{
-A \code{data.table} containing the combined and preprocessed PEP725 data.
+A \code{\link{new_pep}{pep}} object (extends \code{data.table}) containing the combined and preprocessed PEP725 data.
 }
 \description{
 This function imports all CSV files from the folder \code{data/Data_PEP725/},

@@ -17,7 +17,7 @@ pheno_plot_timeseries(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing at least \code{year}, \code{DOY}, and one grouping variable
+\item{data}{A data.frame or data.table containing at least \code{year}, \code{day} (day-of-year), and one grouping variable
 (e.g. \code{species}, \code{phase}, or \code{functional_group}).}
 
 \item{color_by}{Character. Column name used for color grouping (default = "species").}

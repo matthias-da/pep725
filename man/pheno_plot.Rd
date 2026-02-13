@@ -19,33 +19,22 @@ A \code{ggplot} object for visual inspection and further customization.
 }
 \description{
 Generates time series plots from processed phenology data. Shows DOY trends
-by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
+with faceting by phenophase and spatial scope.
 }
 \details{
-This function visualizes DOY trends by source (PEP725, MeteoSwiss) with
-faceting by phenophase and spatial scope.
-
-For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
-functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
+This function visualizes DOY trends with faceting by phenophase and spatial scope.
 }
 \examples{
 \dontrun{
-# Requires pep_download() data - see regional_box_ts()
 pep <- pep_download()
-
-# For GISS-based plots, load hail package:
-# library(hail)
-# data(giss)
+# Requires GISS temperature anomaly data
 # out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
-# pheno_plot(out)  # timeseries
-# hail::plot_giss_smooth(out)
-# hail::plot_giss_sensitivity(out)
+# pheno_plot(out)
 }
 
 }
 \seealso{
-\code{\link{regional_box_ts}}, \code{hail::plot_giss_smooth},
-\code{hail::plot_giss_sensitivity}
+\code{\link{regional_box_ts}}
 }
 \author{
 Matthias Templ

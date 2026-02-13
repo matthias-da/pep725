@@ -35,7 +35,7 @@ utils::globalVariables(c("a"))
 #' @param subregions Character vector of country names to include
 #'   (default: DACH region).
 #' @param giss_data Deprecated. Previously used for climate data integration;
-#'   now ignored. For climate sensitivity analysis, use the \pkg{hail} package.
+#'   now ignored.
 #' @param layout Either \code{"country_phase"} (default) or \code{"phase_country"}
 #'   to control facet arrangement.
 #' @param title Optional plot title. If \code{NULL}, the function generates one

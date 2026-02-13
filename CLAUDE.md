@@ -173,38 +173,8 @@ Each dataset needs these roxygen tags:
 | Dataset | Description | Location |
 |---------|-------------|----------|
 | `pep_seed` | Small subset for testing (1,319 rows) | `data/pep_seed.rda` |
-| `meteoSwiss` | MeteoSwiss phenology observations | `data/meteoSwiss.rda` |
 
 Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()` and cached locally.
-
-## Companion Package: hail
-
-The **hail** package contains climate sensitivity analysis tools that were previously in pep725:
-
-| Component | Location | Usage |
-|-----------|----------|-------|
-| `giss` dataset | `hail::giss` | `data(giss, package = "hail")` |
-| `plot_giss_smooth()` | hail | Climate-phenology smoothed plots |
-| `plot_giss_sensitivity()` | hail | Robust sensitivity analysis |
-
-**Workflow with hail:**
-```r
-library(pep725)
-library(hail)
-
-pep <- pep_download()
-data(giss, package = "hail")
-
-# Prepare data with pep725
-out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 60)
-
-# Time series plot (pep725)
-pheno_plot(out)
-
-# Climate sensitivity plots (hail)
-plot_giss_smooth(out)
-plot_giss_sensitivity(out)
-```
 
 ## Current Status
 
@@ -226,21 +196,15 @@ plot_giss_sensitivity(out)
 ### License
 GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 
-### R CMD Check NOTEs (to fix)
-- Add `.github`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper`, `CLAUDE.md` to `.Rbuildignore`
-- Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
-- Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
-- Add global variable binding for `..na_cols` in `print.pheno_anomaly()`
+### R CMD Check NOTEs
+- All fixed (`.Rbuildignore`, `mgcv::gam()`, `globalVariables()` declarations)
 
 ### Known Issues
 - Non-standard files at top level: `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`
 
 ### Community Files
 - `CONTRIBUTING.md` - Contribution guidelines (bug reports, PRs, code style)
-- `CODE_OF_CONDUCT.md` - Contributor Covenant (TODO: create)
-
-### Companion Package
-- Climate sensitivity analysis (GISS data, `plot_giss_smooth()`, `plot_giss_sensitivity()`) moved to **hail** package
+- `CODE_OF_CONDUCT.md` - Contributor Covenant
 
 ### Key Functions by Category
 
@@ -272,7 +236,6 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 - `pheno_plot_hh()` - Heading/harvest time series plots (uses `\dontrun{}`)
 - `pheno_plot_timeseries()` - Time series plots
 - `leaflet_pep()` - Interactive maps (uses `\dontrun{}` - interactive Shiny gadget)
-- For climate sensitivity plots, use **hail** package: `plot_giss_smooth()`, `plot_giss_sensitivity()`
 - `map_pep()` - Static maps (uses `\dontrun{}` - can require API key)
 
 **Regional Analysis (all use `\dontrun{}`):**

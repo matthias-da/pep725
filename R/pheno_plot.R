@@ -1,7 +1,7 @@
 #' Plot Phenological Time Series
 #'
 #' Generates time series plots from processed phenology data. Shows DOY trends
-#' by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
+#' with faceting by phenophase and spatial scope.
 #'
 #' @param data_list A named list of prepared data objects, typically output from
 #'   \code{\link{regional_box_ts}}. Must contain element \code{ts_tidy}.
@@ -11,27 +11,16 @@
 #' @return A \code{ggplot} object for visual inspection and further customization.
 #'
 #' @details
-#' This function visualizes DOY trends by source (PEP725, MeteoSwiss) with
-#' faceting by phenophase and spatial scope.
+#' This function visualizes DOY trends with faceting by phenophase and spatial scope.
 #'
-#' For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
-#' functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
-#'
-#' @seealso \code{\link{regional_box_ts}}, \code{hail::plot_giss_smooth},
-#'   \code{hail::plot_giss_sensitivity}
+#' @seealso \code{\link{regional_box_ts}}
 #'
 #' @examples
 #' \dontrun{
-#' # Requires pep_download() data - see regional_box_ts()
 #' pep <- pep_download()
-#'
-#' # For GISS-based plots, load hail package:
-#' # library(hail)
-#' # data(giss)
+#' # Requires GISS temperature anomaly data
 #' # out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
-#' # pheno_plot(out)  # timeseries
-#' # hail::plot_giss_smooth(out)
-#' # hail::plot_giss_sensitivity(out)
+#' # pheno_plot(out)
 #' }
 #'
 #' @import ggplot2
@@ -51,11 +40,10 @@ pheno_plot <- function(
   p <- ggplot(ts_tidy, aes(year, DOY, color = source)) +
     geom_line(aes(linetype = source), linewidth = linewidth, alpha = alpha_lines, na.rm = TRUE) +
     facet_grid(phase ~ panel, scales = "free_y") +
-    labs(x = "", y = NULL, title = "Phenology time series: PEP725 vs observations") +
+    labs(x = "", y = NULL, title = "Phenology time series") +
     theme_bw() +
     theme(legend.position = "top") +
     scale_linetype_manual(values = c(
-      "Obs. Changins (MeteoCH)"   = "dashed",
       "PEP725 (aggregated)"       = "solid",
       "PEP725 (near Changins)"    = "solid"
     ))
