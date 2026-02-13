@@ -82,10 +82,21 @@ jobs:
 
 ## Paper Content Review
 
+### Paper Structure (current sections)
+
+1. **Summary** - Package overview and capabilities
+2. **Statement of need** - Analytical challenges addressed
+3. **State of the field** - Comparison with existing R packages (16 refs)
+4. **Software design** - S3 classes, robust estimation, visualization
+5. **Research impact statement** - PEP725 analysis, @templetal2026a methods
+6. **AI usage disclosure** - Editorial aid only
+7. **Acknowledgements** - PEP725 observers, BNF funding, WSL/Vitasse
+8. *Example usage* - Commented out (`<!-- ... -->`)
+
 ### Paper Decisions
 
-- [ ] **Example usage section**: Currently commented out. Decide whether to:
-  - [ ] Include it (adds ~100 words, total would be ~873 words, still within 750-1750 limit)
+- [ ] **Example usage section**: Currently commented out (lines 51-83). Decide whether to:
+  - [ ] Include it (~100 extra words; current body is ~896 words, well within 750-1750 limit)
   - [ ] Keep it commented out
   - [ ] Move to README/vignettes only
 
@@ -98,25 +109,23 @@ jobs:
 
 - [ ] **Summary section**: Review for clarity and completeness
   - [ ] Verify PEP725 statistics are current (13 million obs, 30 countries, 265 species, 46 phenophases)
+  - Note: statistics cite @templ2018pep725 and @templetal2026a — check against the 2026 paper
 
 - [ ] **Research impact statement**: Strengthen with specifics
   - [ ] Add concrete examples of publications using pep725
   - [ ] Mention specific research projects or collaborations
-  - [ ] Add any funding acknowledgements
-
-- [ ] **Acknowledgements**: Consider adding:
-  - [ ] Funding sources (if any)
-  - [ ] Specific contributors or beta testers
-  - [ ] Institutional support
+  - Currently mentions @templetal2026a and adoption in "climate impact studies, ecological analyses, and teaching"
+  - Funding (BNF/Bern) and WSL support are already in Acknowledgements
 
 - [ ] **Companion package**: Mention **hail** package for climate sensitivity analysis?
 
 ### Paper Technical Checks
 
-- [ ] **Logo image**: Verify `pep725_logo_cpt.png` exists and displays correctly
-- [ ] **Bibliography**: Verify all 16 citations resolve correctly
-  - [ ] Check DOIs are valid and accessible
-  - [ ] Verify package version numbers are current
+- [x] **Logo image**: `pep725_logo_cpt.png` exists in `pep725_JOSS-Paper/` ✅
+- [ ] **Bibliography**: 16 references in `paper.bib`
+  - [x] All DOIs with actual DOI values verified and resolve correctly (11 DOIs checked) ✅
+  - [ ] Verify CRAN package version numbers are still current (5 refs use CRAN URLs only)
+  - **Exception**: `opedal2024advancing` DOI is wrong — see Critical Bibliography Fix below
 - [x] **ROR identifiers**: Verify affiliation RORs are correct
   - [x] WSL: `04d81q302` (fixed)
   - [x] FHNW: `02gz82p86`
@@ -124,27 +133,31 @@ jobs:
 ### Critical Bibliography Fix
 
 - [ ] **Fix `opedal2024advancing` reference** - WRONG DOI!
-  - Current DOI `10.1038/s41559-024-02336-5` points to a seagrass paper, NOT phenology
-  - **Replace with one of these options:**
+  - Current DOI `10.1038/s41559-024-02336-5` resolves to Campbell et al. (2024) "Herbivore effects increase with latitude across the extent of a foundational seagrass" — a marine ecology paper, NOT phenology
+  - The title "Advancing phenological research through long-term data integration" does not appear to be a real publication
+  - The listed authors (Opedal, Ovaskainen, et al.) work on metapopulation ecology, not phenological research
+  - **This reference appears fabricated. Replace with one of these options:**
     - **Option A (Recommended):** Primack et al. (2023) "Ten best practices for effective phenological research" Int J Biometeorol 67:1509-1522, DOI: 10.1007/s00484-023-02502-7
     - **Option B:** Kharouba et al. (2018) "Global shifts in the phenological synchrony of species interactions" PNAS 115:5211-5216, DOI: 10.1073/pnas.1714511115
     - **Option C:** Ovaskainen et al. (2013) "Community-level phenological response to climate change" PNAS 110:13434-13439, DOI: 10.1073/pnas.1305533110
-  - Update citation in `paper.bib`
+  - Used in `JOSS_packagePaper.Rmd` line 91: `@opedal2024advancing` in "State of the field" section
+  - Update citation in `paper.bib` (lines 181-189)
   - Update citation key in `JOSS_packagePaper.Rmd` if key changes
 
 ### Co-author Review
 
 - [ ] **Barbara Templ review**: Co-author should review and approve:
   - [ ] Accuracy of scientific content
-  - [ ] Affiliation correctness
-  - [ ] Author order and equal-contrib designation
+  - [ ] Affiliation correctness (WSL for Barbara, FHNW for Matthias)
+  - [ ] Author order (Barbara first, equal-contrib both) and equal-contrib designation
   - [ ] AI disclosure statement
 
 ### Word Count Check
 
-Current: ~773 words (limit: 750-1750)
-- [ ] Review if any sections need expansion
-- [ ] Review if any sections are too verbose
+Current: ~896 body words (limit: 750-1750)
+- Room to include the commented-out Example usage section (~100 words → ~996 total)
+- Room to add figures with captions if desired
+- All sections are concise; no section appears overly verbose
 
 ---
 
@@ -202,10 +215,11 @@ Current: ~773 words (limit: 750-1750)
 | Example usage decision | ❓ Needs decision | Medium |
 | Add figures to paper | ❓ Needs decision | Medium |
 | Research impact specifics | ❌ Not started | Medium |
-| Logo image check | ❌ Not verified | Low |
-| Bibliography verification | ❌ Not verified | Low |
+| Logo image check | ✅ Verified (exists) | Low |
+| Bibliography DOI verification | ✅ All 11 DOIs valid (except opedal) | Low |
+| CRAN pkg version check | ❌ Not verified (5 refs) | Low |
 | ROR identifiers check | ✅ Fixed | Low |
-| Fix opedal2024advancing ref | ❌ Wrong DOI | **High** |
+| Fix opedal2024advancing ref | ❌ Fabricated reference | **High** |
 | **GitHub Issues** | | |
 | Open issues | 13 open | Various |
 | **R CMD Check** | | |
