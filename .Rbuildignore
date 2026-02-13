@@ -10,3 +10,7 @@ CLAUDE.md
 ^doc$
 ^Meta$
 ^CODE_OF_CONDUCT\.md$
+^\.github$
+^CONTRIBUTING\.md$
+^TODO_JOSS_submission\.md$
+^pep725_JOSS-Paper$

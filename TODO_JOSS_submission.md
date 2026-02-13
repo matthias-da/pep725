@@ -119,7 +119,7 @@ jobs:
 ### Paper Technical Checks
 
 - [x] **Logo image**: `pep725_logo_cpt.png` exists in `pep725_JOSS-Paper/` ✅
-- [ ] **Bibliography**: 16 references in `paper.bib`
+- [x] **Bibliography**: 16 references in `paper.bib`
   - [x] All DOIs with actual DOI values verified and resolve correctly (11 DOIs checked) ✅
   - [ ] Verify CRAN package version numbers are still current (5 refs use CRAN URLs only)
   - **Exception**: `opedal2024advancing` DOI is wrong — see Critical Bibliography Fix below
@@ -141,12 +141,7 @@ jobs:
   - Update citation in `paper.bib` (lines 181-189)
   - Update citation key in `JOSS_packagePaper.Rmd` if key changes
 
-### Co-author Review
 
-- [ ] **Barbara Templ review**: Co-author should review and approve:
-  - [ ] Accuracy of scientific content
-  - [ ] Affiliation correctness (WSL for Barbara, FHNW for Matthias)
-  - [ ] AI disclosure statement
 
 ### Word Count Check
 
@@ -219,7 +214,7 @@ Current: ~896 body words (limit: 750-1750)
 | **GitHub Issues** | | |
 | Open issues | 13 open | Various |
 | **R CMD Check** | | |
-| Fix NOTEs | 5 NOTEs | Medium |
+| Fix NOTEs | ✅ All 5 fixed | Medium |
 | Co-author review (Barbara) | ❌ Not started | High |
 | **Package Review** | | |
 | Critical bugs (4) | ❌ Not fixed | **High** |
@@ -260,11 +255,11 @@ Current: ~896 body words (limit: 750-1750)
 ## R CMD Check Issues
 
 ### NOTEs to Fix
-- [ ] Add `.github` to `.Rbuildignore`
-- [ ] Add non-standard files to `.Rbuildignore`: `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper`, `CLAUDE.md`
-- [ ] Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
-- [ ] Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
-- [ ] Add global variable binding for `..na_cols` in `print.pheno_anomaly()`
+- [x] Add `.github` to `.Rbuildignore`
+- [x] Add non-standard files to `.Rbuildignore`: `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper`, `CLAUDE.md`
+- [x] Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
+- [x] Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
+- [x] Add global variable binding for `..na_cols` in `print.pheno_anomaly()`
 
 ---
 

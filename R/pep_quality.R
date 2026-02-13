@@ -1,3 +1,5 @@
+utils::globalVariables(c("grade_num", "worst_grade_num"))
+
 #' Assess Data Quality of Phenological Observations
 #'
 #' Provides a comprehensive assessment of data completeness, temporal coverage,

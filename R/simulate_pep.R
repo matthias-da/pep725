@@ -49,7 +49,7 @@ simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
     group <- groups[i]
     sub <- pep[species == group$species & phase_id == group$phase_id & s_id == group$s_id]
 
-    fit <- try(gam(day ~ s(year), data = sub), silent = TRUE)
+    fit <- try(mgcv::gam(day ~ s(year), data = sub), silent = TRUE)
     if (!inherits(fit, "try-error")) {
       pred <- predict(fit, newdata = sub)
       res_sd <- sd(residuals(fit))

@@ -1,3 +1,5 @@
+utils::globalVariables(c("..na_cols"))
+
 #' Calculate Phenological Anomalies
 #'
 #' Computes deviations from long-term phenological baselines to identify
