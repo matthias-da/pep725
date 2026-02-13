@@ -26,7 +26,12 @@
 
 ### 2. Add GitHub Actions CI Workflow
 
-- [x] Create `.github/workflows/R-CMD-check.yaml`
+- [x] Create `.github/workflows/R-CMD-check.yaml` (created locally)
+- [ ] **Update GitHub PAT to include `workflow` scope** - Required to push workflow files
+  - Go to GitHub → Settings → Developer settings → Personal access tokens
+  - Edit token and add `workflow` scope
+  - Then run: `git add .github/workflows/ && git commit -m "Add CI workflows" && git push`
+  - Workflow files backed up at `/tmp/R-CMD-check.yaml.backup` and `/tmp/draft-pdf.yaml.backup`
 
 ```yaml
 name: R-CMD-check
@@ -185,12 +190,12 @@ Current: ~773 words (limit: 750-1750)
 |------|--------|----------|
 | 6-month development history | ⏳ Waiting (July 2026) | Blocker |
 | testthat tests | ❌ Not started | High |
-| GitHub Actions CI | ✅ Done | High |
+| GitHub Actions CI | ⚠️ Created locally, needs PAT update to push | High |
 | CONTRIBUTING.md | ✅ Done | High |
 | CODE_OF_CONDUCT.md | ❌ Not started | Medium |
 | Paper format (paper.md) | ❌ Not started | Medium |
 | Paper date format | ✅ Done | Low |
-| JOSS PDF workflow | ✅ Done | Medium |
+| JOSS PDF workflow | ⚠️ Created locally, needs PAT update to push | Medium |
 | README badge | ❌ Not started | Low |
 | NEWS.md | ❌ Not started | Low |
 | **Paper Content** | | |
@@ -259,6 +264,6 @@ Current: ~773 words (limit: 750-1750)
 - [x] Bibliography file (paper.bib)
 - [x] Paper date format fixed (4 February 2026)
 - [x] Paper affiliation format fixed (quoted strings)
-- [x] JOSS PDF compilation workflow (`.github/workflows/draft-pdf.yaml`)
-- [x] R CMD check CI workflow (`.github/workflows/R-CMD-check.yaml`)
+- [x] JOSS PDF compilation workflow (`.github/workflows/draft-pdf.yaml`) - created locally, needs PAT update
+- [x] R CMD check CI workflow (`.github/workflows/R-CMD-check.yaml`) - created locally, needs PAT update
 - [x] CONTRIBUTING.md with community guidelines
