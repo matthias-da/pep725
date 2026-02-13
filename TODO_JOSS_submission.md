@@ -184,7 +184,7 @@ Current: ~896 body words (limit: 750-1750)
 
 ### 8. Add NEWS.md
 
-- [ ] Create `NEWS.md` to track version changes:
+- [x] Create `NEWS.md` to track version changes:
 ```markdown
 # pep725 0.1.0
 
@@ -207,7 +207,7 @@ Current: ~896 body words (limit: 750-1750)
 | Paper date format | ✅ Done | Low |
 | JOSS PDF workflow | ⚠️ Created locally, needs PAT update to push | Medium |
 | README badge | ✅ Done | Low |
-| NEWS.md | ❌ Not started | Low |
+| NEWS.md | ✅ Done | Low |
 | **Paper Content** | | |
 | Example usage decision | ❓ Needs decision | Medium |
 | Add figures to paper | ❓ Needs decision | Medium |
