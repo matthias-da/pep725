@@ -31,16 +31,22 @@ Templ et al. (2018). Pan European Phenological database (PEP725): a single point
 - `pheno_gradient()` - Quantify elevation and latitude gradients
 - `pheno_synchrony()` - Measure spatial coherence of phenological events
 
+**Quality & Validation:**
+- `pep_completeness()` - Assess species/phase coverage across stations
+- `check_phases()` - Validate phenological phase sequences
+- `flag_outliers()` - Detect outliers (30-day rule, MAD, IQR, z-score)
+- `detect_second_events()` - Identify second flowering or repeated events
+
+**Advanced Analysis:**
+- `pheno_combine()` - Combined time series from multi-station data (robust/mixed/OLS)
+- `pheno_trend_turning()` - Sequential Mann-Kendall trend turning point detection
+- `pls_phenology()` - PLS regression for temperature-sensitive phenological periods
+
 **Visualization:**
 - `pheno_plot_timeseries()` - DOY trend plots over time
-- `plot_phenological_trends()` - Robust regression trend analysis
-- `pheno_plot()` - Climate sensitivity visualizations
+- `plot_phenology_trends()` - Robust regression trend analysis
 - `leaflet_pep()` - Interactive maps for station exploration and selection
 - `map_pep()` - Static maps of station networks
-
-**Climate Integration:**
-- Link phenology with NASA GISS global temperature anomalies
-- Regional climate-phenology sensitivity analysis
 
 ## Installation
 
@@ -138,8 +144,8 @@ pep_subset <- pep[s_id %in% selected$s_id]
 
 | Dataset | Description |
 |---------|-------------|
-| `pep_seed` | Small seed dataset for quick tests |
-| `giss` | NASA GISS global temperature anomalies (1880-2024) |
+| `pep_seed` | Small seed dataset for quick tests (1,319 rows) |
+| `meteoSwiss` | MeteoSwiss phenological observations (historical heading/harvest) |
 
 ## Vignettes
 
@@ -148,11 +154,13 @@ The package includes detailed vignettes:
 - **Getting Started with pep725** - Data loading, exploration, and basic usage
 - **Phenological Analysis** - Normals, anomalies, quality assessment, and visualization
 - **Spatial Phenological Patterns** - Gradients, synchrony, and mapping
+- **Data Quality Assessment** - Quality grading, outlier detection, and completeness
 
 ```r
 vignette("getting-started", package = "pep725")
 vignette("phenological-analysis", package = "pep725")
 vignette("spatial-patterns", package = "pep725")
+vignette("data-quality", package = "pep725")
 ```
 
 ## Requirements
