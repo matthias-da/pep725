@@ -1,0 +1,31 @@
+name: Draft PDF
+
+on:
+  push:
+    paths:
+      - 'pep725_JOSS-Paper/**'
+      - '.github/workflows/draft-pdf.yaml'
+  pull_request:
+    paths:
+      - 'pep725_JOSS-Paper/**'
+  workflow_dispatch:
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Paper Draft
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: pep725_JOSS-Paper/JOSS_packagePaper.Rmd
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-draft
+          path: pep725_JOSS-Paper/JOSS_packagePaper.pdf
