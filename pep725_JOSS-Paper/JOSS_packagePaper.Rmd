@@ -104,7 +104,7 @@ The package implements an object-oriented design using S3 classes, with dedicate
 
 The **pep725** package has been developed in close connection with the PEP725 database, which as of January 2023 had contributed to at least 115 peer-reviewed publications, including 17 in *Nature* and 2 in *Science* [@templetal2026a]. These studies address phenological questions that the package's analytical functions directly support: climate sensitivity analyses such as @fu2015declining, who demonstrated declining warming effects on spring leaf unfolding at 1,245 PEP725 sites across Europe; and pan-European trend detection as in @menzel2020climate, who identified attributable climate change fingerprints in 97,000 PEP725 time series spanning 1951--2018.
 
-By implementing the methods described in @templetal2026a as reproducible R workflows with explicit quality diagnostics, **pep725** lowers the barrier to conducting such analyses on large phenological observation networks. Four vignettes and a synthetic dataset generator support both research applications and teaching in phenology and environmental data analysis.
+By implementing the methods described in @templetal2026a as reproducible R workflows with explicit quality diagnostics, **pep725** lowers the barrier to conducting such analyses on large phenological observation networks. Four vignettes support both research applications and teaching in phenology and environmental data analysis.
 
 ---
 

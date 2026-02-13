@@ -25,7 +25,8 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr
 Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, nlme, purrr, quantreg, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: hail, knitr, rmarkdown, devtools, rnaturalearthdata, pls
+Suggests: hail, knitr, rmarkdown, devtools, rnaturalearthdata, pls, testthat (>= 3.0.0)
+Config/testthat/edition: 3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

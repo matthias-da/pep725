@@ -385,9 +385,8 @@ Phenological Data Analysis</h1>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
 <p>Phenological observations are a key source of evidence for biological
-responses to climate variability and change. The Pan European Phenology
-database (PEP725; <span class="citation">Templ et al. (2018)</span>,
-<span class="citation">Templ et al. (2026)</span>) is an open-access
+responses to climate variability and change <span class="citation">(Parmesan 2006; Thackeray 2016; Piao et al.
+2019)</span>. The Pan European Phenology database (PEP725; <span class="citation">Templ et al. (2018)</span>, <span class="citation">Templ et al. (2026)</span>) is an open-access
 infrastructure for plant phenology data, unifying more than 13 million
 observations from over 30 countries, spanning the period from 1868 to
 the present and covering approximately 265 plant species and 46
@@ -515,37 +514,53 @@ assessment.</p>
 <div id="research-impact-statement" class="section level1">
 <h1>Research impact statement</h1>
 <p>The <strong>pep725</strong> package has been developed in close
-connection with the analysis of the PEP725 database and related
-phenological observation networks. It supports a wide range of
-applications, including the assessment of spatial phenological
-gradients, evaluation of regional synchrony, identification of
-high-quality stations for trend analysis, and preparation of
-reproducible figures for scientific publications.</p>
-<p>The package implements methods described in <span class="citation">Templ et al. (2026)</span> and has been used to analyze
-phenological trends across multiple European countries. By providing a
-dedicated framework for quality-aware spatial analysis,
-<strong>pep725</strong> lowers the barrier to working with large
-phenological datasets and promotes more transparent and comparable
-phenological research. The package has been adopted in climate impact
-studies, ecological analyses, and teaching contexts focused on phenology
-and environmental data analysis.</p>
+connection with the PEP725 database, which as of January 2023 had
+contributed to at least 115 peer-reviewed publications, including 17 in
+<em>Nature</em> and 2 in <em>Science</em> <span class="citation">(Templ
+et al. 2026)</span>. These studies address phenological questions that
+the package’s analytical functions directly support: climate sensitivity
+analyses such as <span class="citation">Fu et al. (2015)</span>, who
+demonstrated declining warming effects on spring leaf unfolding at 1,245
+PEP725 sites across Europe; and pan-European trend detection as in <span class="citation">Menzel et al. (2020)</span>, who identified
+attributable climate change fingerprints in 97,000 PEP725 time series
+spanning 1951–2018.</p>
+<p>By implementing the methods described in <span class="citation">Templ
+et al. (2026)</span> as reproducible R workflows with explicit quality
+diagnostics, <strong>pep725</strong> lowers the barrier to conducting
+such analyses on large phenological observation networks. Four vignettes
+and a synthetic dataset generator support both research applications and
+teaching in phenology and environmental data analysis.</p>
 <hr />
 </div>
 <div id="ai-usage-disclosure" class="section level1">
 <h1>AI usage disclosure</h1>
-<p>Portions of this manuscript and code documentation were drafted with
-assistance from Claude (Anthropic), an AI language model. All
-AI-generated content was reviewed, edited, and validated by the authors.
-The core package functionality, research methodology, and scientific
-interpretations are the work of the authors.</p>
+<p>Artificial intelligence–based tools were used in a limited and
+supportive role during the preparation of this package and its
+documentation. Specifically, AI assistance was employed for language
+polishing, structural suggestions, and clarity improvements in parts of
+the written documentation.</p>
+<p>All scientific concepts, methodological design, statistical
+reasoning, software architecture, implementation, testing, and
+validation were conceived, developed, and verified by the authors. No
+code, analytical methods, or results were generated automatically by AI
+systems, and all examples and workflows were reviewed and executed by
+the authors to ensure correctness and reproducibility.</p>
+<p>The use of AI tools did not replace scholarly judgment or software
+development practices but served solely as an editorial aid.</p>
 <hr />
 </div>
 <div id="acknowledgements" class="section level1">
 <h1>Acknowledgements</h1>
 <p>We acknowledge the national phenological services and numerous
 observers contributing to the PEP725 database. We also thank members of
-the phenology and climate-impact research communities for feedback
-during the development of this package.</p>
+the phenology and climate-impact research community for feedback during
+the development of this package. Dr. Barbara Templ was supported by the
+Berner Nachwuchsförderung (BNF) program of the University of Bern for
+developing the <strong>pep725</strong> R package. We thank Dr. Yann
+Vitasse for hosting and supporting this work at the Swiss Federal
+Institute for Forest, Snow and Landscape Research (WSL), which provided
+an excellent research environment for conducting parts of the
+development and analysis.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
@@ -560,6 +575,12 @@ Chavez, R. O., S. A. Estay, J. A. Lastra, C. G. Riquelme, M. Olea, J.
 Aquayo, and M. Decuyper. 2023. <span>“Npphen: An r-Package for Detecting
 and Mapping Extreme Vegetation Anomalies Based on Remotely Sensed
 Phenological Variability.”</span> <em>Remote Sensing</em> 15. <a href="https://doi.org/10.3390/rs15010073">https://doi.org/10.3390/rs15010073</a>.
+</div>
+<div id="ref-fu2015declining" class="csl-entry">
+Fu, Yongshuo H., Hongfang Zhao, Shilong Piao, Marc Peaucelle, Shushi
+Peng, Guiyun Zhou, Philippe Ciais, et al. 2015. <span>“Declining Global
+Warming Effects on the Phenology of Spring Leaf Unfolding.”</span>
+<em>Nature</em> 526: 104–7. <a href="https://doi.org/10.1038/nature15402">https://doi.org/10.1038/nature15402</a>.
 </div>
 <div id="ref-girondot2010phenology" class="csl-entry">
 Girondot, Marc. 2010. <span>“Estimating Density of Animals During
@@ -587,11 +608,29 @@ Luedeling, Eike. 2012. <span>“Statistical Methods for Phenology Analysis
 in Temperate Fruit Trees.”</span> <em>Scientia Horticulturae</em> 144:
 218–29. <a href="https://doi.org/10.1016/j.scienta.2012.07.011">https://doi.org/10.1016/j.scienta.2012.07.011</a>.
 </div>
+<div id="ref-menzel2020climate" class="csl-entry">
+Menzel, Annette, Ye Yuan, Michael Matiu, Tim Sparks, Helfried
+Scheifinger, Regula Gehrig, and Nicole Estrella. 2020. <span>“Climate
+Change Fingerprints in Recent European Plant Phenology.”</span>
+<em>Global Change Biology</em> 26 (4): 2599–2612. <a href="https://doi.org/10.1111/gcb.15000">https://doi.org/10.1111/gcb.15000</a>.
+</div>
 <div id="ref-opedal2024advancing" class="csl-entry">
 Opedal, Øystein H., Otso Ovaskainen, Marjo Saastamoinen, Anna-Liisa
 Laine, and Saskya van Nouhuys. 2024. <span>“Advancing Phenological
 Research Through Long-Term Data Integration.”</span> <em>Nature Ecology
 &amp; Evolution</em> 8: 610–18. <a href="https://doi.org/10.1038/s41559-024-02336-5">https://doi.org/10.1038/s41559-024-02336-5</a>.
+</div>
+<div id="ref-Parmesan2006" class="csl-entry">
+Parmesan, Camille. 2006. <span>“Ecological and Evolutionary Responses to
+Recent Climate Change.”</span> Journal Article. <em>Annual Review of
+Ecology, Evolution, and Systematics</em> 37 (Volume 37, 2006): 637–69.
+https://doi.org/<a href="https://doi.org/10.1146/annurev.ecolsys.37.091305.110100">https://doi.org/10.1146/annurev.ecolsys.37.091305.110100</a>.
+</div>
+<div id="ref-Piao2019" class="csl-entry">
+Piao, Shilong, Qiang Liu, Anping Chen, Ivan A. Janssens, Yongshuo Fu,
+Junhu Dai, Lingli Liu, Xu Lian, Miaogen Shen, and Xiaolin Zhu. 2019.
+<span>“Plant Phenology and Global Climate Change: Current Progresses and
+Challenges.”</span> <em>Global Change Biology</em> 25 (6): 1922–40. <a href="https://doi.org/10.1111/gcb.14619">https://doi.org/10.1111/gcb.14619</a>.
 </div>
 <div id="ref-Schaberpheno2026" class="csl-entry">
 Schaber, Joerg, and Maximilian Lange. 2026. <span>“Pheno: Auxiliary
@@ -625,6 +664,10 @@ Templ, Barbara, Helfried Scheifinger, Isabella Ostovary, Markus
 Ungersbock, and Hans Ressl. 2026. <span>“PEP725: 15 Years of Driving
 European and Global Phenology Science.”</span> <em>New Phytologist</em>
 online. <a href="https://doi.org/10.1111/nph.70869">https://doi.org/10.1111/nph.70869</a>.
+</div>
+<div id="ref-Thackeray2016" class="csl-entry">
+Thackeray, S. J. et al. 2016. <span>“Phenological Sensitivity to Climate
+Across Taxa and Trophic Levels.”</span> <em>Nature</em> 535: 241–45. <a href="https://doi.org/10.1038/nature18608">https://doi.org/10.1038/nature18608</a>.
 </div>
 <div id="ref-tschurr2025dymep" class="csl-entry">
 Tschurr, Flavian. 2025. <span>“DyMEP: Dynamic Multi-Environment

@@ -221,6 +221,13 @@ Current: ~896 body words (limit: 750-1750)
 | **R CMD Check** | | |
 | Fix NOTEs | 5 NOTEs | Medium |
 | Co-author review (Barbara) | ❌ Not started | High |
+| **Package Review** | | |
+| Critical bugs (4) | ❌ Not fixed | **High** |
+| Package structure (6) | ❌ Not fixed | **High** |
+| Documentation fixes (6) | ❌ Not fixed | Medium |
+| Vignette fixes (5) | ❌ Not fixed | Medium |
+| Code quality (5) | ❌ Not fixed | Low |
+| Consistency (2) | ❌ Not fixed | Low |
 
 ---
 
@@ -229,9 +236,10 @@ Current: ~896 body words (limit: 750-1750)
 ### Documentation & Content
 - [x] **#32** Refine the README file
 - [x] **#30** Add help for non-PEP725 data users (getting-started.Rmd)
-- [x] **#28** Take back "Expected Values and Troubleshooting" section (if time for reference search)
-- [ ] **#27** Remove Part 2
-- [ ] **#26** Detailed Context - delete
+- [x] **#28** Take back "Expected Values and Troubleshooting" section (if time for reference search) — 
+     [ ]        ⚠️ **Needs Barbara's review** (references verified but content should be checked by domain expert)
+- [x] **#27** Remove Part 2
+- [x] **#26** Detailed Context - delete
 
 ### Papers & Publications
 - [ ] **#29** Write PAPER about the package (enhancement)
@@ -257,6 +265,58 @@ Current: ~896 body words (limit: 750-1750)
 - [ ] Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
 - [ ] Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
 - [ ] Add global variable binding for `..na_cols` in `print.pheno_anomaly()`
+
+---
+
+## Package Review Findings
+
+Comprehensive code, documentation, and vignette review (2026-02-13).
+
+### A. Critical Bugs (fix before CRAN/JOSS)
+
+- [ ] **`simulate_pep.R:76`** — NA fallback is a no-op. The line `observed_doy[is.na(observed_doy)] <- round(rnorm(...))` generates a fixed-length vector, not one matching `sum(is.na(...))`. Result: NAs persist silently.
+- [ ] **`simulate_pep.R:52`** — Unnamespaced `gam()` call. Change to `mgcv::gam()` (also flagged in R CMD check NOTEs).
+- [ ] **`zzz.R:6`** — `.onLoad()` calls `utils::data("meteoSwiss", ...)` which loads into the global environment at package load. This is non-standard; consider lazy-loading or documenting the dataset so it loads on demand via `data(meteoSwiss)`.
+- [ ] **`pheno_gradient.R:133-136`** — `data.table` modify-by-reference bug: `dt[, gradient_var := ...]` modifies the caller's copy before `copy()` is called on line 137. Move the `copy()` call before the `:=` assignment.
+
+### B. Package Structure Issues
+
+- [ ] **Depends → Imports**: `dplyr`, `robustbase`, and `patchwork` are in `Depends` but should be in `Imports` (CRAN policy: only R and base packages in Depends unless re-export is needed)
+- [ ] **Imports → Suggests**: `nlme` and `quantreg` are in `Imports` but used only in `pheno_combine()` — move to `Suggests` with `requireNamespace()` checks
+- [ ] **Heavy interactive deps in Imports**: `shiny`, `miniUI`, `leaflet`, `leaflet.extras` are in `Imports` but only used by `leaflet_pep()` — consider moving to `Suggests`
+- [ ] **`.Rbuildignore` incomplete**: Add `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`, `.github/` (partially overlaps with R CMD check NOTEs above)
+- [ ] **Test coverage ~10%**: 95 tests cover 5 core functions; no tests for `pep_import()`, `simulate_pep()`, `pheno_combine()`, `pheno_trend_turning()`, `pls_phenology()`, `flag_outliers()`, `detect_second_events()`, `check_phases()`, `pep_completeness()`, visualization functions
+- [ ] **BBCH lookup table duplicated 4×**: `bbch_description()` in `pep_class.R`, plus copies in `pep_import.R`, `simulate_pep.R`, `pep_download.R`. Consolidate to a single internal dataset or function.
+
+### C. Documentation Issues
+
+- [ ] **`pheno_timeseries.R`** — `@param` says "DOY" but code uses column `day`; clarify terminology
+- [ ] **`pep_import.R`** — `@return` says "data.table" but actually returns a `pep` object
+- [ ] **`regional_box_ts.R`** — `@return` lists `ts_tidy` column that doesn't exist in the output
+- [ ] **`get_phenological_doys.R`** — Duplicate roxygen block (two `@title` entries)
+- [ ] **`R/dataSets.R`** — `pep_seed` uses `NULL` instead of `"pep_seed"` as the documented object name
+- [ ] **`R/dataSets.R`** — `pep_synth` is documented but no `pep_synth.rda` file exists in `data/`; remove the documentation or add the dataset
+
+### D. Vignette Issues
+
+- [ ] **`phenological-analysis.Rmd`** — Copy-paste error: text says "Wheat" but code uses `"Malus domestica"` (Apple)
+- [ ] **`phenological-analysis.Rmd`** — Claims `giss` dataset is included in pep725; it's in the **hail** companion package
+- [ ] **`data-quality.Rmd`** — References `obs_id` column which doesn't exist in the `pep` class
+- [ ] **`spatial-patterns.Rmd`** — Minor typos to fix (check after Barbara's review of new Expected Values section)
+- [ ] **`getting-started.Rmd`** — Review for consistency with updated README
+
+### E. Code Quality Improvements
+
+- [ ] **Mixed dplyr/data.table paradigms**: Several files use both `dplyr::` and `data.table` syntax. Consider standardizing on `data.table` throughout (the package already depends on it)
+- [ ] **`eval(parse(text=...))` in `regional_box_ts.R`**: Fragile pattern; replace with direct column access via `data.table` syntax
+- [ ] **Deprecated ggplot2 `size` aesthetic**: `plot.pep_quality()` and possibly others use `size =` for line geoms — change to `linewidth =` (deprecated since ggplot2 3.4.0)
+- [ ] **Missing `utils::globalVariables()` declarations**: Several files use non-standard evaluation columns without declaring them (beyond the ones already noted in R CMD check NOTEs): check `pheno_combine.R`, `pheno_trend_turning.R`, `detect_second_events.R`, `flag_outliers.R`
+- [ ] **`pheno_synchrony.R`** — Consider adding input validation for `min_stations` parameter
+
+### F. Consistency Issues
+
+- [ ] **Function naming**: Most functions use `pheno_` or `pep_` prefix, but `flag_outliers()`, `detect_second_events()`, `check_phases()`, `calc_daylength()`, `calc_thermal_units()` don't — consider renaming for consistency (breaking change, defer to post-JOSS)
+- [ ] **`plot()` method coverage**: Not all S3 classes have `plot()` methods (e.g., `pheno_turning`, `pep_connectivity`) — add where useful
 
 ---
 

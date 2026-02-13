@@ -23,7 +23,31 @@
       "Bash(xargs:*)",
       "WebFetch(domain:www.nature.com)",
       "Bash(gh issue list:*)",
-      "Bash(gh issue view:*)"
+      "Bash(gh issue view:*)",
+      "WebFetch(domain:www.contributor-covenant.org)",
+      "Bash(git push:*)",
+      "WebFetch(domain:onlinelibrary.wiley.com)",
+      "Bash(gh issue close:*)",
+      "WebFetch(domain:www.sciencedirect.com)",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.pnas.org)",
+      "WebFetch(domain:www.researchgate.net)",
+      "WebFetch(domain:www.frontiersin.org)",
+      "WebFetch(domain:scholar.google.com)",
+      "WebFetch(domain:ui.adsabs.harvard.edu)",
+      "WebFetch(domain:api.semanticscholar.org)",
+      "WebFetch(domain:linkinghub.elsevier.com)",
+      "WebFetch(domain:www.int-res.com)",
+      "WebFetch(domain:www.semanticscholar.org)",
+      "WebFetch(domain:ecoss.nau.edu)",
+      "WebFetch(domain:journals.sagepub.com)",
+      "WebFetch(domain:www.tandfonline.com)",
+      "WebFetch(domain:creamontblanc.org)",
+      "WebFetch(domain:www.biorxiv.org)",
+      "WebFetch(domain:portal.fis.tum.de)",
+      "WebFetch(domain:elifesciences.org)",
+      "Bash(gh issue comment:*)",
+      "Bash(python3:*)"
     ]
   }
 }
