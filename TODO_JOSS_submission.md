@@ -217,7 +217,7 @@ Current: ~896 body words (limit: 750-1750)
 | Fix NOTEs | ✅ All 5 fixed | Medium |
 | Co-author review (Barbara) | ❌ Not started | High |
 | **Package Review** | | |
-| Critical bugs (4) | ❌ Not fixed | **High** |
+| Critical bugs (4) | ✅ All fixed | **High** |
 | Package structure (6) | ❌ Not fixed | **High** |
 | Documentation fixes (6) | ❌ Not fixed | Medium |
 | Vignette fixes (5) | ❌ Not fixed | Medium |
@@ -269,10 +269,10 @@ Comprehensive code, documentation, and vignette review (2026-02-13).
 
 ### A. Critical Bugs (fix before CRAN/JOSS)
 
-- [ ] **`simulate_pep.R:76`** — NA fallback is a no-op. The line `observed_doy[is.na(observed_doy)] <- round(rnorm(...))` generates a fixed-length vector, not one matching `sum(is.na(...))`. Result: NAs persist silently.
-- [ ] **`simulate_pep.R:52`** — Unnamespaced `gam()` call. Change to `mgcv::gam()` (also flagged in R CMD check NOTEs).
-- [ ] **`zzz.R:6`** — `.onLoad()` calls `utils::data("meteoSwiss", ...)` which loads into the global environment at package load. This is non-standard; consider lazy-loading or documenting the dataset so it loads on demand via `data(meteoSwiss)`.
-- [ ] **`pheno_gradient.R:133-136`** — `data.table` modify-by-reference bug: `dt[, gradient_var := ...]` modifies the caller's copy before `copy()` is called on line 137. Move the `copy()` call before the `:=` assignment.
+- [x] **`simulate_pep.R:76`** — NA fallback was a no-op (`NA + rnorm()` = `NA`). Fixed: use species-phase median + jitter as fallback center.
+- [x] **`simulate_pep.R:52`** — Unnamespaced `gam()` call. Changed to `mgcv::gam()` (fixed in previous commit).
+- [x] **`zzz.R:6`** — Removed `utils::data("meteoSwiss", envir = globalenv())` from `.onAttach()`. Added `LazyData: true` to DESCRIPTION so datasets load on demand.
+- [x] **`pheno_gradient.R:133-136`** — `data.table` modify-by-reference bug: `pep[, alt := ...]` modified caller's data before `copy()`. Fixed: moved `copy()` before column renaming.
 
 ### B. Package Structure Issues
 

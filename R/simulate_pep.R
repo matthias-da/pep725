@@ -1,3 +1,5 @@
+utils::globalVariables(c("med_day", "i.med_day"))
+
 #' Simulate synthetic pep data for a given phenology dataset
 #' keeping station-year-species-phase structure intact
 #'
@@ -72,8 +74,11 @@ simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
 
   if (progress) close(pb)
 
-  # Fallback: jitter for rare/failed groups
-  pep[is.na(day), day := day + rnorm(.N, mean = 0, sd = 5)]
+  # Fallback: replace NAs (rare/failed groups) with species-phase median + jitter
+  medians <- pep[!is.na(day), .(med_day = median(day)), by = .(species, phase_id)]
+  pep[medians, on = .(species, phase_id), med_day := i.med_day]
+  pep[is.na(day) & !is.na(med_day), day := round(med_day + rnorm(.N, mean = 0, sd = 5))]
+  pep[, med_day := NULL]
 
   return(pep)
 }

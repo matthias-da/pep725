@@ -126,21 +126,24 @@ pheno_gradient <- function(pep,
   variable <- match.arg(variable)
   method <- match.arg(method)
 
+  # Make a copy early to avoid modifying original by reference
+  dt <- data.table::copy(pep)
+
   # Check required columns
   required_cols <- c("year", "day", variable)
-  if (variable == "alt" && !"alt" %in% names(pep)) {
+  if (variable == "alt" && !"alt" %in% names(dt)) {
     # Try alternative column names
-    if ("altitude" %in% names(pep)) {
-      pep[, alt := altitude]
-    } else if ("elevation" %in% names(pep)) {
-      pep[, alt := elevation]
+    if ("altitude" %in% names(dt)) {
+      dt[, alt := altitude]
+    } else if ("elevation" %in% names(dt)) {
+      dt[, alt := elevation]
     } else {
       stop("Altitude column not found. Expected 'alt', 'altitude', or 'elevation'.",
            call. = FALSE)
     }
   }
 
-  missing_cols <- setdiff(required_cols, names(pep))
+  missing_cols <- setdiff(required_cols, names(dt))
   if (length(missing_cols) > 0) {
     stop("Missing required columns: ", paste(missing_cols, collapse = ", "),
          call. = FALSE)
@@ -151,9 +154,6 @@ pheno_gradient <- function(pep,
     stop("Package 'quantreg' is required for quantile regression. ",
          "Install it with: install.packages('quantreg')", call. = FALSE)
   }
-
-  # Make a copy to avoid modifying original
-  dt <- data.table::copy(pep)
 
   # Apply species filter
   if (!is.null(species)) {
