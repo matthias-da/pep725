@@ -107,8 +107,8 @@ jobs:
 
 ### Paper Content Improvements
 
-- [ ] **Summary section**: Review for clarity and completeness
-  - [ ] Verify PEP725 statistics are current (13 million obs, 30 countries, 265 species, 46 phenophases)
+- [x] **Summary section**: Review for clarity and completeness
+  - [x] Verify PEP725 statistics are current (13 million obs, 30 countries, 265 species, 46 phenophases)
   - Note: statistics cite @templ2018pep725 and @templetal2026a — check against the 2026 paper
 
 - [x] **Research impact statement**: Strengthened with specifics
@@ -227,9 +227,9 @@ Current: ~896 body words (limit: 750-1750)
 ## GitHub Issues (Open)
 
 ### Documentation & Content
-- [ ] **#32** Refine the README file
-- [ ] **#30** Add help for non-PEP725 data users (getting-started.Rmd)
-- [ ] **#28** Take back "Expected Values and Troubleshooting" section (if time for reference search)
+- [x] **#32** Refine the README file
+- [x] **#30** Add help for non-PEP725 data users (getting-started.Rmd)
+- [x] **#28** Take back "Expected Values and Troubleshooting" section (if time for reference search)
 - [ ] **#27** Remove Part 2
 - [ ] **#26** Detailed Context - delete
 
