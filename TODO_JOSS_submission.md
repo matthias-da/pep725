@@ -117,8 +117,6 @@ jobs:
   - Currently mentions @templetal2026a and adoption in "climate impact studies, ecological analyses, and teaching"
   - Funding (BNF/Bern) and WSL support are already in Acknowledgements
 
-- [ ] **Companion package**: Mention **hail** package for climate sensitivity analysis?
-
 ### Paper Technical Checks
 
 - [x] **Logo image**: `pep725_logo_cpt.png` exists in `pep725_JOSS-Paper/` ✅
@@ -149,7 +147,6 @@ jobs:
 - [ ] **Barbara Templ review**: Co-author should review and approve:
   - [ ] Accuracy of scientific content
   - [ ] Affiliation correctness (WSL for Barbara, FHNW for Matthias)
-  - [ ] Author order (Barbara first, equal-contrib both) and equal-contrib designation
   - [ ] AI disclosure statement
 
 ### Word Count Check
@@ -180,7 +177,7 @@ Current: ~896 body words (limit: 750-1750)
 
 ### 7. Add README Badge
 
-- [ ] Add CI status badge to README.md after CI is set up:
+- [x] Add CI status badge to README.md after CI is set up:
 ```markdown
 [![R-CMD-check](https://github.com/matthias-da/pep725/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/matthias-da/pep725/actions/workflows/R-CMD-check.yaml)
 ```
@@ -209,7 +206,7 @@ Current: ~896 body words (limit: 750-1750)
 | Paper format (paper.md) | ❌ Not started | Medium |
 | Paper date format | ✅ Done | Low |
 | JOSS PDF workflow | ⚠️ Created locally, needs PAT update to push | Medium |
-| README badge | ❌ Not started | Low |
+| README badge | ✅ Done | Low |
 | NEWS.md | ❌ Not started | Low |
 | **Paper Content** | | |
 | Example usage decision | ❓ Needs decision | Medium |

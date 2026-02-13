@@ -4,6 +4,7 @@
   <img src="presentations/pep725_logo_cpt.png" alt="pep725 logo" width="180"/>
 </p>
 
+[![R-CMD-check](https://github.com/matthias-da/pep725/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/matthias-da/pep725/actions/workflows/R-CMD-check.yaml)
 
 PEP725 Pan-European Phenological Data Analysis
 
