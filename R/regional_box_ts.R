@@ -121,31 +121,7 @@ regional_box_ts <- function(
   ][order(get(group_var), year, mean_day, phase_id)]
 
   # --- Helper: flexible phase name mapping + warnings ---------------------
-  phase_lookup <- c(
-    `0`   = "Dry seed",
-    `7`   = "Coleoptile emerged from caryopsis",
-    `10`  = "Leaf development",
-    `11`  = "First true leaf",
-    `15`  = "True leaves",
-    `30`  = "Stem elongation",
-    `31`  = "Stem 10% of final length",
-    `51`  = "Inflorescence or flower buds visible",
-    `60`  = "Heading",
-    `61`  = "Start of flowering: 10% of flowers open",
-    `65`  = "Anthesis",
-    `69`  = "End of flowering",
-    `70`  = "Milk development",
-    `75`  = "50% of fruits have reached final size",
-    `80`  = "Dough development",
-    `81`  = "Beginning of ripening or fruit colouration",
-    `90`  = "Maturity",
-    `95`  = "50% of leaves fallen",
-    `100` = "Harvest",
-    `111` = "First cut for silage winning",
-    `131` = "First cut for hay winning",
-    `151` = "Start of harvest for silage (corn, grass)",
-    `205` = "Autumnal leaf colouring >= 50%"
-  )
+  phase_lookup <- .bbch_lookup
   phase_name <- function(id) {
     res <- as.character(phase_lookup[as.character(id)])
     if (any(is.na(res))) {

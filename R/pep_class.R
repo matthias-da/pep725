@@ -296,23 +296,6 @@ summary.pep <- function(object, by = c("species", "phase", "country", "year"),
     },
     phase = {
       cat("OBSERVATIONS BY BBCH PHASE\n")
-      # BBCH code descriptions
-      bbch_names <- c(
-        "10" = "Leaf development",
-        "11" = "First leaf unfolded",
-        "30" = "Stem elongation",
-        "51" = "Inflorescence visible",
-        "60" = "Flowering/Heading",
-        "61" = "Beginning of flowering",
-        "65" = "Full flowering/Anthesis",
-        "69" = "End of flowering",
-        "70" = "Fruit development",
-        "80" = "Ripening",
-        "85" = "Soft dough",
-        "90" = "Maturity",
-        "100" = "Harvest",
-        "205" = "Autumn coloring >= 50%"
-      )
 
       summary_dt <- x[, .(
         n_obs = .N,
@@ -321,7 +304,7 @@ summary.pep <- function(object, by = c("species", "phase", "country", "year"),
         iqr_doy = as.integer(IQR(day, na.rm = TRUE))
       ), by = phase_id][order(phase_id)]
 
-      summary_dt[, phase_name := bbch_names[as.character(phase_id)]]
+      summary_dt[, phase_name := .bbch_lookup[as.character(phase_id)]]
       summary_dt[is.na(phase_name), phase_name := "Other"]
 
       print(summary_dt[, .(phase_id, phase_name, n_obs, n_species, median_doy, iqr_doy)])
@@ -488,6 +471,60 @@ plot.pep <- function(x, type = c("map", "timeseries", "histogram"), ...) {
 # Helper: BBCH code lookup
 # =============================================================================
 
+# Internal named vector of BBCH codes -> descriptions.
+# Single source of truth used by bbch_description(), summary.pep(),
+# select_phase(), and regional_box_ts().
+.bbch_lookup <- c(
+  "0" = "Dry seed / Dormancy",
+  "1" = "Seed imbibition",
+  "5" = "Radicle emerged",
+  "7" = "Coleoptile emerged",
+  "9" = "Emergence",
+  "10" = "First leaf through coleoptile",
+  "11" = "First leaf unfolded",
+  "12" = "2 leaves unfolded",
+  "13" = "3 leaves unfolded",
+  "15" = "True leaves",
+  "19" = "9+ leaves unfolded",
+  "21" = "Beginning of tillering",
+  "29" = "End of tillering",
+  "30" = "Beginning of stem elongation",
+  "31" = "First node detectable",
+  "37" = "Flag leaf just visible",
+  "39" = "Flag leaf ligule visible",
+  "41" = "Early boot",
+  "45" = "Mid boot",
+  "49" = "Late boot",
+  "51" = "Beginning of heading",
+  "55" = "Middle of heading",
+  "59" = "End of heading",
+  "60" = "Beginning of flowering / Heading complete",
+  "61" = "Beginning of flowering",
+  "65" = "Full flowering / Anthesis",
+  "69" = "End of flowering",
+  "70" = "Milk development",
+  "71" = "Watery ripe",
+  "73" = "Early milk",
+  "75" = "Medium milk",
+  "77" = "Late milk",
+  "80" = "Dough development",
+  "81" = "Beginning of ripening or fruit colouration",
+  "83" = "Early dough",
+  "85" = "Soft dough",
+  "87" = "Hard dough",
+  "89" = "Fully ripe",
+  "90" = "Over-ripe / Maturity",
+  "92" = "Over-ripe, grain hard",
+  "95" = "50% of leaves fallen",
+  "97" = "Plant dead",
+  "99" = "Harvested product",
+  "100" = "Harvest",
+  "111" = "First cut for silage",
+  "131" = "First cut for hay",
+  "151" = "Start of harvest for silage (corn, grass)",
+  "205" = "Autumn coloring >= 50%"
+)
+
 #' Get BBCH Phase Description
 #'
 #' Returns human-readable descriptions for BBCH phenological codes.
@@ -507,50 +544,7 @@ plot.pep <- function(x, type = c("map", "timeseries", "histogram"), ...) {
 #' @author Matthias Templ
 #' @export
 bbch_description <- function(codes, na.rm = TRUE, sort = TRUE) {
-  bbch_lookup <- c(
-    "0" = "Dry seed / Dormancy",
-    "1" = "Seed imbibition",
-    "5" = "Radicle emerged",
-    "7" = "Coleoptile emerged",
-    "9" = "Emergence",
-    "10" = "First leaf through coleoptile",
-    "11" = "First leaf unfolded",
-    "12" = "2 leaves unfolded",
-    "13" = "3 leaves unfolded",
-    "19" = "9+ leaves unfolded",
-    "21" = "Beginning of tillering",
-    "29" = "End of tillering",
-    "30" = "Beginning of stem elongation",
-    "31" = "First node detectable",
-    "37" = "Flag leaf just visible",
-    "39" = "Flag leaf ligule visible",
-    "41" = "Early boot",
-    "45" = "Mid boot",
-    "49" = "Late boot",
-    "51" = "Beginning of heading",
-    "55" = "Middle of heading",
-    "59" = "End of heading",
-    "60" = "Beginning of flowering / Heading complete",
-    "61" = "Beginning of flowering",
-    "65" = "Full flowering / Anthesis",
-    "69" = "End of flowering",
-    "70" = "Milk development",
-    "71" = "Watery ripe",
-    "73" = "Early milk",
-    "75" = "Medium milk",
-    "77" = "Late milk",
-    "80" = "Dough development",
-    "83" = "Early dough",
-    "85" = "Soft dough",
-    "87" = "Hard dough",
-    "89" = "Fully ripe",
-    "90" = "Over-ripe",
-    "92" = "Over-ripe, grain hard",
-    "97" = "Plant dead",
-    "99" = "Harvested product",
-    "100" = "Harvest",
-    "205" = "Autumn coloring >= 50%"
-  )
+  bbch_lookup <- .bbch_lookup
 
   # Remove NA codes if requested
   if (na.rm) {
