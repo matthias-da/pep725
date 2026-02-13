@@ -13,7 +13,17 @@
       "Bash(__NEW_LINE_78726fff34bb660e__ echo \"All files now:\")",
       "Bash(done)",
       "Bash(git checkout:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:doi.org)",
+      "WebFetch(domain:link.springer.com)",
+      "WebFetch(domain:nph.onlinelibrary.wiley.com)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:joss.readthedocs.io)",
+      "Bash(xargs:*)",
+      "WebFetch(domain:www.nature.com)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)"
     ]
   }
 }

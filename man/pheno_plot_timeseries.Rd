@@ -55,13 +55,16 @@ pheno_plot_timeseries(data = pep_alpine[phase_id == 65],
                       color_by = "genus",
                       facet_by = NULL, smooth = TRUE)
 
-# Example: single species, colored by site
-pheno_plot_timeseries(
-  data = pep_alpine[species == "Malus domestica" & phase_id == 60],
-  color_by = "s_id",
-  smooth = TRUE,
-  title = "Apple flowering (BBCH 60) across sites"
-)
+# Example: single species, colored by site (grapevine has longest records)
+vine_data <- pep_alpine[species == "Vitis vinifera" & phase_id == 65]
+if (nrow(vine_data) > 0) {
+  pheno_plot_timeseries(
+    data = vine_data,
+    color_by = "s_id",
+    smooth = TRUE,
+    title = "Grapevine flowering (BBCH 65) across sites"
+  )
+}
 
 # Example: facets by genus
 pheno_plot_timeseries(

@@ -7,3 +7,5 @@ CLAUDE.md
 ^presentations$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$

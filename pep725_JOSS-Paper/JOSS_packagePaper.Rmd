@@ -9,20 +9,22 @@ tags:
   - environmental data
 authors:
   - name: Barbara Templ
-    orcid: 0000-0000-0000-0000
-    affiliation: 1
+    orcid: 0000-0002-9391-5888
+    affiliation: "1"
     equal-contrib: true
   - name: Matthias Templ
-    orcid: 0000-0000-0000-0000
-    affiliation: 2
+    orcid: 0000-0002-8638-5276
+    affiliation: "2"
     equal-contrib: true
     corresponding: true
 affiliations:
- - name: Austrian Central Institute for Meteorology and Geodynamics (ZAMG), Austria
+ - name: Swiss Federal Institute for Forest, Snow and Landscape Research (WSL), Switzerland
    index: 1
+   ror: 04d81q302
  - name: University of Applied Sciences Northwestern Switzerland (FHNW), Switzerland
    index: 2
-date: 2026-02-04
+   ror: 02gz82p86
+date: 4 February 2026
 
 bibliography: paper.bib
 ---
@@ -34,51 +36,59 @@ bibliography: paper.bib
 
 # Summary
 
-Phenological observations are a key source of evidence for biological responses to climate variability and change. The Pan European Phenology database (PEP725; @templ2018pep725, @templetal2026a) is an open-access infrastructure for plant phenology data, unifying more than 13 million observations from over 30 countries, spanning the period from 1868 to the present and covering approximately 265 plant species and 46 phenophases. While these datasets offer exceptional scientific value, their analysis is challenged by uneven spatial coverage, heterogeneous data quality, temporal gaps, and changes in observation protocols over time.
+Phenological observations are a key source of evidence for biological responses to climate variability and change [@Parmesan2006; @Thackeray2016; @Piao2019]. The Pan European Phenology database (PEP725; @templ2018pep725, @templetal2026a) is an open-access infrastructure for plant phenology data, unifying more than 13 million observations from over 30 countries, spanning the period from 1868 to the present and covering approximately 265 plant species and 46 phenophases. While these datasets offer exceptional scientific value, their analysis is challenged by uneven spatial coverage, heterogeneous data quality, temporal gaps, and changes in observation protocols over time.
 
-The **pep725** R package provides a coherent framework for the spatio-temporal analysis of phenological data from PEP725 and similar ground-based datasets. It supports systematic data quality diagnostics, the computation of phenological normals and anomalies, the estimation of spatial gradients along environmental axes, the assessment of phenological synchrony across space and time, and both interactive and publication-ready spatial visualization. The package emphasizes reproducibility and transparency and is designed to complement phenological modeling and remote-sensing tools by enabling a phenology-first exploration of spatial structure and variability in large, heterogeneous observation networks.
+The **pep725** R package provides a coherent framework for the spatio-temporal analysis of phenological data from PEP725 and similar ground-based datasets. It supports systematic data quality diagnostics, the computation of phenological normals and anomalies, the estimation of spatial gradients along environmental axes, the assessment of phenological synchrony across space and time, and both interactive and publication-ready spatial visualization. Additional capabilities include partial least squares (PLS) regression for identifying temperature-sensitive periods affecting phenological timing, sequential Mann-Kendall analysis for detecting trend turning points, and detection of second flowering or repeated phenological events linked to climate anomalies. The package emphasizes reproducibility and transparency and is designed to complement phenological modeling and remote-sensing tools by enabling a phenology-first exploration of spatial structure and variability in large, heterogeneous observation networks.
 
 ---
 
 # Statement of need
 
-Several R packages support phenological research, including tools for mechanistic modeling, statistical estimation, climate–phenology relationships, and satellite-derived land surface phenology. These tools are indispensable for prediction and process-based understanding, but they typically operate on pre-processed inputs and emphasize modeling outcomes rather than the spatial structure and reliability of large observation networks.
-
-Ground-based phenological datasets however pose various analytical challenges. For instance, observation density varies strongly across regions, long-term records are often incomplete, and data quality and observation protocols differ among contributors and time periods. Without explicit diagnostics and spatial characterization, such heterogeneity can bias spatial comparisons, trend analyses, and downstream model calibration.
-
-The **pep725** package fills these methodological gaps by providing a dedicated, quality-aware framework for characterizing station-based phenological datasets prior to modeling. It enables systematic data quality assessment, quantification of spatial gradients, evaluation of phenological synchrony, and spatial visualization of phenological patterns. It is particularly suited for continental-scale datasets such as PEP725 but remains applicable to any station-based phenological data with spatial coordinates. By separating data diagnostics and spatial characterization from downstream modeling, **pep725** enables more robust and reproducible phenological analyses.
+Ground-based phenological datasets pose distinct analytical challenges: observation density varies across regions, long-term records are often incomplete, and data quality differs among contributors and time periods. Without explicit diagnostics and spatial characterization, such heterogeneity can bias spatial comparisons, trend analyses, and downstream model calibration. The **pep725** package addresses these challenges by providing a dedicated framework for characterizing station-based phenological datasets prior to modeling, separating data diagnostics from downstream inference to enable more robust and reproducible analyses.
 
 ---
 
-# Functionality
+<!-- Example usage section commented out to meet JOSS word limit
+# Example usage
 
-The core functionality of **pep725** is organized around four complementary tasks that support the exploratory and diagnostic stages of phenological analysis prior to modeling and inference.
+The following code demonstrates a typical workflow for analyzing phenological gradients using **pep725**:
 
-First, the package provides reproducible data quality assessment for phenological time series. It quantifies temporal coverage, identifies data gaps and statistical outliers, and assigns interpretable quality grades that can be used to filter, stratify, or weight subsequent analyses.
+```r
+library(pep725)
 
-Second, **pep725** supports the computation of phenological normals and anomalies, analogous to climatological normals. These summaries provide consistent reference baselines for comparing phenological timing across periods, regions, and species.
+# Download synthetic PEP data (or use pep_import() for real data)
+pep <- pep_download()
 
-Third, the package includes tools for analyzing spatial structure in phenology. It enables estimation of elevational and latitudinal gradients in mean phenological timing and quantifies phenological synchrony, capturing spatial coherence and variability in timing within regions and across years.
+# Subset to Alpine region and apple flowering
+pep_alpine <- pep[country %in% c("Switzerland", "Austria") &
+                  species == "Malus domestica"]
 
-Finally, **pep725** integrates interactive and static spatial visualization. Interactive station selection supports exploratory data analysis and region definition, while static, publication-ready maps allow spatial patterns in phenological metrics to be communicated without reliance on proprietary mapping services.
+# Assess data quality
+quality <- pep_quality(pep_alpine, phase_id = 65)
+summary(quality)
 
-The package follows a modular design and deliberately avoids embedding specific climate datasets or phenology–climate models, allowing users to integrate **pep725** outputs with external climate data and modeling frameworks according to their research questions.
+# Compute phenological normals (1991-2020 baseline)
+normals <- pheno_normals(pep_alpine, phase_id = 65,
+                         ref_period = 1991:2020)
+
+# Analyze elevation gradient
+gradient <- pheno_gradient(pep_alpine, phase_id = 65,
+                           gradient_var = "alt")
+plot(gradient)
+
+# Quantify spatial synchrony
+sync <- pheno_synchrony(pep_alpine, phase_id = 65)
+summary(sync)
+```
+-->
 
 ---
 
 # State of the field
 
-Phenological analysis in R is supported by various packages that address complementary aspects of data modeling, prediction, and interpretation. Many tools focus on process-based or statistical modeling of phenology, often using climate covariates as primary inputs. For example, **chillR** [@luedeling2012chillR], provides a comprehensive framework for modeling chilling and forcing requirements in temperate fruit trees, including bloom prediction and climate scenario analysis. Similarly, **DyMEP** [@tschurr2025dymep] implements dynamic, weather-driven phenology models for major crops, offering mechanistic prediction across environments based on long-term meteorological data. Crop-specific modeling and parameterization are further addressed by **phenolocrop** [@tanigu2025phenolocrop], which focuses on growth stage transitions and machine-learning-based prediction from time-series traits.
-Other packages emphasize statistical estimation of phenological timing from irregular or presence-only data. **phenesse** [@phenesse2025applies] applies quantile regression approaches to estimate onset, median, and end dates of phenophases, enabling robust inference from opportunistic observations. The **phenology** package provides parametric and Bayesian models for fitting seasonal distributions of biological events, originally developed for animal phenology but applicable more broadly [@girondot2010phenology]. Auxiliary workflows for preprocessing and basic phenological calculations are supported by packages such as **pheno** [@Schaberpheno2026] and **spphpr** [@shi2017spphpr], which implements thermal-time-based spring phenology prediction models. The **sephora** [@Gomezsephora2024package] package provides function and methods for estimating phenological dates from (nearly) periodic Earth Observation time series.
-A parallel line of development targets remote-sensing-based phenology, where land surface phenology is derived from vegetation indices rather than ground observations. Packages such as **npphen** [@chavez2023npphensupport] focuses on the detection and characterization of vegetation anomalies from remote-sensing time series; while tools like **phenex** provide function for spatial analyses of satellite observations of vegetation [@Langephenex2017]. These approaches are essential for large-scale mapping but operate on fundamentally different data structures than the PEP725.
+Phenological analysis in R is supported by packages addressing process-based modeling [e.g. **chillR**, @luedeling2012chillR; **DyMEP**, @tschurr2025dymep; **phenolocrop**, @tanigu2025phenolocrop], statistical estimation of phenological timing [**phenesse**, @phenesse2025; **phenology**, @girondot2010phenology; **pheno**, @Schaberpheno2026; **spphpr**, @shi2017spphpr; **sephora**, @Gomezsephora2024], and remote-sensing-based phenology [**npphen**, @chavez2023npphen; **phenex**, @Langephenex2017; **phenomap**, @phenomap2020; **phenor**, @hufkens2018phenor]. These tools are essential for prediction and process-based understanding but typically emphasize modeling outcomes rather than the spatial structure and reliability of observation networks.
 
-####### TODO: cite: phenomap, and Hufkenss package phenor
-
-In contrast, **pep725** focuses on the spatial–statistical characterization of ground-based phenological observation networks. It emphasizes data quality diagnostics, spatial gradients, synchrony, and exploratory mapping, thereby filling a methodological gap between raw phenological databases and downstream modeling or prediction-oriented software.
-
-OR==========================this is the final paragraphs (instead of "In contrast...):
-Despite this rich ecosystem, few tools focus explicitly on quality-aware spatial analysis of ground-based phenological observation networks themselves. Large databases such as PEP725 combine millions of records collected over decades, across heterogeneous environments, observer networks, and national protocols (Templ et al., 2018, 2026). Analyses of such data require explicit handling of uneven temporal coverage, gaps, outliers, and changing observation practices before spatial patterns can be interpreted reliably.
-Building on the PEP725 infrastructure (Templ et al., 2018, 2026), and complementary to modeling-oriented R tools such as phenor (Hufkens et al., 2018), pep725 provides a quality-aware, phenology-first framework for spatial analysis of ground-based observation networks. It enables systematic diagnostics of data completeness and consistency, estimation of spatial gradients (e.g. with elevation or latitude), and quantification of phenological synchrony, all of which are key derived quantities in contemporary phenological research (e.g. Liu et al., 2016; Opedal et al., 2024).
+Despite this rich ecosystem, few tools focus on quality-aware spatial analysis of ground-based phenological observation networks. Large databases such as PEP725 combine millions of records collected across heterogeneous environments and national protocols [@templ2018pep725; @templetal2026a], requiring explicit handling of data quality issues before spatial patterns can be interpreted reliably. Building on the PEP725 infrastructure and complementary to modeling-oriented tools, **pep725** enables systematic diagnostics, estimation of spatial gradients, and quantification of phenological synchrony—key derived quantities in contemporary phenological research [e.g. @liu2016temperature; @opedal2024advancing].
 
 ---
 
@@ -86,7 +96,7 @@ Building on the PEP725 infrastructure (Templ et al., 2018, 2026), and complement
 
 The design of **pep725** is guided by three principles: (i) explicit treatment of data quality and uncertainty, (ii) transparent and reproducible spatial analysis workflows, and (iii) modular integration with the broader R ecosystem.
 
-Functions operate on tabular phenological data with explicit spatial and temporal attributes and return structured outputs that can be reused across analytical steps. Gradient and synchrony analyses share consistent interfaces and support robust estimation methods to reduce sensitivity to outliers and heterogeneous sampling. Visualization tools are integrated directly into the workflow to support iterative exploration, region definition, and communication of results.
+The package implements an object-oriented design using S3 classes, with dedicated `print`, `summary`, and `plot` methods for all analysis outputs. Functions operate on tabular phenological data with explicit spatial and temporal attributes and return structured objects that can be reused across analytical steps. Gradient and synchrony analyses share consistent interfaces and support robust estimation methods (including `lmrob` and quantile regression) to reduce sensitivity to outliers and heterogeneous sampling. Visualization tools are integrated directly into the workflow to support iterative exploration, region definition, and communication of results. Four vignettes provide reproducible workflows covering data access, phenological analysis, spatial patterns, and data quality assessment.
 
 ---
 
@@ -94,22 +104,22 @@ Functions operate on tabular phenological data with explicit spatial and tempora
 
 The **pep725** package has been developed in close connection with the analysis of the PEP725 database and related phenological observation networks. It supports a wide range of applications, including the assessment of spatial phenological gradients, evaluation of regional synchrony, identification of high-quality stations for trend analysis, and preparation of reproducible figures for scientific publications.
 
-By providing a dedicated framework for quality-aware spatial analysis, **pep725** lowers the barrier to working with large phenological datasets and promotes more transparent and comparable phenological research. The package has been adopted in climate impact studies, ecological analyses, and teaching contexts focused on phenology and environmental data analysis.
+The package implements methods described in @templetal2026a and has been used to analyze phenological trends across multiple European countries. By providing a dedicated framework for quality-aware spatial analysis, **pep725** lowers the barrier to working with large phenological datasets and promotes more transparent and comparable phenological research. The package has been adopted in climate impact studies, ecological analyses, and teaching contexts focused on phenology and environmental data analysis.
+
+---
+
+# AI usage disclosure
+
+Artificial intelligence–based tools were used in a limited and supportive role during the preparation of this package and its documentation. Specifically, AI assistance was employed for language polishing, structural suggestions, and clarity improvements in parts of the written documentation.
+
+All scientific concepts, methodological design, statistical reasoning, software architecture, implementation, testing, and validation were conceived, developed, and verified by the authors. No code, analytical methods, or results were generated automatically by AI systems, and all examples and workflows were reviewed and executed by the authors to ensure correctness and reproducibility.
+
+The use of AI tools did not replace scholarly judgment or software development practices but served solely as an editorial aid.
 
 ---
 
 # Acknowledgements
 
-We acknowledge the national phenological services and numerous observers contributing to the PEP725 database. We also thank members of the phenology and climate-impact research communities for feedback during the development of this package.
+We acknowledge the national phenological services and numerous observers contributing to the PEP725 database. We also thank members of the phenology and climate-impact research community for feedback during the development of this package. Dr. Barbara Templ was supported by the Berner Nachwuchsförderung (BNF) program of the University of Bern for developing the **pep725** R package. We thank Dr. Yann Vitasse for hosting and supporting this work at the Swiss Federal Institute for Forest, Snow and Landscape Research (WSL), which provided an excellent research environment for conducting parts of the development and analysis.
 
 # References
-
-
-
-
-
-
-
-
-
-

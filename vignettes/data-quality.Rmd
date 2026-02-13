@@ -201,6 +201,30 @@ threshold less effective at detecting them.
 summary(outliers)
 ```
 
+### Comparing Outlier Rates Across Species
+
+Different species may have different outlier rates due to observation difficulty
+or data quality:
+
+```{r flag-compare}
+# Check outliers for grapevine
+vine_flowering <- pep[species == "Vitis vinifera" & phase_id %in% c(60, 65)]
+
+if (nrow(vine_flowering) > 0) {
+  outliers_vine <- flag_outliers(
+    pep = vine_flowering,
+    method = "30day",
+    by = c("species", "phase_id")
+  )
+
+  cat("Outlier comparison:\n")
+  cat("All flowering species: ", round(100 * mean(outliers$is_outlier), 2), "%\n")
+  cat("Grapevine only:        ", round(100 * mean(outliers_vine$is_outlier), 2), "%\n")
+} else {
+  cat("No grapevine flowering data available for comparison.\n")
+}
+```
+
 ## Visualizing Outliers
 
 Visual inspection is essential for understanding outlier patterns. The

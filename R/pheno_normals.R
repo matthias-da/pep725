@@ -303,8 +303,15 @@ print.pheno_normals <- function(x, n = 10, ...) {
 
   cat("Phenological Normals\n")
   cat(strrep("-", 50), "\n")
-  cat(sprintf("Reference period: %d-%d\n", min(period), max(period)))
-  cat(sprintf("Minimum years required: %d\n", min_years))
+
+  # Handle period safely (may be NULL or empty)
+  if (!is.null(period) && length(period) > 0) {
+    cat(sprintf("Reference period: %d-%d\n", as.integer(min(period)), as.integer(max(period))))
+  }
+
+  if (!is.null(min_years)) {
+    cat(sprintf("Minimum years required: %d\n", as.integer(min_years)))
+  }
 
   if (!is.null(species_filter)) {
     cat(sprintf("Species filter: %s\n", species_filter))

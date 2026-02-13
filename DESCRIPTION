@@ -17,14 +17,15 @@ Description: Provides comprehensive tools for analyzing phenological data from
     synthetic data generation for testing and teaching, and downloadable example
     datasets. Visualization capabilities include interactive 'leaflet' maps for
     station selection, static maps via 'ggmap', and trend plots with robust
-    regression. Integration with climate data (NASA GISS temperature anomalies,
-    MeteoSwiss) enables climate-phenology relationship analysis. Quality
-    assessment tools help identify reliable observation series.
+    regression. Integration with climate data (MeteoSwiss) enables
+    climate-phenology relationship analysis. For NASA GISS temperature
+    anomalies and climate sensitivity plots, see the companion 'hail' package.
+    Quality assessment tools help identify reliable observation series.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1), data.table, ggplot2, robustbase, patchwork, dplyr
 Imports: mgcv, ggmap, leaflet, leaflet.extras, methods, miniUI, nlme, purrr, quantreg, shiny, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: knitr, rmarkdown, devtools, rnaturalearthdata, pls
+Suggests: hail, knitr, rmarkdown, devtools, rnaturalearthdata, pls
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

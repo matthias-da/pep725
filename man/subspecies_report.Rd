@@ -74,27 +74,31 @@ pep <- pep_download()
 # Use Alpine subset for faster computation
 pep_alpine <- pep[country \%in\% c("Switzerland", "Austria")]
 
-subspecies_report(
-  pep_alpine,
-  subspecies_name = c("Malus domestica Api", "Malus domestica Boskoop"),
-  subregions = c("Switzerland", "Austria"),
-  metric = "all",
-  bbch_names = list("65"="Flowering", "87"="Maturity")
-)
+# Grapevine subspecies (wine varieties) - longest historical records
+if (nrow(pep_alpine[species == "Vitis vinifera"]) > 0) {
+  subspecies_report(
+    pep_alpine,
+    subspecies_name = c("Vitis vinifera Riesling",
+                        "Vitis vinifera MUELLER THURGAU WEISS"),
+    subregions = c("Switzerland", "Austria"),
+    metric = "all",
+    bbch_names = list("65"="Flowering", "81"="Veraison")
+  )
 
-subspecies_report(
-  pep_alpine,
-  species_name = "Malus domestica",
-  subregions = c("Switzerland", "Austria"),
-  metric = c("n_obs","median_doy","completeness")
-)
+  subspecies_report(
+    pep_alpine,
+    species_name = "Vitis vinifera",
+    subregions = c("Switzerland", "Austria"),
+    metric = c("n_obs","median_doy","completeness")
+  )
 
-subspecies_report(
-  pep_alpine,
-  genus_name = "Malus",
-  subregions = c("Switzerland", "Austria"),
-  metric = "all"
-)
+  subspecies_report(
+    pep_alpine,
+    genus_name = "Vitis",
+    subregions = c("Switzerland", "Austria"),
+    metric = "all"
+  )
+}
 }
 }
 \seealso{

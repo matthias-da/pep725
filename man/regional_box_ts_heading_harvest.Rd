@@ -5,8 +5,8 @@
 \title{Compile Regional Phenological and Climate Time Series}
 \usage{
 regional_box_ts_heading_harvest(
-  pep = get("pep", envir = parent.frame()),
-  giss = get("giss", envir = parent.frame()),
+  pep,
+  giss,
   meteoSwiss = get("meteoSwiss", envir = parent.frame()),
   lon_min = 4.2,
   lon_max = 8.1,
@@ -21,8 +21,8 @@ regional_box_ts_heading_harvest(
 \item{pep}{A data.table containing PEP725 phenological data. Defaults to
 object from parent environment.}
 
-\item{giss}{A data.table with GISS global temperature anomalies. Defaults to
-object from parent environment.}
+\item{giss}{A data.table with GISS global temperature anomalies, containing columns
+\code{year}, \code{dT}, and \code{dT_sm}. Load from hail package: \code{data(giss, package = "hail")}.}
 
 \item{meteoSwiss}{A data.table with MeteoSwiss phenological observations.
 Defaults to object from parent environment.}
@@ -76,45 +76,26 @@ selected periods.
 \examples{
 \dontrun{
 pep <- pep_download()
-data(giss)
 data(meteoSwiss)
+
+# Load GISS data from hail package
+data(giss, package = "hail")
+
 out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
                                        species_name = "Triticum aestivum")
 str(out$ts_tidy)
-gt <- pheno_plot_hh(out, type = "timeseries")
-gt
-pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-gt | gc
 
-# Example for other (selected) coordinates of the PEP data:
-out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
-                        lon_min = 4.2,  lon_max = 8.1,
-                        lat_min = 44.7, lat_max = 48.1
-)
-str(out$ts_tidy)
-pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
+# Time series plot
+pheno_plot_hh(out)
 
-# Example for other year selection
-out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
-                                       species_name = "Triticum aestivum",
-                                       year_min = 1980)
-gt <- pheno_plot_hh(out, type = "timeseries")
-gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-gt | gc
-
-# Example to select only nearby stations (more useful that using all PEP station data)
-# Better to select only stations near Changins and for the last 40 years:
-d <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
-                        lon_min = 4.2,  lon_max = 8.1,
-                        lat_min = 44.7, lat_max = 48.1,
-                        year_min = 1980
-)
-pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
+# For climate sensitivity plots, use hail package:
+# hail::plot_giss_smooth(out, month_scale = TRUE)
+# hail::plot_giss_sensitivity(out, month_scale = TRUE)
 }
 }
 \seealso{
-\code{\link{pep_import}}, \code{\link{meteoSwiss}}, \code{\link{giss}}
+\code{\link{pep_import}}, \code{\link{meteoSwiss}},
+\code{hail::giss}, \code{hail::plot_giss_smooth}, \code{hail::plot_giss_sensitivity}
 }
 \author{
 Matthias Templ

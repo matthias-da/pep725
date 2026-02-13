@@ -56,19 +56,23 @@ and completeness ratios.
 pep <- pep_download()
 pep_alpine <- pep[country \%in\% c("Switzerland", "Austria")]
 
-summarize_subspecies_availability(
-  pep_alpine,
-  species_name = "Malus domestica",
-  subregions = c("Switzerland", "Austria"),
-  metric = "all"
-)
+# Grapevine species (longest historical records)
+if (nrow(pep_alpine[species == "Vitis vinifera"]) > 0) {
+  summarize_subspecies_availability(
+    pep_alpine,
+    species_name = "Vitis vinifera",
+    subregions = c("Switzerland", "Austria"),
+    metric = "all"
+  )
 
-summarize_subspecies_availability(
-  pep_alpine,
-  subspecies_name = c("Malus domestica Api", "Malus domestica Boskoop"),
-  subregions = c("Switzerland", "Austria"),
-  metric = c("n_obs","median_doy")
-)
+  summarize_subspecies_availability(
+    pep_alpine,
+    subspecies_name = c("Vitis vinifera Riesling",
+                        "Vitis vinifera MUELLER THURGAU WEISS"),
+    subregions = c("Switzerland", "Austria"),
+    metric = c("n_obs","median_doy")
+  )
+}
 }
 }
 \author{

@@ -374,7 +374,7 @@ display: none;
 
 <h1 class="title toc-ignore">pep725: An R package for Pan-European
 Phenological Data Analysis</h1>
-<h4 class="date">2026-02-04</h4>
+<h4 class="date">4 February 2026</h4>
 
 </div>
 
@@ -400,139 +400,96 @@ for the spatio-temporal analysis of phenological data from PEP725 and
 similar ground-based datasets. It supports systematic data quality
 diagnostics, the computation of phenological normals and anomalies, the
 estimation of spatial gradients along environmental axes, the assessment
-of phenological synchrony and its temporal evolution, and both
-interactive and publication-ready spatial visualization. The package
-emphasizes reproducibility and transparency and is designed to
-complement phenological modeling and remote-sensing tools by enabling a
-phenology-first exploration of spatial structure and variability in
-large, heterogeneous observation networks.</p>
+of phenological synchrony across space and time, and both interactive
+and publication-ready spatial visualization. Additional capabilities
+include partial least squares (PLS) regression for identifying
+temperature-sensitive periods affecting phenological timing, sequential
+Mann-Kendall analysis for detecting trend turning points, and detection
+of second flowering or repeated phenological events linked to climate
+anomalies. The package emphasizes reproducibility and transparency and
+is designed to complement phenological modeling and remote-sensing tools
+by enabling a phenology-first exploration of spatial structure and
+variability in large, heterogeneous observation networks.</p>
 <hr />
 </div>
 <div id="statement-of-need" class="section level1">
 <h1>Statement of need</h1>
-<p>A wide range of R packages support phenological research, including
-tools for mechanistic or statistical modeling of phenological timing,
-climate–phenology relationships, and satellite-derived land surface
-phenology. These tools are essential for prediction and process-based
-understanding, but they typically assume well-prepared inputs and focus
-on modeling phenological responses rather than characterizing the
-structure of large observation networks.</p>
-<p>Ground-based phenological datasets present additional challenges.
-Observation density varies strongly across space and time, data quality
-is heterogeneous, and long-term records often contain gaps, outliers,
-and protocol inconsistencies. If these issues are not addressed
-explicitly, spatial comparisons, trend analyses, and model calibration
-can be strongly biased.</p>
-<p>The <strong>pep725</strong> package addresses this gap by providing
-standardized methods for assessing data quality, quantifying spatial
-gradients, evaluating phenological synchrony, and visualizing spatial
-patterns in phenological observation networks. It is particularly suited
-for continental-scale datasets such as PEP725 but remains applicable to
-any station-based phenological data with spatial coordinates. By
-separating data diagnostics and spatial characterization from downstream
-modeling, <strong>pep725</strong> enables more robust and reproducible
-phenological analyses.</p>
+<p>Ground-based phenological datasets pose distinct analytical
+challenges: observation density varies across regions, long-term records
+are often incomplete, and data quality differs among contributors and
+time periods. Without explicit diagnostics and spatial characterization,
+such heterogeneity can bias spatial comparisons, trend analyses, and
+downstream model calibration. The <strong>pep725</strong> package
+addresses these challenges by providing a dedicated framework for
+characterizing station-based phenological datasets prior to modeling,
+separating data diagnostics from downstream inference to enable more
+robust and reproducible analyses.</p>
 <hr />
-</div>
-<div id="functionality" class="section level1">
-<h1>Functionality</h1>
-<p>The core functionality of <strong>pep725</strong> is organized around
-four complementary tasks that commonly precede phenological modeling and
-inference.</p>
-<p>First, the package provides reproducible data quality assessment for
-phenological time series. Functions such as <code>pep_quality()</code>
-quantify temporal coverage, data gaps, and outlier prevalence and assign
-quality grades that can be used to filter or stratify analyses.</p>
-<p>Second, <strong>pep725</strong> supports the computation of
-phenological normals and anomalies, analogous to climatological normals,
-enabling consistent baseline comparisons across time periods and
-regions.</p>
-<p>Third, the package includes tools for analyzing spatial structure in
-phenology. Elevation and latitudinal gradients can be estimated using
-<code>pheno_gradient()</code>, while <code>pheno_synchrony()</code>
-quantifies spatial coherence and variability in phenological timing
-within regions and over time.</p>
-<p>Finally, <strong>pep725</strong> integrates interactive and static
-spatial visualization. Interactive station selection is supported via
-<code>leaflet_pep()</code>, and publication-ready static maps can be
-generated using <code>map_pep()</code> without requiring proprietary
-mapping services.</p>
-<p>The package follows a modular design and deliberately avoids
-embedding specific climate datasets or phenology–climate models,
-allowing users to integrate <strong>pep725</strong> outputs with
-external climate data and modeling frameworks according to their
-research questions.</p>
+<!-- Example usage section commented out to meet JOSS word limit
+# Example usage
+
+The following code demonstrates a typical workflow for analyzing phenological gradients using **pep725**:
+
+```r
+library(pep725)
+
+# Download synthetic PEP data (or use pep_import() for real data)
+pep <- pep_download()
+
+# Subset to Alpine region and apple flowering
+pep_alpine <- pep[country %in% c("Switzerland", "Austria") &
+                  species == "Malus domestica"]
+
+# Assess data quality
+quality <- pep_quality(pep_alpine, phase_id = 65)
+summary(quality)
+
+# Compute phenological normals (1991-2020 baseline)
+normals <- pheno_normals(pep_alpine, phase_id = 65,
+                         ref_period = 1991:2020)
+
+# Analyze elevation gradient
+gradient <- pheno_gradient(pep_alpine, phase_id = 65,
+                           gradient_var = "alt")
+plot(gradient)
+
+# Quantify spatial synchrony
+sync <- pheno_synchrony(pep_alpine, phase_id = 65)
+summary(sync)
+```
+-->
 <hr />
 </div>
 <div id="state-of-the-field" class="section level1">
 <h1>State of the field</h1>
-<p>Phenological analysis in R is supported by various packages that
-address complementary aspects of data modeling, prediction, and
-interpretation. Many tools focus on process-based or statistical
-modeling of phenology, often using climate covariates as primary inputs.
-For example, <strong>chillR</strong> <span class="citation">(Luedeling
-2012)</span>, provides a comprehensive framework for modeling chilling
-and forcing requirements in temperate fruit trees, including bloom
-prediction and climate scenario analysis. Similarly,
-<strong>DyMEP</strong> <span class="citation">(Tschurr 2025)</span>
-implements dynamic, weather-driven phenology models for major crops,
-offering mechanistic prediction across environments based on long-term
-meteorological data. Crop-specific modeling and parameterization are
-further addressed by <strong>phenolocrop</strong> <span class="citation">(Taniguchi 2025)</span>, which focuses on growth stage
-transitions and machine-learning-based prediction from time-series
-traits. Other packages emphasize statistical estimation of phenological
-timing from irregular or presence-only data. <strong>phenesse</strong>
-<span class="citation">(<strong>phenesse2025applies?</strong>)</span>
-applies quantile regression approaches to estimate onset, median, and
-end dates of phenophases, enabling robust inference from opportunistic
-observations. The <strong>phenology</strong> package provides parametric
-and Bayesian models for fitting seasonal distributions of biological
-events, originally developed for animal phenology but applicable more
-broadly <span class="citation">(Girondot 2010)</span>. Auxiliary
-workflows for preprocessing and basic phenological calculations are
-supported by packages such as <strong>pheno</strong> <span class="citation">(Schaber and Lange 2026)</span> and
-<strong>spphpr</strong> <span class="citation">(Shi et al. 2017)</span>,
-which implements thermal-time-based spring phenology prediction models.
-The <strong>sephora</strong> <span class="citation">(<strong>Gomezsephora2024package?</strong>)</span>
-package provides function and methods for estimating phenological dates
-from (nearly) periodic Earth Observation time series. A parallel line of
-development targets remote-sensing-based phenology, where land surface
-phenology is derived from vegetation indices rather than ground
-observations. Packages such as <strong>npphen</strong> <span class="citation">(<strong>chavez2023npphensupport?</strong>)</span>
-focuses on the detection and characterization of vegetation anomalies
-from remote-sensing time series; while tools like
-<strong>phenex</strong> provide function for spatial analyses of
-satellite observations of vegetation <span class="citation">(Lange and
-Doktor 2017)</span>. These approaches are essential for large-scale
-mapping but operate on fundamentally different data structures than the
-PEP725.</p>
-<div id="todo-cite-phenomap-and-hufkenss-package-phenor" class="section level7">
-<p class="heading">TODO: cite: phenomap, and Hufkenss package phenor</p>
-<p>In contrast, <strong>pep725</strong> focuses on the
-spatial–statistical characterization of ground-based phenological
-observation networks. It emphasizes data quality diagnostics, spatial
-gradients, synchrony, and exploratory mapping, thereby filling a
-methodological gap between raw phenological databases and downstream
-modeling or prediction-oriented software.</p>
-<p>OR==========================this is the final paragraphs (instead of
-“In contrast…): Despite this rich ecosystem, few tools focus explicitly
-on quality-aware spatial analysis of ground-based phenological
-observation networks themselves. Large databases such as PEP725 combine
-millions of records collected over decades, across heterogeneous
-environments, observer networks, and national protocols (Templ et al.,
-2018, 2026). Analyses of such data require explicit handling of uneven
-temporal coverage, gaps, outliers, and changing observation practices
-before spatial patterns can be interpreted reliably. Building on the
-PEP725 infrastructure (Templ et al., 2018, 2026), and complementary to
-modeling-oriented R tools such as phenor (Hufkens et al., 2018), pep725
-provides a quality-aware, phenology-first framework for spatial analysis
-of ground-based observation networks. It enables systematic diagnostics
-of data completeness and consistency, estimation of spatial gradients
-(e.g. with elevation or latitude), and quantification of phenological
-synchrony, all of which are key derived quantities in contemporary
-phenological research (e.g. Liu et al., 2016; Opedal et al., 2024).</p>
+<p>Phenological analysis in R is supported by packages addressing
+process-based modeling <span class="citation">(e.g. <strong>chillR</strong>, Luedeling 2012;
+<strong>DyMEP</strong>, Tschurr 2025; <strong>phenolocrop</strong>,
+Taniguchi 2025)</span>, statistical estimation of phenological timing
+<span class="citation">(<strong>phenesse</strong>, Belitz, Campbell, and
+Li 2025; <strong>phenology</strong>, Girondot 2010;
+<strong>pheno</strong>, Schaber and Lange 2026; <strong>spphpr</strong>,
+Shi et al. 2017; <strong>sephora</strong>, Tecuapetla-Gómez,
+Galicia-Gómez, and Rosales-Marticorena 2024)</span>, and
+remote-sensing-based phenology <span class="citation">(<strong>npphen</strong>, Chavez et al. 2023;
+<strong>phenex</strong>, Lange and Doktor 2017;
+<strong>phenomap</strong>, Zhang 2020; <strong>phenor</strong>, Hufkens
+et al. 2018)</span>. These tools are essential for prediction and
+process-based understanding but typically emphasize modeling outcomes
+rather than the spatial structure and reliability of observation
+networks.</p>
+<p>Despite this rich ecosystem, few tools focus on quality-aware spatial
+analysis of ground-based phenological observation networks. Large
+databases such as PEP725 combine millions of records collected across
+heterogeneous environments and national protocols <span class="citation">(Templ et al. 2018, 2026)</span>, requiring explicit
+handling of data quality issues before spatial patterns can be
+interpreted reliably. Building on the PEP725 infrastructure and
+complementary to modeling-oriented tools, <strong>pep725</strong>
+enables systematic diagnostics, estimation of spatial gradients, and
+quantification of phenological synchrony—key derived quantities in
+contemporary phenological research <span class="citation">(e.g. Liu et
+al. 2016; Opedal et al. 2024)</span>.</p>
 <hr />
-</div>
 </div>
 <div id="software-design" class="section level1">
 <h1>Software design</h1>
@@ -540,13 +497,19 @@ phenological research (e.g. Liu et al., 2016; Opedal et al., 2024).</p>
 (i) explicit treatment of data quality and uncertainty, (ii) transparent
 and reproducible spatial analysis workflows, and (iii) modular
 integration with the broader R ecosystem.</p>
-<p>Functions operate on tabular phenological data with explicit spatial
-and temporal attributes and return structured outputs that can be reused
-across analytical steps. Gradient and synchrony analyses share
-consistent interfaces and support robust estimation methods to reduce
-sensitivity to outliers and heterogeneous sampling. Visualization tools
-are integrated directly into the workflow to support iterative
-exploration, region definition, and communication of results.</p>
+<p>The package implements an object-oriented design using S3 classes,
+with dedicated <code>print</code>, <code>summary</code>, and
+<code>plot</code> methods for all analysis outputs. Functions operate on
+tabular phenological data with explicit spatial and temporal attributes
+and return structured objects that can be reused across analytical
+steps. Gradient and synchrony analyses share consistent interfaces and
+support robust estimation methods (including <code>lmrob</code> and
+quantile regression) to reduce sensitivity to outliers and heterogeneous
+sampling. Visualization tools are integrated directly into the workflow
+to support iterative exploration, region definition, and communication
+of results. Four vignettes provide reproducible workflows covering data
+access, phenological analysis, spatial patterns, and data quality
+assessment.</p>
 <hr />
 </div>
 <div id="research-impact-statement" class="section level1">
@@ -558,12 +521,23 @@ applications, including the assessment of spatial phenological
 gradients, evaluation of regional synchrony, identification of
 high-quality stations for trend analysis, and preparation of
 reproducible figures for scientific publications.</p>
-<p>By providing a dedicated framework for quality-aware spatial
-analysis, <strong>pep725</strong> lowers the barrier to working with
-large phenological datasets and promotes more transparent and comparable
+<p>The package implements methods described in <span class="citation">Templ et al. (2026)</span> and has been used to analyze
+phenological trends across multiple European countries. By providing a
+dedicated framework for quality-aware spatial analysis,
+<strong>pep725</strong> lowers the barrier to working with large
+phenological datasets and promotes more transparent and comparable
 phenological research. The package has been adopted in climate impact
 studies, ecological analyses, and teaching contexts focused on phenology
 and environmental data analysis.</p>
+<hr />
+</div>
+<div id="ai-usage-disclosure" class="section level1">
+<h1>AI usage disclosure</h1>
+<p>Portions of this manuscript and code documentation were drafted with
+assistance from Claude (Anthropic), an AI language model. All
+AI-generated content was reviewed, edited, and validated by the authors.
+The core package functionality, research methodology, and scientific
+interpretations are the work of the authors.</p>
 <hr />
 </div>
 <div id="acknowledgements" class="section level1">
@@ -576,20 +550,48 @@ during the development of this package.</p>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-phenesse2025" class="csl-entry">
+Belitz, Michael, Caitlin Campbell, and Daijiang Li. 2025.
+<span>“Phenesse: Estimate Phenological Metrics Using Presence-Only
+Data.”</span> <em>R Package Version 0.1.3</em>.
+</div>
+<div id="ref-chavez2023npphen" class="csl-entry">
+Chavez, R. O., S. A. Estay, J. A. Lastra, C. G. Riquelme, M. Olea, J.
+Aquayo, and M. Decuyper. 2023. <span>“Npphen: An r-Package for Detecting
+and Mapping Extreme Vegetation Anomalies Based on Remotely Sensed
+Phenological Variability.”</span> <em>Remote Sensing</em> 15. <a href="https://doi.org/10.3390/rs15010073">https://doi.org/10.3390/rs15010073</a>.
+</div>
 <div id="ref-girondot2010phenology" class="csl-entry">
 Girondot, Marc. 2010. <span>“Estimating Density of Animals During
 Migratory Waves: A New Model Applied to Marine Turtles at Nesting
 Sites.”</span> <em>Endangered Species Research</em> 12: 85–105. <a href="https://doi.org/10.3354/esr00292">https://doi.org/10.3354/esr00292</a>.
+</div>
+<div id="ref-hufkens2018phenor" class="csl-entry">
+Hufkens, Koen, David Basler, Tom Milliman, Eli K. Melaas, and Andrew D.
+Richardson. 2018. <span>“An Integrated Phenology Modelling Framework in
+r.”</span> <em>Methods in Ecology and Evolution</em> 9 (5): 1276–85. <a href="https://doi.org/10.1111/2041-210X.12970">https://doi.org/10.1111/2041-210X.12970</a>.
 </div>
 <div id="ref-Langephenex2017" class="csl-entry">
 Lange, M., and Daniel Doktor. 2017. <span>“Phenex: Auxiliary Functions
 for Phenological Data Analysis.”</span> <em>R Package Version
 1.4-5</em>.
 </div>
+<div id="ref-liu2016temperature" class="csl-entry">
+Liu, Qiang, Yongshuo H. Fu, Zhenzhong Zeng, Mengtian Huang, Xiaoyang Li,
+and Shilong Piao. 2016. <span>“Temperature, Precipitation, and
+Insolation Effects on Autumn Vegetation Phenology in Temperate
+China.”</span> <em>Global Change Biology</em> 22 (2): 644–55. <a href="https://doi.org/10.1111/gcb.13081">https://doi.org/10.1111/gcb.13081</a>.
+</div>
 <div id="ref-luedeling2012chillR" class="csl-entry">
 Luedeling, Eike. 2012. <span>“Statistical Methods for Phenology Analysis
 in Temperate Fruit Trees.”</span> <em>Scientia Horticulturae</em> 144:
 218–29. <a href="https://doi.org/10.1016/j.scienta.2012.07.011">https://doi.org/10.1016/j.scienta.2012.07.011</a>.
+</div>
+<div id="ref-opedal2024advancing" class="csl-entry">
+Opedal, Øystein H., Otso Ovaskainen, Marjo Saastamoinen, Anna-Liisa
+Laine, and Saskya van Nouhuys. 2024. <span>“Advancing Phenological
+Research Through Long-Term Data Integration.”</span> <em>Nature Ecology
+&amp; Evolution</em> 8: 610–18. <a href="https://doi.org/10.1038/s41559-024-02336-5">https://doi.org/10.1038/s41559-024-02336-5</a>.
 </div>
 <div id="ref-Schaberpheno2026" class="csl-entry">
 Schaber, Joerg, and Maximilian Lange. 2026. <span>“Pheno: Auxiliary
@@ -606,6 +608,11 @@ of Rising Winter Low Temperatures and Early Spring Temperatures.”</span>
 Taniguchi, Y. 2025. <span>“Phenolocrop: Crop Phenology Modelling and
 Parameterization.”</span> <em>R Package Version 0.0.3</em>.
 </div>
+<div id="ref-Gomezsephora2024" class="csl-entry">
+Tecuapetla-Gómez, Inder, Fanny Galicia-Gómez, and Francisco
+Rosales-Marticorena. 2024. <span>“SEPHORA: Statistical Estimation of
+Phenological Parameters.”</span> <em>R Package Version 0.1.31</em>.
+</div>
 <div id="ref-templ2018pep725" class="csl-entry">
 Templ, Barbara, Elisabeth Koch, Kjell Bolmgren, Michael Ungersböck,
 Andreas Paul, Heinrich Scheifinger, Thorsten Rutishauser, et al. 2018.
@@ -617,11 +624,15 @@ Biometeorology</em> 62 (6): 1109–13. <a href="https://doi.org/10.1007/s00484-0
 Templ, Barbara, Helfried Scheifinger, Isabella Ostovary, Markus
 Ungersbock, and Hans Ressl. 2026. <span>“PEP725: 15 Years of Driving
 European and Global Phenology Science.”</span> <em>New Phytologist</em>
-online: NA. <a href="https://doi.org/10.1111/nph.70869">https://doi.org/10.1111/nph.70869</a>.
+online. <a href="https://doi.org/10.1111/nph.70869">https://doi.org/10.1111/nph.70869</a>.
 </div>
 <div id="ref-tschurr2025dymep" class="csl-entry">
 Tschurr, Flavian. 2025. <span>“DyMEP: Dynamic Multi-Environment
 Phenology Model.”</span> <em>R Package Version 0.1.2</em>.
+</div>
+<div id="ref-phenomap2020" class="csl-entry">
+Zhang, Xiaoyang. 2020. <span>“Phenomap: Remote Sensing Based
+Phenological Mapping.”</span> <em>R Package Version 1.0</em>.
 </div>
 </div>
 </div>

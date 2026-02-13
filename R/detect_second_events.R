@@ -81,29 +81,31 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #' \donttest{
 #' pep <- pep_download()
 #'
-#' # Use subset for speed (apple flowering in Switzerland/Austria)
-#' pep_subset <- pep[species == "Solanum tuberosum" & phase_id %in% c(60, 65) &
-#'                   country %in% c("Germany-South","Switzerland", "Austria")]
+#' # Use grapevine flowering in Alpine region (long records, second events possible)
+#' pep_subset <- pep[species == "Vitis vinifera" & phase_id %in% c(60, 65) &
+#'                   country %in% c("Germany-South", "Switzerland", "Austria")]
 #'
-#' # Method 1: Detect late-season flowering events (default)
-#' second <- detect_second_events(pep_subset, phases = c(60, 65))
-#' print(second)
-#' summary(second)
+#' if (nrow(pep_subset) > 0) {
+#'   # Method 1: Detect late-season flowering events (default)
+#'   second <- detect_second_events(pep_subset, phases = c(60, 65))
+#'   print(second)
+#'   summary(second)
 #'
-#' # Plot from 1980 onwards for clearer trends
-#' plot(second, from_year = 1980)
-#' plot(second, type = "overview", scale = "relative", from_year = 1980)
+#'   # Plot from 1980 onwards for clearer trends
+#'   plot(second, from_year = 1980)
+#'   plot(second, type = "overview", scale = "relative", from_year = 1980)
 #'
-#' # Method 2: Detect repeated observations at same station
-#' repeated <- detect_second_events(pep_subset, method = "multiple_per_year")
-#' print(repeated)
-#' plot(repeated, type = "timeline", from_year = 1980)
+#'   # Method 2: Detect repeated observations at same station
+#'   repeated <- detect_second_events(pep_subset, method = "multiple_per_year")
+#'   print(repeated)
+#'   plot(repeated, type = "timeline", from_year = 1980)
 #'
-#' # Method 3: Combine both detection methods
-#' all_events <- detect_second_events(pep_subset, method = "both")
-#' summary(all_events)
-#' plot(all_events)
-#' plot(all_events, scale = "relative")
+#'   # Method 3: Combine both detection methods
+#'   all_events <- detect_second_events(pep_subset, method = "both")
+#'   summary(all_events)
+#'   plot(all_events)
+#'   plot(all_events, scale = "relative")
+#' }
 #' }
 #'
 #' @seealso \code{\link{flag_outliers}} for general outlier detection,

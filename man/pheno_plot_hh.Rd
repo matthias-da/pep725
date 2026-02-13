@@ -2,86 +2,58 @@
 % Please edit documentation in R/pheno_plot_hh.R
 \name{pheno_plot_hh}
 \alias{pheno_plot_hh}
-\title{Plot Phenological Time Series and Climate Sensitivity}
+\title{Plot Phenological Time Series for Heading and Harvest}
 \usage{
 pheno_plot_hh(
   data_list,
-  type = c("timeseries", "giss_smooth", "giss_sensitivity"),
   phase_select = NULL,
   alpha_lines = 0.6,
-  linewidth = 0.7,
-  smooth = c("gam", "loess"),
-  span = 0.3,
-  gam_bs = "tp",
-  gam_k = NULL,
-  se = FALSE
+  linewidth = 0.7
 )
 }
 \arguments{
-\item{data_list}{A named list returned by \code{\link{regional_box_ts}}, containing at minimum \code{ts_tidy} and \code{pep_giss}.}
+\item{data_list}{A named list returned by \code{\link{regional_box_ts_heading_harvest}},
+containing \code{ts_tidy}.}
 
-\item{type}{Character. Type of plot to produce. One of \code{"timeseries"} (default), \code{"giss_smooth"}, or \code{"giss_sensitivity"}.}
-
-\item{phase_select}{Character. Optional filter for a specific phenological phase (e.g., "Heading", "Harvest"). If NULL, all phases are shown.}
+\item{phase_select}{Character. Optional filter for a specific phenological phase
+(e.g., "Heading", "Harvest"). If NULL, all phases are shown.}
 
 \item{alpha_lines}{Numeric. Transparency level for lines (default is 0.6).}
 
 \item{linewidth}{Numeric. Line width for time series plots (default is 0.7).}
-
-\item{smooth}{Character. Smoother type for \code{"giss_smooth"} plots. Either \code{"gam"} (default) or \code{"loess"}.}
-
-\item{span}{Numeric. Span parameter for LOESS smoothing (default is 0.3).}
-
-\item{gam_bs}{Character. Basis type for GAM smoothing (default is \code{"tp"}). See \code{\link[mgcv]{s}}.}
-
-\item{gam_k}{Integer (optional). Number of basis functions (\code{k}) for GAM smoothing. If \code{NULL}, defaults are used.}
-
-\item{se}{Logical. Whether to display confidence intervals (shaded areas) around the smoother (default is \code{FALSE}).}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-Visualizes phenological time series and their relationship to climate using data from \code{\link{regional_box_ts}}.
-Supports three plot types: year-wise time series across data sources, smoothed temperature–phenology relationships,
-and robust linear sensitivity to global temperature anomalies.
+Visualizes phenological time series for heading and harvest phases,
+comparing data from multiple sources (PEP725, MeteoSwiss observations).
 }
 \details{
-\itemize{
-\item \code{type = "timeseries"}: Shows DOY trends by phase and data source across years.
-\item \code{type = "giss_smooth"}: Shows smoothed DOY vs. global temperature anomalies (\code{dTgl}) using either GAM or LOESS.
-\item \code{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) and visualizes phase-specific climate sensitivity.
-}
+This function shows DOY trends by phase and data source across years,
+with month labels on the y-axis for easier interpretation.
 
-Global temperature data are taken from the \code{\link{giss}} dataset. Phenological data are drawn from the PEP725 database.
-Aggregation and preparation is assumed to be done via \code{\link{regional_box_ts}}.
+For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
+functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
 }
 \examples{
 \dontrun{
 # Requires pep_download() data - see regional_box_ts_heading_harvest()
 pep <- pep_download()
-data(giss)
 data(meteoSwiss)
 
-out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss,
-                                       species_name = "Triticum aestivum")
-str(out$ts_tidy)
-gt <- pheno_plot_hh(out, type = "timeseries")
-gt
-pheno_plot_hh(out, type = "giss_smooth", smooth = "loess", se = TRUE)
-gc <- pheno_plot_hh(out, type = "giss_sensitivity")
-gt | gc
-
-# Select only nearby stations and recent years:
-d <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss, pep_for_giss = "near",
-                        lon_min = 4.2,  lon_max = 8.1,
-                        lat_min = 44.7, lat_max = 48.1,
-                        year_min = 1980)
-pheno_plot_hh(d, type = "timeseries", alpha_lines = 0.6, linewidth = 0.7)
+# For GISS-based plots, load hail package:
+# library(hail)
+# data(giss)
+# out <- regional_box_ts_heading_harvest(pep, giss, meteoSwiss)
+# pheno_plot_hh(out)  # timeseries
+# hail::plot_giss_smooth(out, month_scale = TRUE)
+# hail::plot_giss_sensitivity(out, month_scale = TRUE)
 }
 }
 \seealso{
-\code{\link{regional_box_ts}}, \code{\link[ggplot2]{ggplot}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
+\code{\link{regional_box_ts_heading_harvest}}, \code{hail::plot_giss_smooth},
+\code{hail::plot_giss_sensitivity}
 }
 \author{
 Matthias Templ

@@ -137,10 +137,17 @@ Use **`\donttest{}`** with subsets for all other examples.
 **Country names** in synthetic data (NOT "Germany"):
 - `"Germany-North"`, `"Germany-South"`, `"Switzerland"`, `"Austria"`
 
-**Well-covered species** for examples:
-- `"Malus domestica"` - good coverage in Switzerland/Austria
-- `"Vitis vinifera"` - good coverage in Alpine countries
-- Avoid `"Triticum aestivum"` with Germany filter (use Germany-North/Germany-South)
+**Recommended species** for examples (use both for variety):
+- `"Malus domestica"` (Apple) - 70k rows in Alpine subset, 1402 stations, 92 years, 9 phases
+- `"Vitis vinifera"` (Grapevine) - 20k rows in Alpine subset, 830 stations, **187 years** (longest!), 13 phases
+
+**Important**: Always verify subset has data before analysis:
+```r
+vine <- pep[species == "Vitis vinifera" & country %in% c("Switzerland", "Austria")]
+stopifnot(nrow(vine) > 0)  # Or use: if (nrow(vine) == 0) stop("No data")
+```
+
+Avoid `"Triticum aestivum"` with Germany filter (use Germany-North/Germany-South)
 
 **Available columns** (no `functional_group`):
 - `s_id`, `lon`, `lat`, `alt`, `genus`, `species`, `subspecies`, `phase_id`, `year`, `day`, `country`
@@ -166,10 +173,38 @@ Each dataset needs these roxygen tags:
 | Dataset | Description | Location |
 |---------|-------------|----------|
 | `pep_seed` | Small subset for testing (1,319 rows) | `data/pep_seed.rda` |
-| `giss` | NASA GISS temperature anomalies (1880-2024) | `data/giss.rda` |
 | `meteoSwiss` | MeteoSwiss phenology observations | `data/meteoSwiss.rda` |
 
 Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()` and cached locally.
+
+## Companion Package: hail
+
+The **hail** package contains climate sensitivity analysis tools that were previously in pep725:
+
+| Component | Location | Usage |
+|-----------|----------|-------|
+| `giss` dataset | `hail::giss` | `data(giss, package = "hail")` |
+| `plot_giss_smooth()` | hail | Climate-phenology smoothed plots |
+| `plot_giss_sensitivity()` | hail | Robust sensitivity analysis |
+
+**Workflow with hail:**
+```r
+library(pep725)
+library(hail)
+
+pep <- pep_download()
+data(giss, package = "hail")
+
+# Prepare data with pep725
+out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 60)
+
+# Time series plot (pep725)
+pheno_plot(out)
+
+# Climate sensitivity plots (hail)
+plot_giss_smooth(out)
+plot_giss_sensitivity(out)
+```
 
 ## Current Status
 
@@ -179,8 +214,8 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 ### Known Issues
 - Non-standard files at top level: `CLAUDE.md`, `pepperPaper/`
 
-### Excluded Content
-- Hail-related functions moved to `inst/scripts/` (excluded via `.Rbuildignore`)
+### Companion Package
+- Climate sensitivity analysis (GISS data, `plot_giss_smooth()`, `plot_giss_sensitivity()`) moved to **hail** package
 
 ### Key Functions by Category
 
@@ -208,10 +243,11 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 - `plot.second_events()` - Visualize second events (supports `scale = "relative"` for proportional display)
 
 **Visualization:**
-- `pheno_plot()` - General phenology plots (uses `\dontrun{}` - depends on regional_box_ts)
-- `pheno_plot_hh()` - Heading/harvest specific plots (uses `\dontrun{}`)
+- `pheno_plot()` - Phenology time series plots (uses `\dontrun{}`)
+- `pheno_plot_hh()` - Heading/harvest time series plots (uses `\dontrun{}`)
 - `pheno_plot_timeseries()` - Time series plots
 - `leaflet_pep()` - Interactive maps (uses `\dontrun{}` - interactive Shiny gadget)
+- For climate sensitivity plots, use **hail** package: `plot_giss_smooth()`, `plot_giss_sensitivity()`
 - `map_pep()` - Static maps (uses `\dontrun{}` - can require API key)
 
 **Regional Analysis (all use `\dontrun{}`):**

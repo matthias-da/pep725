@@ -59,21 +59,33 @@ library(pep725)
 # Download the synthetic dataset
 pep <- pep_download()
 
-# For this vignette, we'll focus on apple (Malus domestica)
-# This is one of the best-represented species in PEP725
-apple <- pep[species == "Malus domestica"]
+# For this vignette, we'll focus on two well-represented species:
+# 1. Apple (Malus domestica) - excellent coverage across Europe
+# 2. Grapevine (Vitis vinifera) - longest historical records
 
-# Quick overview of our apple data
-cat("Apple observations:", nrow(apple), "\n")
+apple <- pep[species == "Malus domestica"]
+vine <- pep[species == "Vitis vinifera"]
+
+# Verify subsets contain data
+stopifnot(nrow(apple) > 0, nrow(vine) > 0)
+
+# Quick overview of our data
+cat("=== Apple (Malus domestica) ===\n")
+cat("Observations:", nrow(apple), "\n")
 cat("Year range:", min(apple$year), "-", max(apple$year), "\n")
-cat("Countries:", length(unique(apple$country)), "\n")
-cat("Stations:", length(unique(apple$s_id)), "\n")
-cat("Phases recorded:", paste(sort(unique(apple$phase_id)), collapse = ", "), "\n")
+cat("Stations:", length(unique(apple$s_id)), "\n\n")
+
+cat("=== Grapevine (Vitis vinifera) ===\n")
+cat("Observations:", nrow(vine), "\n")
+cat("Year range:", min(vine$year), "-", max(vine$year), "\n")
+cat("Stations:", length(unique(vine$s_id)), "\n")
 ```
 
-**Why apple?** *Malus domestica* (domestic apple) is one of the best-represented
-species in the database with excellent coverage across Europe. It has clear phenological
-phases (bud burst, flowering, fruit development) that are routinely monitored.
+**Why these species?**
+- *Malus domestica* (apple) has excellent coverage across Europe with clear
+  phenological phases (bud burst, flowering, fruit development)
+- *Vitis vinifera* (grapevine) has the longest historical records (back to 1775)
+  and is economically important for wine production
 
 ## Part 1: Phenological Normals
 
@@ -231,6 +243,28 @@ if (nrow(period1) > 0 && nrow(period2) > 0) {
 
 **Ecological interpretation**: A shift of -5 days (earlier) over 30 years
 corresponds to about 1.7 days per decade.
+
+### Comparing Species: Grapevine with Longer History
+
+Grapevine records extend much further back, enabling comparison across longer
+time periods:
+
+```{r normals-vine, warning=FALSE, message=FALSE}
+# Calculate normals for grapevine flowering
+vine_normals <- pheno_normals(
+  pep = vine,
+  period = 1990:2015,
+  phase_id = 65,  # Full flowering
+  by = "country",
+  min_years = 5
+)
+
+# Compare with apple for countries that have both
+if (nrow(vine_normals) > 0) {
+  cat("Grapevine flowering normals (BBCH 65):\n")
+  print(vine_normals[!is.na(mean_doy), .(country, n_years, mean_doy, sd_doy)])
+}
+```
 
 ## Part 2: Phenological Anomalies
 

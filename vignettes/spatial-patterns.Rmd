@@ -207,6 +207,35 @@ cat("OLS slope:", round(grad_ols$summary$slope, 2), "days/100m\n")
 
 **Recommendation**: Start with `method = "robust"`for exploratory and applied analyses. Substantial differences between robust and OLS estimates often indicate influential observations and should prompt further inspection.
 
+### Comparing Species: Grapevine Gradient
+
+Different species may show different gradient strengths. Let's compare apple
+with grapevine:
+
+```{r gradient-vine}
+# Calculate gradient for grapevine
+vine_data <- pep[species == "Vitis vinifera"]
+
+# Verify data exists before analysis
+if (nrow(vine_data) > 0) {
+  grad_vine <- pheno_gradient(
+    pep = pep,
+    variable = "alt",
+    species = "Vitis vinifera",
+    phase_id = 65,  # Full flowering
+    method = "robust"
+  )
+
+  cat("Comparison of elevation gradients:\n")
+  cat("Apple:     ", round(grad_robust$summary$slope, 2), "days/100m",
+      "(R² =", round(grad_robust$summary$r_squared, 3), ")\n")
+  cat("Grapevine: ", round(grad_vine$summary$slope, 2), "days/100m",
+      "(R² =", round(grad_vine$summary$r_squared, 3), ")\n")
+} else {
+  cat("No grapevine data available for gradient analysis.\n")
+}
+```
+
 ## Gradients by Region
 
 Phenological gradients are not uniform across space. Their magnitude and shape can vary between regions due to:
@@ -413,6 +442,32 @@ head(sync_simple$data)
 ```
 
 This approach is useful for rapid assessment or when time series length is insufficient for robust trend estimation.
+
+### Comparing Synchrony: Grapevine vs. Apple
+
+Different species may show different synchrony levels due to their biology:
+
+```{r synchrony-compare}
+# Calculate synchrony for grapevine
+vine_check <- pep[species == "Vitis vinifera" & phase_id == 65]
+
+if (nrow(vine_check) > 0) {
+  sync_vine <- pheno_synchrony(
+    pep = pep,
+    species = "Vitis vinifera",
+    phase_id = 65,
+    by = c("country", "year"),
+    min_stations = 3,
+    compute_trend = FALSE
+  )
+
+  cat("Synchrony comparison (mean SD across years):\n")
+  cat("Apple (flowering):    ", round(sync$overall$mean_sd_doy, 1), "days\n")
+  cat("Grapevine (flowering):", round(sync_vine$overall$mean_sd_doy, 1), "days\n")
+} else {
+  cat("Insufficient grapevine data for synchrony comparison.\n")
+}
+```
 
 ---
 

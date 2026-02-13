@@ -40,6 +40,7 @@
 #' @param giss_data A data frame with at least \code{year} and either \code{Tgl}
 #'   (absolute temperature) or \code{dT} (anomaly). If \code{dT} is supplied,
 #'   the function automatically constructs \code{Tgl = dT + 14}.
+#'   Load from hail package: \code{data(giss, package = "hail")}.
 #' @param layout Either \code{"country_phase"} (default) or \code{"phase_country"}
 #'   to control facet arrangement.
 #' @param title Optional plot title. If \code{NULL}, the function generates one
@@ -71,63 +72,35 @@
 #' pep <- pep_download()
 #' colnames(pep)[colnames(pep) == "day"] <- "DOY"
 #'
-#' # Apple (Malus domestica), phases BBCH 65 & 87, DACH only:
+#' # Load GISS data from hail package
+#' data(giss, package = "hail")
+#'
+#' # Grapevine (Vitis vinifera) - longest historical records
+#' # phases BBCH 65 (flowering) & 81 (veraison), DACH only:
 #' plot_phenology_trends(
 #'   pep,
-#'   species_name = "Malus domestica",
-#'   phases = c(65, 87),
+#'   species_name = "Vitis vinifera",
+#'   phases = c(65, 81),
+#'   giss_data = giss,
 #'   layout = "country_phase"
 #' )
 #'
 #' # Same data, but facets flipped:
 #' plot_phenology_trends(
 #'   pep,
-#'   species_name = "Malus domestica",
-#'   phases = c(65, 87),
+#'   species_name = "Vitis vinifera",
+#'   phases = c(65, 81),
+#'   giss_data = giss,
 #'   layout = "phase_country"
 #' )
 #'
-#' # Genus-level plot (all species of the genus Malus)
+#' # Genus-level plot (all species of the genus Vitis)
 #' plot_phenology_trends(
 #'   pep,
-#'   genus_name = "Malus",
-#'   phases = c(65, 87)
+#'   genus_name = "Vitis",
+#'   phases = c(65, 81),
+#'   giss_data = giss
 #' )
-#'
-#' # With custom phases (e.g., leaf unfolding & senescence)
-#' plot_phenology_trends(
-#'   pep,
-#'   species_name = "Fagus sylvatica",
-#'   phases = c(11, 95)
-#' )
-#'
-#' # Limiting countries of interest
-#' plot_phenology_trends(
-#'   pep,
-#'   species_name = "Malus domestica",
-#'   subregions = c("Austria", "Switzerland")
-#' )
-#'
-#' # subspecies (error, should be!)
-#' plot_phenology_trends(
-#'   pep,
-#'   subspecies_name = "Malus domestica Boskoop"
-#' )
-#'
-#' # subspecies (now without common_species)
-#' plot_phenology_trends(
-#'   pep,
-#'   subspecies_name = "Malus domestica Boskoop",
-#'   common_stations = FALSE
-#' )
-#'
-#' # subspecies (now without common_species)
-#' plot_phenology_trends(
-#'   pep,
-#'   subspecies_name = "Malus domestica Golden Delicious",
-#'   common_stations = FALSE
-#' )
-#'
 #' }
 plot_phenology_trends <- function(
     pep,
@@ -142,7 +115,7 @@ plot_phenology_trends <- function(
     calib_years = 1991:2020,
     pred_years = NULL,
     subregions = c("Austria","Germany-North","Germany-South","Switzerland"),
-    giss_data = giss,
+    giss_data,
     layout = c("country_phase", "phase_country"),
     title = NULL
 ){

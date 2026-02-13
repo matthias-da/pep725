@@ -57,9 +57,11 @@ utils::globalVariables(c("year", "day", "tau_prog", "tau_retr", "is_turning"))
 #'
 #' # Using pep_seed data (no grouping for speed)
 #' data(pep_seed)
-#' wheat <- pep_seed[pep_seed$species == "Triticum aestivum" &
-#'                   pep_seed$phase_id == 60, ]
-#' turning <- pheno_trend_turning(wheat)
+#' vine <- pep_seed[pep_seed$species == "Vitis vinifera" &
+#'                  pep_seed$phase_id == 65, ]
+#' if (nrow(vine) > 0) {
+#'   turning <- pheno_trend_turning(vine)
+#' }
 #'
 #' @references
 #' Sneyers R (1990). On statistical analysis of series of observations.

@@ -41,7 +41,7 @@ Key characteristics of PEP725 include [@templ2018; @templ2026]:
 - **Thousands of monitoring stations** spanning a wide range of elevations
 - **Broad taxonomic coverage** including agricultural crops, fruit trees, wild plant and forest tree species
 
-Observations in PEP725 are based on standardized phase definitions (largely aligned with BBCH-type schemes) and consistent observation protocols within national networks. This standardization enables comparative analyses across regions, species, and time periods.
+Observations in PEP725 are based on standardized phase definitions (largely aligned with BBCH-type schemes) and consistent observation protocols within national networks. This standardization enables comparative analyses across regions, species, and time periods, thus addresses key data integration and reusability challenges commonly encountered in large, heterogeneous phenological datasets [@templ2025].
 
 ## Why Use the pep725 R Package?
 
@@ -60,6 +60,7 @@ The **pep725** package addresses these challenges by providing:
 - Functions for calculating phenological normals and anomalies
 - Spatial analysis (gradients, synchrony)
 - Publication-ready visualizations
+
 
 ## Installation
 
@@ -555,6 +556,54 @@ if (nrow(annual_mean) > 1) {
 earlier in the year - a common finding for spring phenology in a warming
 climate. A shift of -2 days per decade means that over 50 years, flowering
 has advanced by about 10 days.
+
+### Comparing with Another Species: Grapevine
+
+Let's compare apple with grapevine (*Vitis vinifera*), which has the longest
+time series in the database (records back to 1775 in some regions):
+
+```{r quick-analysis-vine}
+# Step 1: Filter to grapevine flowering (BBCH 65 = full flowering)
+vine_flowering <- pep[species == "Vitis vinifera" & phase_id == 65]
+
+# Always verify the subset contains data
+if (nrow(vine_flowering) > 0) {
+  cat("Grapevine flowering observations:", nrow(vine_flowering), "\n")
+  cat("Year range:", min(vine_flowering$year), "-", max(vine_flowering$year), "\n")
+  cat("Countries:", length(unique(vine_flowering$country)), "\n")
+
+  # Step 2: Calculate annual mean DOY
+  vine_annual <- vine_flowering[, .(
+    mean_doy = mean(day, na.rm = TRUE),
+    n_obs = .N
+  ), by = year][order(year)]
+
+  # Step 3: Plot the trend
+  if (nrow(vine_annual) > 1) {
+    plot(vine_annual$year, vine_annual$mean_doy,
+         type = "b",
+         xlab = "Year",
+         ylab = "Mean Day of Year",
+         main = "Grapevine Flowering Date Over Time",
+         pch = 19,
+         col = "purple")
+
+    if (nrow(vine_annual) >= 3) {
+      trend <- lm(mean_doy ~ year, data = vine_annual)
+      abline(trend, col = "red", lty = 2)
+
+      slope <- coef(trend)[2]
+      cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
+    }
+  }
+} else {
+  cat("No grapevine flowering data available in this subset.\n")
+}
+```
+
+**Why grapevine?** *Vitis vinifera* is economically important (wine production),
+and its phenology is closely monitored. The long historical records make it
+ideal for studying long-term climate trends.
 
 ## Common Pitfalls and Tips
 

@@ -59,10 +59,10 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #' # Basic check for common phases
 #' check <- check_phases(pep_ch)
 #'
-#' # Check specific phases for apples
+#' # Check specific phases for grapevine (longest historical records)
 #' check <- check_phases(pep_ch,
-#'                       expected = c(60, 65, 87),
-#'                       species = "Malus domestica")
+#'                       expected = c(60, 65, 81),
+#'                       species = "Vitis vinifera")
 #'
 #' # Check within analysis window
 #' check <- check_phases(pep_ch,
@@ -71,9 +71,11 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #'                       year_max = 2020)
 #'
 #' # Use in pipeline with custom label
-#' apple_data <- pep_ch[species == "Malus domestica"]
-#' check_phases(apple_data, expected = c(60, 65),
-#'              label = "Apple analysis")
+#' vine_data <- pep_ch[species == "Vitis vinifera"]
+#' if (nrow(vine_data) > 0) {
+#'   check_phases(vine_data, expected = c(60, 65),
+#'                label = "Grapevine analysis")
+#' }
 #'
 #' # Silent check (no warnings)
 #' result <- check_phases(pep_ch, warn = FALSE)

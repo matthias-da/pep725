@@ -59,7 +59,8 @@ get_phenology_doys(
 
 \item{delta_Tgl}{Numeric. Global temperature change (degC) for scenario.}
 
-\item{giss_data}{Data frame with GISS temperature data. Required for robust_shift method.}
+\item{giss_data}{Data frame with GISS temperature data. Required for robust_shift method.
+Load from hail package: \code{data(giss, package = "hail")}.}
 }
 \value{
 A data frame containing:
@@ -91,7 +92,9 @@ warming-shift model or a GDD-based model.
 \examples{
 \donttest{
 pep <- pep_download()
-data(giss)
+
+# Load GISS data from hail package
+data(giss, package = "hail")
 
 # Use Alpine subset for faster computation
 regions <- c("Austria", "Switzerland")

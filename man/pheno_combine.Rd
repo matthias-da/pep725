@@ -87,17 +87,19 @@ identify and investigate these.
 \donttest{
 pep <- pep_download()
 
-# Apple flowering in Switzerland (small, fast subset)
-apple_ch <- pep[species == "Malus domestica" &
-                phase_id == 60 & country == "Switzerland"]
+# Grapevine flowering in Switzerland (longest historical records)
+vine_ch <- pep[species == "Vitis vinifera" &
+               phase_id == 65 & country == "Switzerland"]
 
-# Create combined series using OLS
-combined <- pheno_combine(apple_ch, method = "ols")
-print(combined)
+if (nrow(vine_ch) > 0) {
+  # Create combined series using OLS
+  combined <- pheno_combine(vine_ch, method = "ols")
+  print(combined)
 
-# Identify potential outliers (residuals > 30 days)
-outliers <- combined$residuals[abs(residual) > 30]
-outliers
+  # Identify potential outliers (residuals > 30 days)
+  outliers <- combined$residuals[abs(residual) > 30]
+  outliers
+}
 }
 
 }

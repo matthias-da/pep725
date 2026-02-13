@@ -72,25 +72,27 @@
 #' \donttest{
 #' pep <- pep_download()
 #'
-#' # Filter to one country for speed, analyze apple flowering
-#' apple_ch <- pep[country == "Switzerland" & species == "Malus domestica"]
+#' # Grapevine in Switzerland (longest historical records back to 1775)
+#' vine_ch <- pep[country == "Switzerland" & species == "Vitis vinifera"]
 #'
-#' # Calculate anomalies relative to 1961-1990 baseline
-#' anomalies <- pheno_anomaly(apple_ch,
-#'                            baseline_period = 1961:1990,
-#'                            phase_id = 60)
-#' print(anomalies)
+#' if (nrow(vine_ch) > 0) {
+#'   # Calculate anomalies relative to 1961-1990 baseline
+#'   anomalies <- pheno_anomaly(vine_ch,
+#'                              baseline_period = 1961:1990,
+#'                              phase_id = 65)
+#'   print(anomalies)
 #'
-#' # Find extreme early years
-#' extreme_early <- anomalies[is_extreme == TRUE & direction == "early"]
-#' extreme_early
+#'   # Find extreme early years
+#'   extreme_early <- anomalies[is_extreme == TRUE & direction == "early"]
+#'   extreme_early
 #'
-#' # Anomalies for recent years only
-#' recent <- pheno_anomaly(apple_ch,
-#'                         baseline_period = 1961:1990,
-#'                         target_years = 2000:2020,
-#'                         phase_id = 60)
-#' recent
+#'   # Anomalies for recent years only
+#'   recent <- pheno_anomaly(vine_ch,
+#'                           baseline_period = 1961:1990,
+#'                           target_years = 2000:2020,
+#'                           phase_id = 65)
+#'   recent
+#' }
 #' }
 #'
 #' @seealso

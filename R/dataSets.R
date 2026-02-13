@@ -79,39 +79,3 @@ NULL
 #' plot(meteoSwiss$yearHd, meteoSwiss$DOYHd, type = "b", ylab = "Heading DOY", xlab = "Year")
 #' plot(meteoSwiss$yearHv, meteoSwiss$DOYHv, type = "b", ylab = "Harvest DOY", xlab = "Year")
 "meteoSwiss"
-
-#' Global GISS Temperature Anomalies (1880–2024)
-#'
-#' This dataset contains global annual surface air temperature anomalies
-#' from the NASA GISS (Goddard Institute for Space Studies), relative to a 1951–1980 baseline.
-#' It is used in climate–phenology comparisons and sensitivity analyses.
-#'
-#' @format A \code{data.table} with 145 rows and 3 variables:
-#' \describe{
-#'   \item{\code{year}}{Integer. Calendar year from 1880 to 2024.}
-#'   \item{\code{dT}}{Numeric. Annual global mean surface temperature anomaly (°C) relative to the 1951–1980 baseline.}
-#'   \item{\code{dT_sm}}{Numeric. Smoothed anomaly (°C), typically a 5- or 11-year running mean.}
-#' }
-#'
-#' @source NASA GISS Surface Temperature Analysis (GISTEMP v4) via \url{https://data.giss.nasa.gov/gistemp/}
-#'
-#' @details
-#' The anomaly values are computed relative to the 1951–1980 climatological average.
-#' The smoothed version (\code{dT_sm}) is useful for visual trend analysis or for climate-driven modeling where year-to-year variability should be dampened.
-#'
-#' This dataset is automatically loaded with the package and used by the function \code{\link{regional_box_ts}}
-#' to link phenological responses with temperature anomalies.
-#'
-#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{meteoSwiss}}
-#'
-#' @docType data
-#' @keywords datasets
-#' @name giss
-#' @usage data(giss)
-#'
-#' @examples
-#' data(giss)
-#' plot(giss$year, giss$dT, type = "l", main = "Global Temperature Anomalies (GISS)",
-#'      ylab = "Anomaly (degC)", xlab = "Year")
-"giss"
-

@@ -2,79 +2,50 @@
 % Please edit documentation in R/pheno_plot.R
 \name{pheno_plot}
 \alias{pheno_plot}
-\title{Plot Phenological Trends and Climate Sensitivities}
+\title{Plot Phenological Time Series}
 \usage{
-pheno_plot(
-  data_list,
-  type = c("timeseries", "giss_smooth", "giss_sensitivity"),
-  alpha_lines = 0.6,
-  linewidth = 0.7,
-  smooth = c("gam", "loess"),
-  span = 0.3,
-  gam_bs = "tp",
-  gam_k = NULL,
-  se = FALSE
-)
+pheno_plot(data_list, alpha_lines = 0.6, linewidth = 0.7)
 }
 \arguments{
-\item{data_list}{A named list of prepared data objects, typically output from \code{\link{regional_box_ts}}. Must contain elements like \code{ts_tidy} and \code{pep_giss}.}
-
-\item{type}{Type of plot to generate. One of \code{"timeseries"}, \code{"giss_smooth"}, or \code{"giss_sensitivity"}.}
+\item{data_list}{A named list of prepared data objects, typically output from
+\code{\link{regional_box_ts}}. Must contain element \code{ts_tidy}.}
 
 \item{alpha_lines}{Alpha transparency for time series lines (default is \code{0.6}).}
 
 \item{linewidth}{Line width for time series lines (default is \code{0.7}).}
-
-\item{smooth}{Smoothing method for \code{type = "giss_smooth"}: either \code{"gam"} or \code{"loess"}.}
-
-\item{span}{Smoothing span for LOESS (default is \code{0.3}).}
-
-\item{gam_bs}{Basis type for GAM smoother. See \code{mgcv::s} for options (default is \code{"tp"}).}
-
-\item{gam_k}{Optional \code{k} parameter (basis dimension) for GAM smoothing. If \code{NULL}, the default from \code{mgcv::gam} is used.}
-
-\item{se}{Logical. Whether to include confidence bands in smoothed plots (default is \code{FALSE}).}
 }
 \value{
 A \code{ggplot} object for visual inspection and further customization.
 }
 \description{
-Generates diagnostic plots from processed phenology–climate data. Supports three types of visualizations: multi-source time series comparison, smoothed phase–temperature trends using GAM or LOESS, and robust linear sensitivity analysis. Optional filtering by specific phenological phase is available.
+Generates time series plots from processed phenology data. Shows DOY trends
+by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
 }
 \details{
-\itemize{
-\item \strong{type = "timeseries"}: Shows DOY trends by source (PEP725, MeteoSwiss) with faceting by phenophase and spatial scope.
-\item \strong{type = "giss_smooth"}: Plots phenological timing (DOY) against GISS global temperature anomalies, applying the selected smoother.
-\item \strong{type = "giss_sensitivity"}: Fits robust linear models (via \code{robustbase::lmrob}) to estimate phenological sensitivity (days/degC).
-}
-Use \code{phase_select} to restrict to one phenophase for clearer interpretation or focused analysis.
+This function visualizes DOY trends by source (PEP725, MeteoSwiss) with
+faceting by phenophase and spatial scope.
+
+For climate sensitivity plots (DOY vs temperature), use the \code{hail} package
+functions \code{hail::plot_giss_smooth()} and \code{hail::plot_giss_sensitivity()}.
 }
 \examples{
 \dontrun{
 # Requires pep_download() data - see regional_box_ts()
 pep <- pep_download()
-data(giss)
 
-# Using functional groups:
-d1 <- regional_box_ts(pep, giss, phase = 10, year_min = 1950,
-                      functional_group = "C4_summer_cereals",
-                      pep_for_giss = "near",
-                      lon_min = 8.0,  lon_max = 8.1,
-                      lat_min = 44.7, lat_max = 47.9)
-pC <- pheno_plot(d1, type = "giss_smooth")
-pD <- pheno_plot(d1, type = "giss_sensitivity")
-pC | pD
-
-# Without functional groups:
-out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
-p2 <- pheno_plot(out, type = "giss_smooth", smooth = "gam")
-p3 <- pheno_plot(out, type = "giss_sensitivity")
-p2 | p3
+# For GISS-based plots, load hail package:
+# library(hail)
+# data(giss)
+# out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
+# pheno_plot(out)  # timeseries
+# hail::plot_giss_smooth(out)
+# hail::plot_giss_sensitivity(out)
 }
 
 }
 \seealso{
-\code{\link{regional_box_ts}}, \code{\link[mgcv]{gam}}, \code{\link[robustbase]{lmrob}}
+\code{\link{regional_box_ts}}, \code{hail::plot_giss_smooth},
+\code{hail::plot_giss_sensitivity}
 }
 \author{
 Matthias Templ

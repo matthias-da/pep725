@@ -19,11 +19,12 @@
 #' # Generate synthetic data
 #' pep_synth <- simulate_pep(pep_ch)
 #'
-#' # Use with analysis functions
-#' data(giss)
+#' # Use with analysis functions (grapevine has longest records)
+#' # Load GISS data from hail package
+#' data(giss, package = "hail")
 #' out <- regional_box_ts(pep = pep_synth, giss = giss,
-#'                        species_name = "Malus domestica",
-#'                        phase = 60)
+#'                        species_name = "Vitis vinifera",
+#'                        phase = 65)
 #' }
 simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
   set.seed(seed)

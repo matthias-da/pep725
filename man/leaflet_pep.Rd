@@ -37,13 +37,16 @@ selected <- leaflet_pep(wheat)
 pep <- pep_download()
 
 # For faster loading, filter the data first (recommended)
-pep_subset <- pep[species == "Triticum aestivum"]
+# Grapevine has the longest historical records
+pep_subset <- pep[species == "Vitis vinifera"]
 
-# Launch interactive selection gadget
-selected <- leaflet_pep(pep_subset, label_col = "species")
+if (nrow(pep_subset) > 0) {
+  # Launch interactive selection gadget
+  selected <- leaflet_pep(pep_subset, label_col = "species")
 
-# Inspect selected subset
-print(selected)
+  # Inspect selected subset
+  print(selected)
+}
 }
 }
 \author{

@@ -5,8 +5,8 @@
 \title{Compile Regional Phenology Data and Climate Sensitivity Inputs}
 \usage{
 regional_box_ts(
-  pep = get("pep", envir = parent.frame()),
-  giss = get("giss", envir = parent.frame()),
+  pep,
+  giss,
   lon_min = 4.2,
   lon_max = 8.1,
   lat_min = 44.7,
@@ -21,7 +21,8 @@ regional_box_ts(
 \arguments{
 \item{pep}{A data.table containing the full PEP725 dataset, typically loaded at package startup. Must include at least columns: \code{species}, \code{year}, \code{phase_id}, \code{day}, \code{lat}, \code{lon}. Defaults to a global object \code{pep} from the parent environment.}
 
-\item{giss}{A data.table with GISS global temperature anomalies, typically containing columns \code{year}, \code{dT}, and \code{dT_sm}. Defaults to global object \code{giss}.}
+\item{giss}{A data.table with GISS global temperature anomalies, containing columns
+\code{year}, \code{dT}, and \code{dT_sm}. Load from hail package: \code{data(giss, package = "hail")}.}
 
 \item{lon_min}{Minimum longitude for spatial filtering of PEP data (default is \code{4.2})}
 
@@ -69,18 +70,22 @@ global warming trends.
 \dontrun{
 # Typical usage for winter wheat heading phase:
 pep <- pep_download()
-data(giss)
+
+# Load GISS data from hail package
+data(giss, package = "hail")
+
 out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
 str(out)
 
-out <- regional_box_ts(pep, giss,
-                       functional_group = "Aromatic_or_medicinal_perennials", phase = 60)
-str(out)
+# For climate sensitivity plots, use hail package:
+# hail::plot_giss_smooth(out)
+# hail::plot_giss_sensitivity(out)
 }
 
 }
 \seealso{
-\code{\link{pheno_plot}}, \code{\link{pep_download}}, \code{\link{giss}}
+\code{\link{pheno_plot}}, \code{\link{pep_download}},
+\code{hail::giss}, \code{hail::plot_giss_smooth}, \code{hail::plot_giss_sensitivity}
 }
 \author{
 Matthias Templ

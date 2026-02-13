@@ -4,7 +4,7 @@
 .onAttach <- function(libname, pkgname) {
   # Load small auxiliary datasets into global environment
   utils::data("meteoSwiss", package = pkgname, envir = globalenv())
-  utils::data("giss", package = pkgname, envir = globalenv())
+  # Note: giss dataset has moved to the hail package
 
   packageStartupMessage("pep725 loaded.")
  packageStartupMessage("To get phenological data, use:")
