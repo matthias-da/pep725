@@ -561,72 +561,65 @@ cat("Original observations:", nrow(apple), "\n")
 cat("After quality filter:", nrow(apple_clean), "\n")
 cat("Retained:", round(100 * nrow(apple_clean) / nrow(apple), 1), "%\n")
 
+stopifnot(nrow(apple_clean) > 0)
+
 cat("\n=== STEP 3: Calculate Baseline Normals ===\n\n")
 
-if (nrow(apple_clean) > 0) {
-  normals <- pheno_normals(
-    apple_clean,
-    period = 1990:2010,
-    by = c("country", "phase_id"),
-    min_years = 5
-  )
+normals <- pheno_normals(
+  apple_clean,
+  period = 1990:2010,
+  by = c("country", "phase_id"),
+  min_years = 5
+)
 
-  cat("Normals calculated for", sum(!is.na(normals$mean_doy)), "groups\n")
-  cat("Mean DOY range:", round(min(normals$mean_doy, na.rm = TRUE), 0),
-      "to", round(max(normals$mean_doy, na.rm = TRUE), 0), "\n")
+cat("Normals calculated for", sum(!is.na(normals$mean_doy)), "groups\n")
+cat("Mean DOY range:", round(min(normals$mean_doy, na.rm = TRUE), 0),
+    "to", round(max(normals$mean_doy, na.rm = TRUE), 0), "\n")
 
-  cat("\n=== STEP 4: Calculate Anomalies ===\n\n")
+cat("\n=== STEP 4: Calculate Anomalies ===\n\n")
 
-  anomalies <- pheno_anomaly(
-    apple_clean,
-    baseline_period = 1990:2010,
-    by = c("country", "phase_id"),
-    min_years = 5
-  )
+anomalies <- pheno_anomaly(
+  apple_clean,
+  baseline_period = 1990:2010,
+  by = c("country", "phase_id"),
+  min_years = 5
+)
 
-  # Convert to plain data.table for aggregation
-  anomalies_dt <- as.data.table(anomalies)
+# Convert to plain data.table so grouped aggregation works correctly
+# (the pheno_anomaly S3 class can interfere with [.data.table dispatch)
+anomalies_dt <- as.data.table(anomalies)
 
-  if ("anomaly_days" %in% names(anomalies_dt) &&
-      any(!is.na(anomalies_dt$anomaly_days))) {
+cat("Anomalies calculated for", sum(!is.na(anomalies_dt$anomaly_days)), "year-groups\n")
+cat("Extreme years:", sum(anomalies_dt$is_extreme, na.rm = TRUE), "\n")
 
-    cat("Anomalies calculated for", sum(!is.na(anomalies_dt$anomaly_days)), "year-groups\n")
-    cat("Extreme years:", sum(anomalies_dt$is_extreme, na.rm = TRUE), "\n")
+cat("\n=== STEP 5: Analyze Trends by Decade ===\n\n")
 
-    cat("\n=== STEP 5: Analyze Trends by Decade ===\n\n")
+decade_summary <- anomalies_dt[
+  !is.na(anomaly_days),
+  .(
+    mean_anomaly = round(mean(anomaly_days, na.rm = TRUE), 1),
+    sd_anomaly = round(sd(anomaly_days, na.rm = TRUE), 1),
+    n_obs = .N,
+    pct_extreme = round(100 * sum(is_extreme, na.rm = TRUE) / .N, 1)
+  ),
+  by = .(decade = floor(year / 10) * 10)
+][order(decade)]
 
-    decade_summary <- anomalies_dt[
-      !is.na(anomaly_days),
-      .(
-        mean_anomaly = round(mean(anomaly_days, na.rm = TRUE), 1),
-        sd_anomaly = round(sd(anomaly_days, na.rm = TRUE), 1),
-        n_obs = .N,
-        pct_extreme = round(100 * sum(is_extreme, na.rm = TRUE) / .N, 1)
-      ),
-      by = .(decade = floor(year / 10) * 10)
-    ][order(decade)]
+print(decade_summary)
 
-    print(decade_summary)
+cat("\nInterpretation:\n")
+first_decade <- decade_summary$mean_anomaly[1]
+last_decade <- decade_summary$mean_anomaly[nrow(decade_summary)]
+change <- last_decade - first_decade
 
-    cat("\nInterpretation:\n")
-    if (nrow(decade_summary) >= 2) {
-      first_decade <- decade_summary$mean_anomaly[1]
-      last_decade <- decade_summary$mean_anomaly[nrow(decade_summary)]
-      change <- last_decade - first_decade
-
-      if (change < -3) {
-        cat("- Strong shift toward EARLIER phenology\n")
-      } else if (change < 0) {
-        cat("- Moderate shift toward earlier phenology\n")
-      } else if (change > 3) {
-        cat("- Strong shift toward LATER phenology\n")
-      } else {
-        cat("- No clear directional change\n")
-      }
-    }
-  } else {
-    cat("Insufficient data for anomaly analysis\n")
-  }
+if (change < -3) {
+  cat("- Strong shift toward EARLIER phenology\n")
+} else if (change < 0) {
+  cat("- Moderate shift toward earlier phenology\n")
+} else if (change > 3) {
+  cat("- Strong shift toward LATER phenology\n")
+} else {
+  cat("- No clear directional change\n")
 }
 ```
 
@@ -733,24 +726,41 @@ if (tau < -2.58) {
 
 ### Linking Phenology to Climate
 
-For advanced analysis, you can link phenological timing to climate variables
-like global temperature anomalies using `regional_box_ts()`:
+A central goal of phenological research is to understand how climate drives
+the timing of biological events. The `regional_box_ts()` function compiles
+multi-station phenological data into regional time series and links them to
+global temperature anomalies, enabling you to assess **climate sensitivity** -
+how many days earlier (or later) phenology occurs per degree of warming.
 
 ```{r regional-climate, eval=FALSE}
-# Compile regional data (PEP725 only)
+# Compile regional data and link to temperature anomalies
 regional_data <- regional_box_ts(
   pep = pep,
   species_name = "Malus domestica",
   year_min = 1961
 )
 
-# Visualize time series
+# Visualize phenology alongside temperature anomalies
 pheno_plot(regional_data)
 ```
 
-**Climate sensitivity** tells you how many days earlier (or later) phenology
-occurs per degree of warming. A typical value for spring phenology is -2 to -5
-days/°C (earlier with warming).
+**What the output shows:**
+
+- **Regional median DOY** per year, aggregated from individual stations
+- **Global temperature anomaly** for context (GISS dataset)
+- **Correlation** between phenological timing and temperature
+
+**Typical climate sensitivities** for European spring phenology:
+
+| Phase | Sensitivity | Meaning |
+|-------|-------------|---------|
+| Leaf unfolding | -2 to -4 days/°C | Moderate response to spring warming |
+| Flowering | -3 to -5 days/°C | Strong response, especially for fruit trees |
+| Harvest | -1 to -3 days/°C | Weaker response, partly compensated by summer processes |
+
+These values mean that for every 1°C increase in spring temperature, flowering
+tends to occur 3-5 days earlier. Over the past 50 years, this has translated
+to an advance of roughly 2-5 days per decade across Central Europe.
 
 ## Best Practices Summary
 

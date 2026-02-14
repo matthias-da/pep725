@@ -31,7 +31,7 @@ research because it allows us to:
 - **Validate models**: Compare observed gradients with model predictions
 
 This vignette covers spatial analysis and visualization functions in the
-`pep725` package, organized into three main topics:
+`pep725` package, organized into four parts:
 
 ### What You'll Learn
 
@@ -764,7 +764,7 @@ High inter-species variability may indicate ecological heterogeneity or mixed ha
 
 ## Combining Mapping with Analysis
 
-A typical workflow integrates mapping with spatial analysis in such a workflow:
+A typical workflow integrates mapping with spatial analysis:
 
 ```{r mapping-workflow, eval=FALSE}
 # 1. Explore stations interactively

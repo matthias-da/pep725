@@ -465,15 +465,15 @@ print(multi_check)
 Here's a recommended workflow for data quality assessment that combines all the
 tools covered in this vignette:
 
-```{r workflow, eval=FALSE}
+```{r workflow}
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 1: Assess temporal completeness
 # ══════════════════════════════════════════════════════════════════════════════
 # Why: Incomplete stations can bias trend estimates and normals
 
-completeness <- pep_completeness(pep, by = c("s_id", "phase_id"))
+completeness <- pep_completeness(flowering, by = c("s_id", "phase_id"))
 good_stations <- completeness[completeness_pct >= 50, s_id]
-pep_filtered <- pep[s_id %in% good_stations]
+fl_filtered <- flowering[s_id %in% good_stations]
 
 cat("Kept", length(good_stations), "stations with >= 50% completeness\n")
 
@@ -482,34 +482,31 @@ cat("Kept", length(good_stations), "stations with >= 50% completeness\n")
 # ══════════════════════════════════════════════════════════════════════════════
 # Why: Identify observations that deviate from expected patterns
 
-outliers <- flag_outliers(pep_filtered, method = "mad", threshold = 3)
+outliers_wf <- flag_outliers(fl_filtered, method = "mad", threshold = 3)
 
-cat("Flagged", sum(outliers$is_outlier), "outliers\n")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# STEP 3: Visualize to understand patterns
-# ══════════════════════════════════════════════════════════════════════════════
-# Why: Visual inspection reveals patterns that statistics miss
-
-plot_outliers(outliers, type = "overview")   # How many, which species?
-plot_outliers(outliers, type = "seasonal")   # When in the year?
+cat("Flagged", sum(outliers_wf$is_outlier), "outliers",
+    "(", round(100 * mean(outliers_wf$is_outlier), 1), "% )\n")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 4: Make informed decisions about exclusion
+# STEP 3: Make informed decisions about exclusion
 # ══════════════════════════════════════════════════════════════════════════════
 # Key principle: Document your decisions!
 
 # Option A: Strict cleaning (for normals calculation)
-pep_strict <- outliers[is_outlier == FALSE]
+fl_strict <- outliers_wf[is_outlier == FALSE]
 
 # Option B: Moderate cleaning (keep moderate outliers)
-pep_moderate <- outliers[is_outlier == FALSE | abs(deviation) < 60]
+fl_moderate <- outliers_wf[is_outlier == FALSE | abs(deviation) < 60]
+
+cat("Strict cleaning keeps:", nrow(fl_strict), "obs\n")
+cat("Moderate cleaning keeps:", nrow(fl_moderate), "obs\n")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 5: Proceed with analysis on cleaned data
+# STEP 4: Proceed with analysis on cleaned data
 # ══════════════════════════════════════════════════════════════════════════════
 
-normals <- pheno_normals(pep_moderate, period = 1991:2020)
+normals <- pheno_normals(fl_moderate, period = 1991:2020, min_years = 5)
+cat("Normals calculated for", sum(!is.na(normals$mean_doy)), "groups\n")
 ```
 
 ## Documentation Template
