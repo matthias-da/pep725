@@ -409,7 +409,7 @@ two approaches.
 
 The **robust method** (`robust = TRUE`, default and recommended) uses the median as the baseline and the MAD (median absolute deviation) for standardization. This approach is less affected by outliers and should be preferred in most situations.
 
-The **classical method** (`robust = FALSE`) uses the mean as the baseline and the standard deviation (SD) for standardization. This approach is more affected by outliers and should only be used if you have already cleaned outliers from your data, or for comparison with older literature that used classical methods.
+The **classical method** (`robust = FALSE`) uses the mean as the baseline and the standard deviation (SD) for standardization. This approach is more affected by outliers.
 
 **When to use each:**
 
@@ -584,17 +584,15 @@ if (nrow(apple_clean) > 0) {
     min_years = 5
   )
 
-  anomalies_dt <- as.data.table(anomalies)
+  if ("anomaly_days" %in% names(anomalies) &&
+      any(!is.na(anomalies$anomaly_days))) {
 
-  if ("anomaly_days" %in% names(anomalies_dt) &&
-      any(!is.na(anomalies_dt$anomaly_days))) {
-
-    cat("Anomalies calculated for", sum(!is.na(anomalies_dt$anomaly_days)), "year-groups\n")
-    cat("Extreme years:", sum(anomalies_dt$is_extreme, na.rm = TRUE), "\n")
+    cat("Anomalies calculated for", sum(!is.na(anomalies$anomaly_days)), "year-groups\n")
+    cat("Extreme years:", sum(anomalies$is_extreme, na.rm = TRUE), "\n")
 
     cat("\n=== STEP 5: Analyze Trends by Decade ===\n\n")
 
-    decade_summary <- anomalies_dt[
+    decade_summary <- anomalies[
       !is.na(anomaly_days),
       .(
         mean_anomaly = round(mean(anomaly_days, na.rm = TRUE), 1),
@@ -703,10 +701,12 @@ annual_doy <- apple_flowering[, .(
   mean_doy = mean(day, na.rm = TRUE)
 ), by = year][order(year)]
 
-# Calculate Kendall's tau
+# Calculate Mann-Kendall test statistic
+# Note: kendall_tau() returns the standardized z-statistic, not Kendall's
+# tau correlation. Values beyond ±1.96 indicate significant trends.
 tau <- kendall_tau(annual_doy$mean_doy)
 
-cat("Kendall tau:", round(tau, 3), "\n")
+cat("Mann-Kendall z-statistic:", round(tau, 3), "\n")
 cat("\nInterpretation:\n")
 if (tau < -2.58) {
   cat("- Highly significant earlier trend (p < 0.01)\n")
@@ -788,7 +788,15 @@ You now understand the core analytical functions. Continue to:
 - **Spatial Phenological Patterns**: How does phenology vary with elevation
   and latitude? Use `pheno_gradient()` and `pheno_synchrony()`.
 
+```{r eval = FALSE}
+vignette("spatial-patterns", package = "pep725")
+```
+
 - **Data Quality & Irregular Events**: How to detect outliers and identify abnormal events.
+
+```{r eval = FALSE}
+vignette("data-quality", package = "pep725")
+```
 
 ## Session Info
 
