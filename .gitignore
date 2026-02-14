@@ -52,3 +52,7 @@ po/*~
 rsconnect/
 /doc/
 /Meta/
+
+# Claude Code
+.claude/
+CLAUDE.md
