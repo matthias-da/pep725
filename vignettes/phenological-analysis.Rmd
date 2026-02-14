@@ -584,15 +584,18 @@ if (nrow(apple_clean) > 0) {
     min_years = 5
   )
 
-  if ("anomaly_days" %in% names(anomalies) &&
-      any(!is.na(anomalies$anomaly_days))) {
+  # Convert to plain data.table for aggregation
+  anomalies_dt <- as.data.table(anomalies)
 
-    cat("Anomalies calculated for", sum(!is.na(anomalies$anomaly_days)), "year-groups\n")
-    cat("Extreme years:", sum(anomalies$is_extreme, na.rm = TRUE), "\n")
+  if ("anomaly_days" %in% names(anomalies_dt) &&
+      any(!is.na(anomalies_dt$anomaly_days))) {
+
+    cat("Anomalies calculated for", sum(!is.na(anomalies_dt$anomaly_days)), "year-groups\n")
+    cat("Extreme years:", sum(anomalies_dt$is_extreme, na.rm = TRUE), "\n")
 
     cat("\n=== STEP 5: Analyze Trends by Decade ===\n\n")
 
-    decade_summary <- anomalies[
+    decade_summary <- anomalies_dt[
       !is.na(anomaly_days),
       .(
         mean_anomaly = round(mean(anomaly_days, na.rm = TRUE), 1),
