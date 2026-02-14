@@ -101,8 +101,36 @@ summary(quality)
 | `data(pep_seed)` | Quick offline tests, minimal examples | No |
 | `simulate_pep()` | Creating shareable datasets from your own data | No |
 | `pep_import()` | Research with actual PEP725 observations | For download |
+| `as.pep()` | Working with your own phenological data | No |
 
 **Why synthetic data?** The original PEP725 database requires registration and has usage restrictions. Synthetic data preserves statistical properties while being freely shareable for tutorials and reproducible workflows.
+
+### Working with your own phenological data
+
+You can use all analysis functions on any phenological dataset — it does not have to come from PEP725. Convert your data to a `pep` object with `as.pep()`:
+
+```r
+library(data.table)
+
+my_data <- data.table(
+  s_id     = c(1, 1, 2, 2),
+  lon      = c(8.5, 8.5, 9.1, 9.1),
+  lat      = c(47.4, 47.4, 46.9, 46.9),
+  alt      = c(400, 400, 550, 550),
+  genus    = "Prunus",
+  species  = "Prunus avium",
+  phase_id = 60,
+  year     = c(2022, 2023, 2022, 2023),
+  day      = c(105, 98, 112, 103)
+)
+
+my_pep <- as.pep(my_data)
+
+# Now use any pep725 analysis function
+normals <- pheno_normals(my_pep, period = 2022:2023, min_years = 2)
+```
+
+Required columns: `s_id`, `lon`, `lat`, `genus`, `species`, `phase_id`, `year`, `day`. Optional: `alt`, `country`, `subspecies`.
 
 ## Spatial Analysis
 
