@@ -96,8 +96,8 @@ to extreme values but provides interpretable z-scores under normality.
 than normal"
 \item \strong{z_score}: Standardized - values > 2 or < -2 are typically
 considered extreme
-\item \strong{percentile}: Non-parametric - e.g., 5th percentile means
-"earlier than 95\% of baseline years"
+\item \strong{percentile}: Normal approximation from z-score - e.g.,
+5th percentile means "earlier than 95\\% of baseline years"
 }
 }
 

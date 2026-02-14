@@ -386,10 +386,29 @@ pheno_gradient <- function(pep,
     group_results[, variable := variable]
     group_results[, method := method]
 
+    # Aggregate data for plotting (same as fit_gradient does internally)
+    if (aggregate && "s_id" %in% names(dt)) {
+      plot_data <- dt[, .(
+        mean_doy = mean(day, na.rm = na.rm),
+        var_value = mean(get(variable), na.rm = na.rm),
+        n_obs = .N
+      ), by = c("s_id", by)]
+    } else {
+      plot_data <- data.table::data.table(
+        mean_doy = dt$day,
+        var_value = dt[[variable]],
+        n_obs = 1L
+      )
+      if (!is.null(by)) {
+        for (b in by) plot_data[, (b) := dt[[b]]]
+      }
+    }
+    plot_data <- plot_data[!is.na(mean_doy) & !is.na(var_value)]
+
     result <- list(
       summary = group_results,
       model = NULL,  # Multiple models, not stored individually
-      data = dt,
+      data = plot_data,
       variable = variable,
       method = method,
       by = by,
@@ -473,12 +492,15 @@ plot.pheno_gradient <- function(x, ...) {
       y = "Day of Year",
       title = sprintf("Phenological %s Gradient",
                       ifelse(x$variable == "alt", "Elevation", "Latitude")),
-      subtitle = sprintf("Method: %s | R-sq = %.3f",
-                         x$method,
-                         ifelse(!is.null(x$summary$r_squared[1]),
-                                x$summary$r_squared[1], NA))
+      subtitle = sprintf("Method: %s", x$method)
     ) +
     ggplot2::theme_minimal()
+
+  # Facet by group if available
+  if (!is.null(x$by) && length(x$by) > 0) {
+    facet_formula <- stats::as.formula(paste("~", paste(x$by, collapse = " + ")))
+    p <- p + ggplot2::facet_wrap(facet_formula, scales = "free")
+  }
 
   p
 }

@@ -154,7 +154,8 @@ pheno_synchrony <- function(pep,
                 call. = FALSE)
         phase_id <- phase_id[1]
       }
-      dt <- dt[dt$phase_id == phase_id]
+      pid <- phase_id
+      dt <- dt[dt$phase_id == pid]
       if (nrow(dt) == 0) {
         stop("No observations found for phase_id: ", phase_id, call. = FALSE)
       }

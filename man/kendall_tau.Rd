@@ -2,21 +2,24 @@
 % Please edit documentation in R/pheno_trend_turning.R
 \name{kendall_tau}
 \alias{kendall_tau}
-\title{Kendall's Normalized Tau}
+\title{Mann-Kendall Z-Statistic}
 \usage{
 kendall_tau(x)
 }
 \arguments{
-\item{x}{Numeric vector (time series assumed to be equidistant)}
+\item{x}{Numeric vector (time series assumed to be equidistant).
+\code{NA} values are silently removed.}
 }
 \value{
-Numeric. Kendall's normalized tau statistic.
-Values near +1 indicate increasing trend, -1 decreasing trend,
-0 no trend. Approximately standard normal under no-trend null.
+Numeric. The Mann-Kendall Z-statistic (\code{S / sqrt(Var(S))}).
+Positive values indicate increasing trend, negative values decreasing.
+Compare against standard normal quantiles (e.g., |Z| > 1.96 for p < 0.05).
+Returns \code{NA} if fewer than 3 non-missing values.
 }
 \description{
-Computes Kendall's normalized tau statistic for a time series,
-providing a non-parametric measure of monotonic trend.
+Computes the Mann-Kendall Z-statistic for a time series,
+providing a non-parametric test of monotonic trend. The Z-statistic
+is approximately standard normal under the no-trend null hypothesis.
 }
 \examples{
 # Decreasing trend (earlier phenology)

@@ -348,6 +348,8 @@ check_phases_multi <- function(pep,
                                 year_max = NULL,
                                 warn = TRUE) {
 
+  species_list <- as.character(species_list)
+
   results <- lapply(species_list, function(sp) {
     check <- check_phases(pep,
                           expected = expected,

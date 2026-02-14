@@ -1,4 +1,6 @@
-utils::globalVariables(c("..na_cols"))
+utils::globalVariables(c("..na_cols", "..keep_cols",
+                         "baseline_q05", "baseline_q95",
+                         "n_baseline_years", "n_years"))
 
 #' Calculate Phenological Anomalies
 #'
@@ -66,8 +68,8 @@ utils::globalVariables(c("..na_cols"))
 #'     than normal"
 #'   \item \strong{z_score}: Standardized - values > 2 or < -2 are typically
 #'     considered extreme
-#'   \item \strong{percentile}: Non-parametric - e.g., 5th percentile means
-#'     "earlier than 95% of baseline years"
+#'   \item \strong{percentile}: Normal approximation from z-score - e.g.,
+#'     5th percentile means "earlier than 95\% of baseline years"
 #' }
 #'
 #' @examples
@@ -223,7 +225,7 @@ pheno_anomaly <- function(pep,
               call. = FALSE)
     }
 
-    # Select appropriate baseline columns
+    # Select appropriate baseline columns and keep only what we need
     if (robust) {
       baseline_stats[, baseline_doy := median_doy]
       baseline_stats[, baseline_spread := mad_doy]
@@ -231,6 +233,19 @@ pheno_anomaly <- function(pep,
       baseline_stats[, baseline_doy := mean_doy]
       baseline_stats[, baseline_spread := sd_doy]
     }
+
+    # Keep only grouping + baseline columns to avoid merge artifacts
+    keep_cols <- c(normals_by, "baseline_doy", "baseline_spread")
+    if ("q05" %in% names(baseline_stats)) {
+      baseline_stats[, baseline_q05 := q05]
+      baseline_stats[, baseline_q95 := q95]
+      keep_cols <- c(keep_cols, "baseline_q05", "baseline_q95")
+    }
+    if ("n_years" %in% names(baseline_stats)) {
+      baseline_stats[, n_baseline_years := n_years]
+      keep_cols <- c(keep_cols, "n_baseline_years")
+    }
+    baseline_stats <- baseline_stats[, ..keep_cols]
 
   } else {
     # Calculate baseline from data
@@ -512,4 +527,131 @@ summary.pheno_anomaly <- function(object, ...) {
     n_extreme = if (nrow(valid) > 0) sum(valid$is_extreme, na.rm = TRUE) else 0,
     baseline_period = baseline
   ))
+}
+
+
+#' Plot Method for Phenological Anomalies
+#'
+#' Visualise phenological anomalies as a colour-coded timeline or as a
+#' histogram of anomaly magnitudes.
+#'
+#' @param x A \code{pheno_anomaly} object returned by
+#'   \code{\link{pheno_anomaly}}.
+#' @param which Character string selecting the plot type: \code{"timeline"}
+#'   (default) shows \code{anomaly_days} per year as bars coloured by
+#'   \code{direction} with extreme events marked; \code{"histogram"} shows
+#'   the distribution of anomaly values.
+#' @param ... Additional arguments (unused).
+#'
+#' @return A \code{ggplot} object (returned invisibly).
+#'
+#' @examples
+#' \donttest{
+#' pep <- pep_download()
+#' vine_ch <- pep[country == "Switzerland" & species == "Vitis vinifera"]
+#'
+#' if (nrow(vine_ch) > 0) {
+#'   a <- pheno_anomaly(vine_ch,
+#'                      baseline_period = 1961:1990,
+#'                      phase_id = 65,
+#'                      by = "phase_id")
+#'   plot(a)
+#'   plot(a, which = "histogram")
+#' }
+#' }
+#'
+#' @seealso \code{\link{pheno_anomaly}}, \code{\link{pheno_normals}}
+#' @author Matthias Templ
+#' @export
+plot.pheno_anomaly <- function(x, which = c("timeline", "histogram"), ...) {
+  which <- match.arg(which)
+
+  # Remove rows with NA anomalies
+  plot_data <- data.table::as.data.table(x)[!is.na(anomaly_days)]
+
+  if (nrow(plot_data) == 0) {
+    stop("No valid anomalies to plot", call. = FALSE)
+  }
+
+  # Identify grouping columns
+  known_cols <- c("year", "observed_doy", "baseline_doy", "baseline_spread",
+                  "anomaly_days", "z_score", "percentile", "is_extreme",
+                  "direction", "n_obs", "n_baseline_years",
+                  "baseline_q05", "baseline_q95")
+  group_cols <- setdiff(names(plot_data), known_cols)
+
+  # Build facet label when there are grouping columns
+  has_groups <- length(group_cols) > 0
+  if (has_groups) {
+    for (gc in group_cols) {
+      if (gc == "phase_id") {
+        descs <- .bbch_lookup[as.character(plot_data[[gc]])]
+        descs[is.na(descs)] <- as.character(plot_data[[gc]][is.na(descs)])
+        plot_data[, (gc) := paste0(plot_data[[gc]], " - ", descs)]
+      }
+    }
+    plot_data[, facet_label := do.call(paste, c(.SD, sep = " | ")),
+              .SDcols = group_cols]
+  }
+
+  # Subtitle from attributes
+  baseline <- attr(x, "baseline_period")
+  subtitle <- if (!is.null(baseline) && length(baseline) > 0) {
+    sprintf("Baseline: %d-%d", min(baseline), max(baseline))
+  } else {
+    "Baseline: pre-computed normals"
+  }
+
+  direction_colors <- c("early" = "steelblue", "late" = "coral",
+                         "normal" = "gray70")
+
+  if (which == "timeline") {
+    # Ensure direction is a factor for consistent colours
+    plot_data[, direction := factor(direction,
+                                    levels = c("early", "normal", "late"))]
+
+    p <- ggplot2::ggplot(plot_data,
+                         ggplot2::aes(x = year, y = anomaly_days,
+                                      fill = direction)) +
+      ggplot2::geom_col(width = 0.8) +
+      ggplot2::scale_fill_manual(values = direction_colors, drop = FALSE) +
+      ggplot2::labs(x = "Year", y = "Anomaly (days)",
+                    fill = "Direction",
+                    title = "Phenological Anomalies",
+                    subtitle = subtitle) +
+      ggplot2::theme_minimal()
+
+    # Mark extreme events
+    extremes <- plot_data[is_extreme == TRUE]
+    if (nrow(extremes) > 0) {
+      p <- p + ggplot2::geom_point(data = extremes,
+                                   ggplot2::aes(x = year, y = anomaly_days),
+                                   shape = 18, size = 2.5, color = "black",
+                                   inherit.aes = FALSE)
+    }
+
+    # Facet if multiple groups
+    if (has_groups) {
+      p <- p + ggplot2::facet_wrap(~ facet_label, scales = "free_y")
+    }
+
+  } else {
+    # Histogram
+    p <- ggplot2::ggplot(plot_data,
+                         ggplot2::aes(x = anomaly_days)) +
+      ggplot2::geom_histogram(fill = "steelblue", color = "white",
+                              bins = 30) +
+      ggplot2::geom_vline(xintercept = 0, linetype = "dashed",
+                          color = "gray40") +
+      ggplot2::labs(x = "Anomaly (days)", y = "Count",
+                    title = "Distribution of Phenological Anomalies",
+                    subtitle = subtitle) +
+      ggplot2::theme_minimal()
+
+    if (has_groups) {
+      p <- p + ggplot2::facet_wrap(~ facet_label)
+    }
+  }
+
+  p
 }

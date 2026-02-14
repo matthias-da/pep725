@@ -35,8 +35,7 @@ Can be genus name (e.g., "Triticum") or full species (e.g., "Triticum aestivum")
 If \code{NULL} (default), all species in the data are included.}
 
 \item{phase_id}{Optional integer vector to filter by BBCH phase codes.
-If \code{NULL} (default
-), all phases in the data are included.}
+If \code{NULL} (default), all phases in the data are included.}
 
 \item{min_years}{Minimum number of years required to calculate valid normals.
 Default is 20 (WMO standard). Groups with fewer years return \code{NA}.}

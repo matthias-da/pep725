@@ -26,10 +26,12 @@
 #'   \item Developing analysis workflows before accessing real data
 #' }
 #'
-#' The data is cached in a platform-appropriate location:
+#' The data is cached in the platform-appropriate user cache directory
+#' determined by \code{\link[tools]{R_user_dir}("pep725", which = "cache")}.
+#' Typical locations:
 #' \itemize{
-#'   \item Windows: \code{\%LOCALAPPDATA\%/R/pep725/}
-#'   \item macOS: \code{~/Library/Caches/R/pep725/}
+#'   \item Windows: \code{\%LOCALAPPDATA\%/R/cache/R/pep725/}
+#'   \item macOS: \code{~/Library/Caches/org.R-project.R/R/pep725/}
 #'   \item Linux: \code{~/.cache/R/pep725/}
 #' }
 #'
@@ -78,18 +80,15 @@ pep_download <- function(url = NULL,
 
     pep <- tryCatch({
       env <- new.env()
-      load(cache_file, envir = env)
-      get(ls(env)[1], envir = env)
+      var_names <- load(cache_file, envir = env)
+      obj <- get(var_names[1], envir = env)
+      new_pep(obj)
     }, error = function(e) {
       warning("Cached file appears corrupted. Re-downloading...", call. = FALSE)
       NULL
     })
 
     if (!is.null(pep)) {
-      # Ensure it has the pep class
-      if (!inherits(pep, "pep")) {
-        class(pep) <- c("pep", class(pep))
-      }
       return(pep)
     }
   }
@@ -128,28 +127,19 @@ pep_download <- function(url = NULL,
     )
   }
 
-  # Read the downloaded data
+  # Read the downloaded data and validate via new_pep()
   pep <- tryCatch({
     env <- new.env()
-    load(temp_file, envir = env)
-    get(ls(env)[1], envir = env)
+    var_names <- load(temp_file, envir = env)
+    obj <- get(var_names[1], envir = env)
+    new_pep(obj)
   }, error = function(e) {
     stop(
-      "Downloaded file could not be read. It may be corrupted.\n",
+      "Downloaded file could not be read or is not valid PEP data.\n",
       "Error: ", e$message,
       call. = FALSE
     )
   })
-
-  # Convert to data.table if needed
-  if (!inherits(pep, "data.table")) {
-    pep <- data.table::as.data.table(pep)
-  }
-
-  # Add pep class
-  if (!inherits(pep, "pep")) {
-    class(pep) <- c("pep", class(pep))
-  }
 
   # Cache the data
   if (cache) {

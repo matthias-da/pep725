@@ -23,7 +23,8 @@ polygons from \pkg{rnaturalearth}. Geometry is handled via \pkg{sf}.
 }
 \details{
 The input data must contain numeric columns named \code{lat} and \code{lon}
-in WGS84 (EPSG:4326).
+in WGS84 (EPSG:4326).  Rows with \code{NA} coordinates receive
+\code{country = NA}.
 
 After assigning countries, Germany is automatically split into
 \code{"Germany-North"} and \code{"Germany-South"} using a latitude threshold:
@@ -31,6 +32,9 @@ After assigning countries, Germany is automatically split into
 \item lat >= 50 → \code{"Germany-North"}
 \item lat  < 50 → \code{"Germany-South"}
 }
+
+If the input already contains a \code{country} column it is removed and
+replaced by the spatially derived one.
 }
 \examples{
 \donttest{

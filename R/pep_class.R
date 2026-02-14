@@ -21,7 +21,7 @@ utils::globalVariables(c(
   "s_id", "lon", "lat", "genus", "species", "phase_id", "year", "day",
   "n_obs", "country", "phase_name",
   # data.table special symbols
-  ".N", ".I", ".SD", ":=", ".row_id", ".has_na",
+  ".N", ".I", ".SD", ":=", ".row_id", ".row_idx", ".has_na",
   # Analysis variables
   "Country", "DOY", "DOYHd", "DOYHv", "HarvestDOY", "HarvestYEAR", "HeadingDOY",
   "Integral", "N", "PLZ", "Scenario", "Tgl", "alt", "altitude", "annual_mean_doy",
@@ -39,7 +39,9 @@ utils::globalVariables(c(
   "tmp_start_ctrl", "tmp_start_scen", "total", "value", "var_value", "x", "y",
   "yearHd", "yearHv", "year_max", "year_min", "years_present", "z_score",
   # pep_quality plot variables
-  "quality_grade", "pct", "completeness_pct", "outlier_pct"
+  "quality_grade", "pct", "completeness_pct", "outlier_pct",
+  # plot.pheno_normals / plot.pheno_anomaly labels
+  "group_label", "facet_label"
 ))
 
 # =============================================================================
@@ -90,7 +92,8 @@ new_pep <- function(x, validate = TRUE) {
   }
 
   # Add class (prepend to preserve data.table inheritance)
-  class(x) <- c("pep", class(x))
+  # Remove any existing "pep" to avoid duplication
+  class(x) <- c("pep", setdiff(class(x), "pep"))
 
   x
 }

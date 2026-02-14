@@ -85,12 +85,11 @@ library(pep725)
 ```
 
 When the package loads, you'll see a startup message with tips on how to get
-data. The package also automatically loads some small auxiliary datasets (like
-global temperature anomalies) that are used by certain functions.
+data.
 
 ## Getting Phenological Data
 
-The **pep725** package offers four ways to obtain data. Understanding which
+The **pep725** package offers five ways to obtain data. Understanding which
 option to use is important for your workflow:
 
 | Option | Best For | Data Size | Internet Required? |

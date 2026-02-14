@@ -19,8 +19,7 @@
 #'   Can be genus name (e.g., "Triticum") or full species (e.g., "Triticum aestivum").
 #'   If \code{NULL} (default), all species in the data are included.
 #' @param phase_id Optional integer vector to filter by BBCH phase codes.
-#'   If \code{NULL} (default
-#' ), all phases in the data are included.
+#'   If \code{NULL} (default), all phases in the data are included.
 #' @param min_years Minimum number of years required to calculate valid normals.
 #'   Default is 20 (WMO standard). Groups with fewer years return \code{NA}.
 #' @param probs Numeric vector of probabilities for percentile calculation.
@@ -131,12 +130,19 @@ pheno_normals <- function(pep,
          call. = FALSE)
   }
 
- # Check that 'by' columns exist
-  missing_by <- setdiff(by, names(pep))
-  if (length(missing_by) > 0) {
-    stop("Column(s) specified in 'by' not found: ",
-         paste(missing_by, collapse = ", "),
-         call. = FALSE)
+  # Normalize by = character(0) to NULL
+  if (is.character(by) && length(by) == 0) {
+    by <- NULL
+  }
+
+  # Check that 'by' columns exist
+  if (!is.null(by)) {
+    missing_by <- setdiff(by, names(pep))
+    if (length(missing_by) > 0) {
+      stop("Column(s) specified in 'by' not found: ",
+           paste(missing_by, collapse = ", "),
+           call. = FALSE)
+    }
   }
 
   # Validate period
@@ -147,6 +153,10 @@ pheno_normals <- function(pep,
   # Validate probs
   if (!is.numeric(probs) || any(probs < 0) || any(probs > 1)) {
     stop("'probs' must be numeric values between 0 and 1", call. = FALSE)
+  }
+  if (length(probs) != 6) {
+    stop("'probs' must have exactly 6 values (mapped to columns q05..q95). ",
+         "Default: c(0.05, 0.10, 0.25, 0.75, 0.90, 0.95)", call. = FALSE)
   }
 
  # Make a copy to avoid modifying original
@@ -394,4 +404,100 @@ summary.pheno_normals <- function(object, ...) {
     n_valid = sum(!is.na(object$mean_doy)),
     period = period
   ))
+}
+
+
+#' Plot Method for Phenological Normals
+#'
+#' Visualise phenological normals as a dot plot with interquartile-range bars
+#' or as a bar chart.
+#'
+#' @param x A \code{pheno_normals} object returned by \code{\link{pheno_normals}}.
+#' @param which Character string selecting the plot type: \code{"dotplot"}
+#'   (default) shows \code{median_doy} with Q25--Q75 range via
+#'   \code{geom_pointrange}; \code{"bar"} shows \code{median_doy} as columns
+#'   with error bars.
+#' @param ... Additional arguments (unused).
+#'
+#' @return A \code{ggplot} object (returned invisibly).
+#'
+#' @examples
+#' \donttest{
+#' pep <- pep_download()
+#' pep_ch <- pep[country == "Switzerland"]
+#'
+#' # Normals by phase for apple
+#' n <- pheno_normals(pep_ch, species = "Malus", by = "phase_id")
+#' plot(n)
+#' plot(n, which = "bar")
+#' }
+#'
+#' @seealso \code{\link{pheno_normals}}, \code{\link{pheno_anomaly}}
+#' @author Matthias Templ
+#' @export
+plot.pheno_normals <- function(x, which = c("dotplot", "bar"), ...) {
+  which <- match.arg(which)
+
+  # Remove rows with NA normals
+  plot_data <- data.table::as.data.table(x)[!is.na(median_doy)]
+
+  if (nrow(plot_data) == 0) {
+    stop("No valid normals to plot", call. = FALSE)
+  }
+
+  # Identify grouping columns
+  stat_cols <- c("n_years", "n_obs", "mean_doy", "median_doy", "sd_doy",
+                 "iqr_doy", "mad_doy", "q05", "q10", "q25", "q75", "q90",
+                 "q95", "period")
+  group_cols <- setdiff(names(plot_data), stat_cols)
+
+  # Build human-readable group label
+  if (length(group_cols) > 0) {
+    for (gc in group_cols) {
+      if (gc == "phase_id") {
+        descs <- .bbch_lookup[as.character(plot_data[[gc]])]
+        descs[is.na(descs)] <- as.character(plot_data[[gc]][is.na(descs)])
+        plot_data[, (gc) := paste0(plot_data[[gc]], " - ", descs)]
+      }
+    }
+    plot_data[, group_label := do.call(paste, c(.SD, sep = " | ")),
+              .SDcols = group_cols]
+  } else {
+    plot_data[, group_label := "All"]
+  }
+
+  # Subtitle from attributes
+  period <- attr(x, "period")
+  subtitle <- if (!is.null(period) && length(period) > 0) {
+    sprintf("Reference period: %d-%d  |  n groups: %d",
+            min(period), max(period), nrow(plot_data))
+  } else {
+    sprintf("n groups: %d", nrow(plot_data))
+  }
+
+  if (which == "dotplot") {
+    p <- ggplot2::ggplot(plot_data,
+                         ggplot2::aes(x = median_doy,
+                                      y = stats::reorder(group_label, median_doy),
+                                      xmin = q25, xmax = q75)) +
+      ggplot2::geom_pointrange(color = "steelblue") +
+      ggplot2::labs(x = "Day of Year", y = NULL,
+                    title = "Phenological Normals",
+                    subtitle = subtitle) +
+      ggplot2::theme_minimal()
+  } else {
+    p <- ggplot2::ggplot(plot_data,
+                         ggplot2::aes(x = stats::reorder(group_label, median_doy),
+                                      y = median_doy)) +
+      ggplot2::geom_col(fill = "steelblue", width = 0.7) +
+      ggplot2::geom_errorbar(ggplot2::aes(ymin = q25, ymax = q75),
+                             width = 0.25) +
+      ggplot2::labs(x = NULL, y = "Day of Year",
+                    title = "Phenological Normals",
+                    subtitle = subtitle) +
+      ggplot2::coord_flip() +
+      ggplot2::theme_minimal()
+  }
+
+  p
 }

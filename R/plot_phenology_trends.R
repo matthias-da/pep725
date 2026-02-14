@@ -288,7 +288,7 @@ plot_phenology_trends <- function(
     ggplot2::geom_line(
       data = pred,
       ggplot2::aes(year, mean_DOY),
-      size = 0.7,
+      linewidth = 0.7,
       linetype = "dashed",
       colour = "red"
     ) +
@@ -304,13 +304,13 @@ plot_phenology_trends <- function(
       xintercept = c(min(calib_years), max(calib_years)),
       linetype = 1,
       colour = "blue",
-      size = 0.5
+      linewidth = 0.5
     ) +
     ggplot2::geom_vline(
       xintercept = c(2066, 2095),
       linetype = 5,
       colour = "red",
-      size = 0.5
+      linewidth = 0.5
     ) +
     ggplot2::annotate(
       "text",

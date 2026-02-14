@@ -1,5 +1,5 @@
 # Prevent R CMD check notes
-utils::globalVariables(c("year", "day", "tau_prog", "tau_retr", "is_turning"))
+utils::globalVariables(c("year", "day", "tau_prog", "tau_retr", "is_turning", "..by"))
 
 #' Detect Trend Turning Points in Phenological Time Series
 #'
@@ -78,18 +78,31 @@ pheno_trend_turning <- function(pep,
                                  min_years = 10,
                                  aggregate = TRUE) {
 
- # Handle numeric vector input
- if (is.numeric(pep) && is.null(dim(pep))) {
+  # Handle numeric vector input
+  if (is.numeric(pep) && is.null(dim(pep))) {
     x <- pep
     if (length(x) < min_years) {
       stop(sprintf("Time series too short: %d values (minimum %d required)",
                    length(x), min_years), call. = FALSE)
     }
-    result <- sequential_mk(x)
-    result$year <- seq_along(x)
+    mk_result <- sequential_mk(x)
+    yearly <- data.table::data.table(
+      year = seq_along(x),
+      median_day = x,
+      n_obs = 1L,
+      tau_prog = mk_result$progressive,
+      tau_retr = mk_result$retrograde,
+      is_turning = mk_result$turning_points
+    )
+    result <- list(
+      results = yearly,
+      turning_points = yearly[is_turning == TRUE, year],
+      n_years = length(x),
+      error = NULL,
+      by = NULL,
+      group_results = NULL
+    )
     class(result) <- c("pheno_turning", "list")
-    attr(result, "n_years") <- length(x)
-    attr(result, "by") <- NULL
     return(result)
   }
 
@@ -165,20 +178,7 @@ pheno_trend_turning <- function(pep,
     group_results <- list()
 
     for (i in seq_len(nrow(groups))) {
-      # Build filter expression
-      filter_expr <- paste(
-        sapply(by, function(col) {
-          val <- groups[[col]][i]
-          if (is.character(val) || is.factor(val)) {
-            sprintf("%s == '%s'", col, as.character(val))
-          } else {
-            sprintf("%s == %s", col, val)
-          }
-        }),
-        collapse = " & "
-      )
-
-      group_data <- pep[eval(parse(text = filter_expr))]
+      group_data <- pep[groups[i, , drop = FALSE], on = by, nomatch = NULL]
       group_label <- paste(sapply(by, function(col) as.character(groups[[col]][i])),
                            collapse = " | ")
 
@@ -282,16 +282,19 @@ sequential_mk <- function(x) {
 }
 
 
-#' Kendall's Normalized Tau
+#' Mann-Kendall Z-Statistic
 #'
-#' Computes Kendall's normalized tau statistic for a time series,
-#' providing a non-parametric measure of monotonic trend.
+#' Computes the Mann-Kendall Z-statistic for a time series,
+#' providing a non-parametric test of monotonic trend. The Z-statistic
+#' is approximately standard normal under the no-trend null hypothesis.
 #'
-#' @param x Numeric vector (time series assumed to be equidistant)
+#' @param x Numeric vector (time series assumed to be equidistant).
+#'   \code{NA} values are silently removed.
 #'
-#' @return Numeric. Kendall's normalized tau statistic.
-#'   Values near +1 indicate increasing trend, -1 decreasing trend,
-#'   0 no trend. Approximately standard normal under no-trend null.
+#' @return Numeric. The Mann-Kendall Z-statistic (\code{S / sqrt(Var(S))}).
+#'   Positive values indicate increasing trend, negative values decreasing.
+#'   Compare against standard normal quantiles (e.g., |Z| > 1.96 for p < 0.05).
+#'   Returns \code{NA} if fewer than 3 non-missing values.
 #'
 #' @examples
 #' # Decreasing trend (earlier phenology)

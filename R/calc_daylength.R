@@ -72,20 +72,21 @@ calc_daylength <- function(doy, lat) {
   # cos(hour_angle) = -tan(lat) * tan(declination)
   cos_hour_angle <- -tan(lat_rad) * tan(declination_rad)
 
-  # Handle polar day/night cases
-  daylength <- numeric(length(cos_hour_angle))
+  # Handle polar day/night and NA cases
+  daylength <- rep(NA_real_, length(cos_hour_angle))
+  not_na <- !is.na(cos_hour_angle)
 
   # Normal case: sun rises and sets
-  normal <- abs(cos_hour_angle) <= 1
+  normal <- not_na & abs(cos_hour_angle) <= 1
   hour_angle <- acos(pmin(pmax(cos_hour_angle, -1), 1))
   daylength[normal] <- 2 * hour_angle[normal] * 12 / pi
 
   # Polar day: sun never sets (cos_hour_angle < -1)
-  polar_day <- cos_hour_angle < -1
+  polar_day <- not_na & cos_hour_angle < -1
   daylength[polar_day] <- 24
 
   # Polar night: sun never rises (cos_hour_angle > 1)
-  polar_night <- cos_hour_angle > 1
+  polar_night <- not_na & cos_hour_angle > 1
   daylength[polar_night] <- 0
 
   # Convert declination to degrees for output
@@ -127,11 +128,7 @@ calc_max_daylength <- function(lat) {
   # Summer solstice is approximately DOY 172 (June 21)
   result <- calc_daylength(172, lat)
 
-  if (is.data.frame(result)) {
-    result$daylength
-  } else {
-    result$daylength
-  }
+  result$daylength
 }
 
 

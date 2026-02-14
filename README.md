@@ -35,7 +35,6 @@ Templ et al. (2018). Pan European Phenological database (PEP725): a single point
 - `pep_completeness()` - Assess species/phase coverage across stations
 - `check_phases()` - Validate phenological phase sequences
 - `flag_outliers()` - Detect outliers (30-day rule, MAD, IQR, z-score)
-- `detect_second_events()` - Identify second flowering or repeated events
 
 **Advanced Analysis:**
 - `pheno_combine()` - Combined time series from multi-station data (robust/mixed/OLS)

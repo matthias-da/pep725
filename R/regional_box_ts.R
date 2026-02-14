@@ -83,10 +83,13 @@ regional_box_ts <- function(
   # pep_species <- pep[species %in% species_name]
 
   if (!is.null(functional_group)) {
-    functional_group <- as.character(functional_group)
-    pep_filtered <- pep[as.character(functional_group) == functional_group]
-    message("Filtering by functional group: ", functional_group)
-    effective_label <- functional_group
+    fg <- as.character(functional_group)
+    if (!"functional_group" %in% names(pep)) {
+      stop("Column 'functional_group' not found in data.", call. = FALSE)
+    }
+    pep_filtered <- pep[as.character(pep$functional_group) == fg]
+    message("Filtering by functional group: ", fg)
+    effective_label <- fg
   } else {
     species_name <- as.character(species_name)
     pep_filtered <- pep[as.character(species) == species_name]

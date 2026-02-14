@@ -2,26 +2,46 @@
 % Please edit documentation in R/simulate_pep.R
 \name{simulate_pep}
 \alias{simulate_pep}
-\title{Simulate synthetic pep data for a given phenology dataset
-keeping station-year-species-phase structure intact}
+\title{Simulate Synthetic PEP Data}
 \usage{
 simulate_pep(pep, min_obs = 20, seed = 42, progress = TRUE)
 }
 \arguments{
-\item{pep}{A data.table with PEP-like structure}
+\item{pep}{A \code{pep} object or \code{data.table} with at least the
+columns \code{species}, \code{phase_id}, \code{s_id}, \code{year}, and
+\code{day}.}
 
-\item{min_obs}{Minimum number of observations to allow simulation per group}
+\item{min_obs}{Integer. Minimum number of observations required per
+station-species-phase group to attempt GAM fitting.
+Groups with fewer observations keep their original \code{day} values
+unchanged. Default is 20.}
 
-\item{seed}{Random seed}
+\item{seed}{Integer. Random seed for reproducibility. Default is 42.}
 
-\item{progress}{Logical. Show progress bar? Default TRUE.}
+\item{progress}{Logical. Show a progress bar? Default \code{TRUE}.}
 }
 \value{
-data.table with same rows as pep, synthetic day values
+A \code{\link[=new_pep]{pep}} object with the same rows and columns
+as the input.  The \code{day} column is overwritten with synthetic values
+for groups that meet the \code{min_obs} threshold; other rows retain their
+original values.
 }
 \description{
-Simulate synthetic pep data for a given phenology dataset
-keeping station-year-species-phase structure intact
+Generates synthetic phenological observations by fitting a GAM smooth
+(\code{day ~ s(year)}) per station-species-phase group and replacing the
+observed \code{day} values with predictions plus Gaussian noise.  The
+station-year-species-phase structure of the input data is kept intact.
+}
+\details{
+For each qualifying group (station x species x phase with at least
+\code{min_obs} observations), a GAM is fitted and synthetic day-of-year
+values are generated as \code{round(predicted + rnorm(n, sd = residual_sd))}.
+
+Groups where the GAM fit fails receive a fallback: the species-phase median
+day plus Gaussian jitter (sd = 5 days).
+
+Groups below the \code{min_obs} threshold are left unchanged.  A message
+reports how many rows were not simulated.
 }
 \examples{
 \dontrun{

@@ -1,6 +1,6 @@
 #' Import and preprocess PEP725 phenological data
 #'
-#' This function imports all CSV files from the folder \code{data/Data_PEP725/},
+#' This function imports all CSV files from the specified folder,
 #' reads them efficiently using \pkg{data.table}, and combines them into a single
 #' data table. It performs several preprocessing steps, including:
 #' \itemize{
@@ -18,7 +18,7 @@
 #' @param path path to the folder containing PEP725 CSV files (default is \code{"data/Data_PEP725_all/"}).
 #' @param flags Logical indicating whether the pep data contains quality control flags (default is \code{FALSE}).
 #' @param add_country Logical indicating whether to add country information based on station coordinates (default is \code{TRUE}).
-#' @return A \code{\link{new_pep}{pep}} object (extends \code{data.table}) containing the combined and preprocessed PEP725 data.
+#' @return A \code{\link[=new_pep]{pep}} object (extends \code{data.table}) containing the combined and preprocessed PEP725 data.
 #' @importFrom rnaturalearth ne_countries
 #' @importFrom sf st_make_valid st_as_sf st_transform st_join st_agr st_agr<-
 #' @seealso \code{\link[data.table]{fread}}, \code{\link[data.table]{rbindlist}}
@@ -32,19 +32,27 @@
 #' }
 #' @export
 pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country = TRUE){
-  # # each csv
-  # ll <- list.files("data/")
-  # for (i in ll[-length(ll)]) {
-  #   assign(gsub(".csv", "", i), read.csv(paste0("data/", i), sep=";"))
-  # }
 
-  # Import all csv files and rbind them
+  # Validate path
+  if (!dir.exists(path)) {
+    stop("Directory does not exist: ", path, call. = FALSE)
+  }
 
-  # get all file paths
+  # Get all CSV file paths
   files <- list.files(path, pattern = "\\.csv$", full.names = TRUE)
 
-  # read and bind them efficiently
-  dt <- rbindlist(lapply(files, fread, fill = TRUE, quote = "",encoding = "UTF-8", na.strings = c("", "NA")))
+  if (length(files) == 0) {
+    stop("No CSV files found in: ", path, call. = FALSE)
+  }
+
+  # Read and bind them efficiently
+  dt <- rbindlist(lapply(files, fread, sep = ";", fill = TRUE, quote = "",
+                         encoding = "UTF-8", na.strings = c("", "NA")))
+
+  if (nrow(dt) == 0) {
+    stop("CSV files in '", path, "' contain no data rows", call. = FALSE)
+  }
+
   dt$provider_id <- factor(dt$provider_id)
   dt$s_id <- factor(dt$s_id)
   dt$gss_id <- factor(dt$gss_id)
@@ -79,19 +87,10 @@ pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country
   ))
 
   if(add_country){
-    # =============================================================
     # Add country information to PEP data using fast spatial join
-    # =============================================================
+    message("Adding country information (add_country = TRUE). This may take 1-3 minutes...")
 
-    warning("adding country information (function argument add_country = TRUE)\n --> this may take a while (1-3 minutes)...")
-    # library(data.table)
-    # library(sf)
-    # library(rnaturalearth)
-    # library(rnaturalearthdata)
-
-    # -------------------------------------------------------------
     # Convert to sf POINT object with WGS84 coordinates
-
     pep_sf <- st_as_sf(
       dt,
       coords = c("lon", "lat"),
@@ -99,32 +98,23 @@ pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country
       remove = FALSE
     )
 
-    # -------------------------------------------------------------
     # Load world country polygons
-
     world <- ne_countries(scale = "medium", returnclass = "sf")[, c("name")]
 
     # Fix invalid geometries (important)
     world <- st_make_valid(world)
 
-    # -------------------------------------------------------------
-    # Transform both dataset and world polygons to a projected
-    # coordinate reference system (CRS 3857 = fast for intersections)
-
+    # Transform both to projected CRS (3857 = fast for intersections)
     pep_sf   <- st_transform(pep_sf, 3857)
     world    <- st_transform(world, 3857)
 
     # Improve join performance (avoid warnings)
     st_agr(world) <- "constant"
 
-    # -------------------------------------------------------------
     # Fast spatial join: assign each point the country polygon
-
     pep_sf_joined <- st_join(pep_sf, world, left = TRUE)
 
-    # -------------------------------------------------------------
     # Convert back to data.table
-
     dt <- as.data.table(pep_sf_joined)
 
     # Remove geometry column (not needed anymore)
@@ -134,7 +124,6 @@ pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country
     setnames(dt, "name", "country")
 
     # Split Germany into south and north
-
     dt[
       country == "Germany" & lat >= 50,
       country := "Germany-North"
@@ -146,8 +135,6 @@ pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country
     ]
   }
 
-
-  # Return as pep class object
-  new_pep(dt, validate = FALSE)
+  # Return as pep class object (validate required columns)
+  new_pep(dt)
 }
-

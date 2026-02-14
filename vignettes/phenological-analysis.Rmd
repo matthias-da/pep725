@@ -141,7 +141,7 @@ print(normals)
 
 | Parameter | What it does | Our choice |
 |-----------|--------------|------------|
-| `pep` | Input data | Wheat observations |
+| `pep` | Input data | Apple observations |
 | `period` | Years to include in normal | 1990-2015 (26 years) |
 | `by` | Grouping variables | Country and phase (separate normals for each) |
 | `min_years` | Minimum years required | 10 (groups with fewer years get NA) |
@@ -171,6 +171,17 @@ and when to use each:
 # Get a summary of the normals
 summary(normals)
 ```
+
+### Visualizing Normals
+
+The `plot()` method shows the median DOY with interquartile range (Q25-Q75) for
+each group:
+
+```{r normals-plot, fig.width=7, fig.height=5}
+plot(normals)
+```
+
+A bar chart variant is also available with `plot(normals, which = "bar")`.
 
 ### Filtering to Specific Phases
 
@@ -367,6 +378,18 @@ flagged as extreme. This corresponds to roughly the most unusual 5% of years
 ```{r anomalies-summary}
 summary(anomalies)
 ```
+
+### Visualizing Anomalies
+
+The `plot()` method shows anomalies over time, coloured by direction (early vs.
+late), with extreme events marked:
+
+```{r anomalies-plot, fig.width=7, fig.height=5}
+plot(anomalies)
+```
+
+A histogram of anomaly magnitudes is available with
+`plot(anomalies, which = "histogram")`.
 
 ### Robust vs. Classical Methods
 
@@ -623,7 +646,7 @@ if (nrow(apple_annual) > 0) {
     apple_annual,
     color_by = "phase",
     smooth = TRUE,
-    title = "Wheat Phenology Trends"
+    title = "Apple Phenology Trends"
   )
 }
 ```

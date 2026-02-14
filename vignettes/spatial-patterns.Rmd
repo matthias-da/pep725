@@ -400,7 +400,7 @@ Different synchrony metrics capture complementary aspects of spatial variability
 | `sd_doy` | Standard deviation of day-of-year | Absolute variability in days | Comparing synchrony across phases or regions |
 | `cv_pct` | (SD/mean) × 100 | Relative variability | Comparing phases with different mean timing |
 | `range_doy` | Maximum minus minimum doy | Total observed spread | Assessing extreme differences |
-| `iqr_doy` | 75th - 25th percentile | Robust measure of spread | Preffered when outliers are present |
+| `iqr_doy` | 75th - 25th percentile | Robust measure of spread | Preferred when outliers are present |
 
 **Interpretation guide:**
 
@@ -639,7 +639,7 @@ Rendering all these points in an interactive map can take long. Restricting the 
 
 ## Static Maps with map_pep()
 
-The `map_pep()` function creates static maps suitable for reporting and publication Two background options are supported:
+The `map_pep()` function creates static maps suitable for reporting and publication. Two background options are supported:
 
 | `background` | Description | API Key Required? |
 |--------------|-------------|-------------------|

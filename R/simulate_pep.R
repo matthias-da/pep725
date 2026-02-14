@@ -1,13 +1,38 @@
 utils::globalVariables(c("med_day", "i.med_day"))
 
-#' Simulate synthetic pep data for a given phenology dataset
-#' keeping station-year-species-phase structure intact
+#' Simulate Synthetic PEP Data
 #'
-#' @param pep A data.table with PEP-like structure
-#' @param min_obs Minimum number of observations to allow simulation per group
-#' @param seed Random seed
-#' @param progress Logical. Show progress bar? Default TRUE.
-#' @return data.table with same rows as pep, synthetic day values
+#' Generates synthetic phenological observations by fitting a GAM smooth
+#' (\code{day ~ s(year)}) per station-species-phase group and replacing the
+#' observed \code{day} values with predictions plus Gaussian noise.  The
+#' station-year-species-phase structure of the input data is kept intact.
+#'
+#' @param pep A \code{pep} object or \code{data.table} with at least the
+#'   columns \code{species}, \code{phase_id}, \code{s_id}, \code{year}, and
+#'   \code{day}.
+#' @param min_obs Integer. Minimum number of observations required per
+#'   station-species-phase group to attempt GAM fitting.
+#'   Groups with fewer observations keep their original \code{day} values
+#'   unchanged. Default is 20.
+#' @param seed Integer. Random seed for reproducibility. Default is 42.
+#' @param progress Logical. Show a progress bar? Default \code{TRUE}.
+#'
+#' @return A \code{\link[=new_pep]{pep}} object with the same rows and columns
+#'   as the input.  The \code{day} column is overwritten with synthetic values
+#'   for groups that meet the \code{min_obs} threshold; other rows retain their
+#'   original values.
+#'
+#' @details
+#' For each qualifying group (station x species x phase with at least
+#' \code{min_obs} observations), a GAM is fitted and synthetic day-of-year
+#' values are generated as \code{round(predicted + rnorm(n, sd = residual_sd))}.
+#'
+#' Groups where the GAM fit fails receive a fallback: the species-phase median
+#' day plus Gaussian jitter (sd = 5 days).
+#'
+#' Groups below the \code{min_obs} threshold are left unchanged.  A message
+#' reports how many rows were not simulated.
+#'
 #' @author Matthias Templ
 #' @export
 #' @examples
@@ -26,16 +51,35 @@ utils::globalVariables(c("med_day", "i.med_day"))
 #'                          by = c("country", "phase_id"))
 #' }
 simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
+
+  # Input validation
+  if (!inherits(pep, "data.frame")) {
+    stop("'pep' must be a data.frame or data.table", call. = FALSE)
+  }
+
+  required_cols <- c("species", "phase_id", "s_id", "year", "day")
+  missing_cols <- setdiff(required_cols, names(pep))
+  if (length(missing_cols) > 0) {
+    stop("Missing required columns: ", paste(missing_cols, collapse = ", "),
+         call. = FALSE)
+  }
+
   set.seed(seed)
   pep <- copy(pep)
   setDT(pep)
 
-  # Output synthetic column
-  pep[, doy_synth := NA_real_]
-
   # Grouping
   groups <- pep[, .N, by = .(species, phase_id, s_id)][N >= min_obs]
   n_groups <- nrow(groups)
+
+  if (n_groups == 0) {
+    warning("No groups have >= ", min_obs,
+            " observations. Returning data unchanged.", call. = FALSE)
+    return(new_pep(pep))
+  }
+
+  # Track how many rows are in qualifying groups
+  n_total <- nrow(pep)
 
   # Init progress bar and time
   if (progress) {
@@ -77,5 +121,16 @@ simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
   pep[is.na(day) & !is.na(med_day), day := round(med_day + rnorm(.N, mean = 0, sd = 5))]
   pep[, med_day := NULL]
 
-  return(pep)
+  # Report coverage
+  all_groups <- pep[, .N, by = .(species, phase_id, s_id)]
+  n_small <- sum(all_groups$N < min_obs)
+  if (n_small > 0) {
+    n_unchanged <- pep[all_groups[N < min_obs], on = .(species, phase_id, s_id), .N]
+    message(sprintf(
+      "Note: %d group(s) had fewer than %d observations. %d row(s) (%.1f%%) retain original day values.",
+      n_small, min_obs, n_unchanged, 100 * n_unchanged / n_total
+    ))
+  }
+
+  new_pep(pep)
 }

@@ -5,7 +5,8 @@
 #' polygons from \pkg{rnaturalearth}. Geometry is handled via \pkg{sf}.
 #'
 #' The input data must contain numeric columns named \code{lat} and \code{lon}
-#' in WGS84 (EPSG:4326).
+#' in WGS84 (EPSG:4326).  Rows with \code{NA} coordinates receive
+#' \code{country = NA}.
 #'
 #' After assigning countries, Germany is automatically split into
 #' \code{"Germany-North"} and \code{"Germany-South"} using a latitude threshold:
@@ -13,6 +14,9 @@
 #'   \item lat >= 50 → \code{"Germany-North"}
 #'   \item lat  < 50 → \code{"Germany-South"}
 #' }
+#'
+#' If the input already contains a \code{country} column it is removed and
+#' replaced by the spatially derived one.
 #'
 #' @param dt A \code{data.frame} or \code{data.table} containing columns
 #'   \code{lat} and \code{lon}.
@@ -38,39 +42,61 @@ add_country <- function(dt, keep_geometry = FALSE) {
 
   # Check input
   if (!("lat" %in% names(dt)) || !("lon" %in% names(dt))) {
-    stop("Input data must contain columns 'lat' and 'lon'.")
+    stop("Input data must contain columns 'lat' and 'lon'.", call. = FALSE)
   }
 
-  suppressWarnings({
-    message("Assigning countries based on coordinates ...")
-  })
-
-  # Load required packages
+  # Check required packages
   if (!requireNamespace("sf", quietly = TRUE))
-    stop("Package 'sf' is required.")
+    stop("Package 'sf' is required. Install it with install.packages('sf').",
+         call. = FALSE)
   if (!requireNamespace("rnaturalearth", quietly = TRUE))
-    stop("Package 'rnaturalearth' is required.")
+    stop("Package 'rnaturalearth' is required. Install it with install.packages('rnaturalearth').",
+         call. = FALSE)
   if (!requireNamespace("rnaturalearthdata", quietly = TRUE))
-    stop("Package 'rnaturalearthdata' is required.")
-  if (!requireNamespace("data.table", quietly = TRUE))
-    stop("Package 'data.table' is required.")
+    stop("Package 'rnaturalearthdata' is required. Install it with install.packages('rnaturalearthdata').",
+         call. = FALSE)
 
-  # Convert to data.table
-  dt <- data.table::as.data.table(dt)
+  message("Assigning countries based on coordinates ...")
 
-  # -------------------------------------------------------------
+  # Convert to data.table (copy to avoid modifying original)
+  dt <- data.table::copy(data.table::as.data.table(dt))
+
+  # Remove pre-existing country column to avoid duplicates
+  if ("country" %in% names(dt)) {
+    dt[, country := NULL]
+  }
+
+  # Handle NA coordinates: set aside rows, join valid rows only
+  has_na_coords <- is.na(dt$lon) | is.na(dt$lat)
+  n_na <- sum(has_na_coords)
+  if (n_na > 0) {
+    message(sprintf("Note: %d row(s) have NA coordinates and will get country = NA.", n_na))
+  }
+
+  if (all(has_na_coords)) {
+    dt[, country := NA_character_]
+    return(dt)
+  }
+
+  # Split into valid and NA-coordinate rows
+  if (n_na > 0) {
+    dt[, .row_idx := .I]
+    dt_valid <- dt[!has_na_coords]
+    dt_na <- dt[has_na_coords]
+    dt_na[, country := NA_character_]
+  } else {
+    dt_valid <- dt
+  }
+
   # Convert to sf POINT object with WGS84 coordinates
-  # -------------------------------------------------------------
   pep_sf <- sf::st_as_sf(
-    dt,
+    dt_valid,
     coords = c("lon", "lat"),
     crs = 4326,
     remove = FALSE
   )
 
-  # -------------------------------------------------------------
   # Load world polygons
-  # -------------------------------------------------------------
   world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")[, c("name")]
   world <- sf::st_make_valid(world)
 
@@ -80,33 +106,37 @@ add_country <- function(dt, keep_geometry = FALSE) {
 
   sf::st_agr(world) <- "constant"
 
-  # -------------------------------------------------------------
   # Spatial join
-  # -------------------------------------------------------------
   pep_joined <- sf::st_join(pep_sf, world, left = TRUE)
 
   # Convert back to data.table
-  dt2 <- data.table::as.data.table(pep_joined)
+  dt_result <- data.table::as.data.table(pep_joined)
 
   # Remove geometry unless requested
   if (!keep_geometry) {
-    dt2[, geometry := NULL]
+    dt_result[, geometry := NULL]
   }
 
-  data.table::setnames(dt2, "name", "country")
+  data.table::setnames(dt_result, "name", "country")
 
-  # -------------------------------------------------------------
+  # Recombine with NA-coordinate rows
+  if (n_na > 0) {
+    dt_result <- data.table::rbindlist(list(dt_result, dt_na),
+                                       use.names = TRUE, fill = TRUE)
+    data.table::setorderv(dt_result, ".row_idx")
+    dt_result[, .row_idx := NULL]
+  }
+
   # Germany split
-  # -------------------------------------------------------------
-  dt2[
+  dt_result[
     country == "Germany" & lat >= 50,
     country := "Germany-North"
   ]
 
-  dt2[
+  dt_result[
     country == "Germany" & lat < 50,
     country := "Germany-South"
   ]
 
-  return(dt2)
+  dt_result
 }
