@@ -28,7 +28,7 @@ on the timing of recurring biological events such as:
 - **Fruit ripening**: The maturation of fruits
 - **Leaf senescence**: Autumn coloring and leaf fall
 
-These phenological phases are are strongly temperature-dependent and respond sensitively to interannual climate variability as well as long-term climate change. As a result, phenological records provide some of the most direct biological evidence of climate impacts on terrestrial ecosystems.
+These phenological phases are strongly temperature-dependent and respond sensitively to interannual climate variability as well as long-term climate change. As a result, phenological records provide some of the most direct biological evidence of climate impacts on terrestrial ecosystems.
 
 ## The PEP725 Database
 
@@ -104,7 +104,7 @@ option to use is important for your workflow:
 
 You might wonder why we use synthetic data instead of real observations. The
 original PEP725 database has usage restrictions that prevent redistribution -
-you must register on pep725.eu website the and accept the data use policy. This creates a problem for
+you must register on the pep725.eu website and accept the data use policy. This creates a problem for
 tutorials and examples that need to be reproducible.
 
 **Synthetic data** solves this problem. It is generated to preserve the
