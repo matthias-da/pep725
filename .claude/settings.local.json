@@ -47,7 +47,10 @@
       "WebFetch(domain:portal.fis.tum.de)",
       "WebFetch(domain:elifesciences.org)",
       "Bash(gh issue comment:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(R CMD build:*)",
+      "Bash(_R_CHECK_FORCE_SUGGESTS_=false R CMD check:*)",
+      "Bash(git status:*)"
     ]
   }
 }
