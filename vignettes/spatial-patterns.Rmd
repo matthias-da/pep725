@@ -412,7 +412,7 @@ The following table provides a rule-of-thumb interpretation of synchrony based o
 
 | SD Value | Interpretation |
 |----------|----------------|
-| < 5 days | Very high synchrony; stations behave very similar |
+| < 5 days | Very high synchrony; stations behave very similarly |
 | 5-10 days | Moderate synchrony; regional pattern dominates |
 | 10-20 days | Low synchrony; local variability is substantial |
 | > 20 days | Very low synchrony; local factors dominate |
@@ -426,7 +426,7 @@ summary(sync)
 An important question in phenological analysis is whether spatial synchrony changes over time.
 
 - **Decreasing synchrony**: means growing spatial heterogeneity, for example due to more variable weather or diverging local conditions.
-- **Increasing synchrony**: suggest stronger regional coherence, potentially driven by a common climate signal overriding local factors
+- **Increasing synchrony**: suggests stronger regional coherence, potentially driven by a common climate signal overriding local factors
 
 ```{r synchrony-trend}
 # Check if trend analysis was performed
@@ -866,6 +866,28 @@ This vignette demonstrated how `pep725` supports spatial phenological analysis t
 
 4. **Mapping is essential** for exploring data, selecting regions, and
    communicating results
+
+## Next Steps
+
+Explore the other vignettes for complementary analyses:
+
+- **Getting Started**: Data access, the `pep` class, and basic exploration
+
+```{r eval = FALSE}
+vignette("getting-started", package = "pep725")
+```
+
+- **Phenological Analysis**: Normals, anomalies, quality assessment, and trends
+
+```{r eval = FALSE}
+vignette("phenological-analysis", package = "pep725")
+```
+
+- **Data Quality & Irregular Events**: Outlier detection and data validation
+
+```{r eval = FALSE}
+vignette("data-quality", package = "pep725")
+```
 
 ---
 
