@@ -1,6 +1,9 @@
 ---
 title: "Spatial Phenological Patterns"
+author: "Matthias Templ"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Spatial Phenological Patterns}
   %\VignetteEngine{knitr::rmarkdown}
@@ -36,7 +39,8 @@ This vignette covers spatial analysis and visualization functions in the
 |---------|--------------|-----------|
 | Part 1: Gradients | How phenology changes with altitude & latitude | `pheno_gradient()` |
 | Part 2: Synchrony | Spatial coherence of phenological events | `pheno_synchrony()` |
-| Part 3: Mapping | Visualizing station networks and patterns | `leaflet_pep()`, `map_pep()` |
+| Part 3: Combined | Integrating gradient and synchrony results | `pheno_gradient()`, `pheno_synchrony()` |
+| Part 4: Mapping | Visualizing station networks and patterns | `leaflet_pep()`, `map_pep()` |
 
 ### Prerequisites
 
@@ -202,10 +206,10 @@ cat("OLS slope:", round(grad_ols$summary$slope, 2), "days/100m\n")
 | Method | Strengths | Weaknesses | When to Use |
 |--------|-----------|------------|-------------|
 | `robust` | Resistant to outliers and leverage points | Slightly lower efficiency under ideal conditions (clean data) | Recommended **default choice** for phenological data |
-| `ols` | Efficient when assumptions are met | Highly sensitive to outliers | Use after  careful data screening |
+| `ols` | Efficient when assumptions are met | Highly sensitive to outliers | Use after careful data screening |
 | `quantile` | Models conditional medians or other quantiles | Less precise estimates (wider confidence intervals) | When focusing on median responses |
 
-**Recommendation**: Start with `method = "robust"`for exploratory and applied analyses. Substantial differences between robust and OLS estimates often indicate influential observations and should prompt further inspection.
+**Recommendation**: Start with `method = "robust"` for exploratory and applied analyses. Substantial differences between robust and OLS estimates often indicate influential observations and should prompt further inspection.
 
 ### Comparing Species: Grapevine Gradient
 
@@ -619,7 +623,7 @@ The interactive map supports multiple selection and inspection tools:
 | **Done button** | Click "Done" to finalize and return selected stations |
 
 The function returns a `data.frame` containing all selected stations with their
-coordinates and metadata for all selected stations, which can be then directly reused in subsequent analysis.
+coordinates and metadata, which can then be directly reused in subsequent analysis.
 
 ### Best Practices for Interactive Mapping
 
