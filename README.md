@@ -8,7 +8,7 @@
 
 pep725: an R package for Pan-European Phenological Data Analysis
 
-**pep725** is an R package for analyzing phenological data from the [PEP725 Pan-European Phenology Database](http://www.pep725.eu/) and other European observational sources. It provides tools for data exploration, quality assessment, climatological baseline calculation, trend analysis, and visualization of phenology-climate relationships.
+**pep725** is an R package for analyzing phenological data from the [PEP725 Pan-European Phenology Database](http://www.pep725.eu/) and beyond. It provides tools for data exploration, quality assessment, climatological baseline calculation, trend analysis and visualization of phenology-climate relationships.
 
 ## Citation
 
