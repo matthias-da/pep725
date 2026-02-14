@@ -1,6 +1,6 @@
-# pep725 0.0.0.901
+# pep725 0.0.1
 
-* Initial JOSS submission on Valentin`s day, 14. February 2026
+* Initial JOSS and CRAN submission on Valentin`s day, 14. February 2026
 * Data access: `pep_download()`, `pep_import()`, `simulate_pep()`
 * Core analysis: `pheno_normals()`, `pheno_anomaly()`, `pheno_gradient()`, `pheno_synchrony()`, `pheno_combine()`, `pheno_trend_turning()`
 * Quality and validation: `pep_quality()`, `pep_completeness()`, `check_phases()`, `flag_outliers()`, `detect_second_events()`
