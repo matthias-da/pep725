@@ -57,3 +57,6 @@ rsconnect/
 .claude/
 CLAUDE.md
 TODO_JOSS_submission.md
+
+# JOSS paper generated output
+paper/paper.html
