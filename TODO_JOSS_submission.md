@@ -26,12 +26,8 @@
 
 ### 2. Add GitHub Actions CI Workflow
 
-- [x] Create `.github/workflows/R-CMD-check.yaml` (created locally)
-- [x] **Update GitHub PAT to include `workflow` scope** - Required to push workflow files
-  - Go to GitHub → Settings → Developer settings → Personal access tokens
-  - Edit token and add `workflow` scope
-  - Then run: `git add .github/workflows/ && git commit -m "Add CI workflows" && git push`
-  - Workflow files backed up at `/tmp/R-CMD-check.yaml.backup` and `/tmp/draft-pdf.yaml.backup`
+- [x] Create `.github/workflows/R-CMD-check.yaml` (created and pushed to remote)
+- [x] **GitHub PAT updated and workflows pushed** - Both `R-CMD-check.yaml` and `draft-pdf.yaml` are live on remote
 
 ```yaml
 name: R-CMD-check
@@ -95,15 +91,12 @@ jobs:
 
 ### Paper Decisions
 
-- [ ] **Example usage section**: Currently commented out (lines 51-83). Decide whether to:
-  - [ ] Include it (~100 extra words; current body is ~896 words, well within 750-1750 limit)
-  - [ ] Keep it commented out
-  - [ ] Move to README/vignettes only
+- [x] **Example usage section**: Uncommented and rewritten as focused quality→gradient workflow (~70 extra words)
 
-- [ ] **Figures**: JOSS papers often include 1-2 figures. Consider adding:
-  - [ ] Example plot output (e.g., gradient analysis, synchrony plot)
-  - [ ] Workflow diagram showing package structure
-  - [ ] Map visualization example
+- [x] **Figures**: Added elevation gradient figure (`paper/figures/gradient_example.png`)
+  - [x] Example plot output (gradient analysis with robust regression)
+  - [ ] Workflow diagram showing package structure (optional)
+  - [ ] Map visualization example (optional)
 
 ### Paper Content Improvements
 
@@ -120,24 +113,24 @@ jobs:
 
 **High priority — will cause rendering failures or reviewer rejection:**
 
-- [ ] **Remove horizontal rules (`---`) between sections** — Lines 43, 49, 85, 93, 101, 109, 119 have `---` separators. JOSS papers should not use horizontal rules; they render as `<hr>` lines in the PDF. Use heading levels only.
-- [ ] **Fix citation syntax in Summary** — Line 39: `(PEP725; @templ2018pep725, @templetal2026a)` uses invalid comma-separated bare citations. Should be `[PEP725; @templ2018pep725; @templetal2026a]` (semicolons inside square brackets).
-- [ ] **Remove logo HTML from paper body** — Lines 32-34: `<p align="center"><img ...>` won't render in JOSS PDF (Pandoc → LaTeX pipeline). The logo belongs in the repository README only.
-- [ ] **Fix Thackeray2016 "et al." in paper.bib** — Line 39: `author = {Thackeray, S. J. et al.}` will render literally. BibTeX must list actual author names (the paper has 47 authors; include at least the first 5-10).
-- [ ] **Fix DOI format in Parmesan2006** — paper.bib line 24: `doi = "https://doi.org/10.1146/..."` includes the full URL. The `doi` field should contain only the identifier (`10.1146/annurev.ecolsys.37.091305.110100`). Most styles auto-prepend the URL, so this produces a doubled link.
-- [ ] **Fix wrong parameter names in commented-out Example usage** — Lines 51-83: `ref_period` → `period`, `gradient_var` → `variable`. If this section is uncommented, the code will not work.
-- [ ] **Fix `volume = {online}` in templetal2026a** — paper.bib line 64: renders as volume "online". Either remove the `volume` field or use `note = {Advance online publication}`.
+- [x] **Remove horizontal rules (`---`) between sections** — Removed all 7 `---` separators.
+- [x] **Fix citation syntax in Summary** — Fixed to `[PEP725; @templ2018pep725; @templ2026pep725]` (semicolons inside square brackets).
+- [x] **Remove logo HTML from paper body** — Removed; logo kept in README only.
+- [x] **Fix Thackeray2016 "et al." in paper.bib** — Replaced with all 31 actual author names.
+- [x] **Fix DOI format in Parmesan2006** — Removed URL prefix; now contains only DOI identifier.
+- [x] **Fix wrong parameter names in commented-out Example usage** — Fixed `ref_period` → `period`, `gradient_var` → `variable`, added `species` to `pheno_synchrony()`.
+- [x] **Fix `volume = {online}` in templetal2026a** — Removed `volume` field; added `note = {Advance online publication}`.
 
 **Medium priority — reviewers would flag:**
 
-- [ ] **Change R package bib entries from `@article` to `@manual`** — Entries: `tschurr2025dymep`, `tanigu2025phenolocrop`, `phenesse2025`, `Schaberpheno2026`, `Gomezsephora2024`, `Langephenex2017`, `phenomap2020` use `@article` with `journal = {R package version X.Y.Z}`. Should be `@manual` or `@misc`.
-- [ ] **Update stale "January 2023" date in research impact** — Line 105: "which as of January 2023 had contributed to at least 115 peer-reviewed publications" is 3 years stale for a Feb 2026 submission. Update with most recent count from @templetal2026a.
-- [ ] **Clean up Parmesan2006 bib entry** — (1) Six duplicate `keywords` fields (only last is used); combine into one. (2) Full abstract embedded — remove. (3) Non-standard `type = "Journal Article"` field — remove.
+- [x] **Change R package bib entries from `@article` to `@manual`** — Changed 7 entries to `@manual`.
+- [x] **Update stale "January 2023" date in research impact** — Updated to "more than 115 peer-reviewed publications".
+- [x] **Clean up Parmesan2006 bib entry** — Removed 6 duplicate `keywords` fields, abstract, and `type` field.
 
 **Low priority — polish:**
 
-- [ ] **Standardize BibTeX key naming** — Mixed conventions (`Piao2019`, `templ2018pep725`, `luedeling2012chillR`, `Schaberpheno2026`). Adopt consistent scheme.
-- [ ] **Shorten AI usage disclosure** — Current 3-paragraph disclosure (lines 111-117) is verbose. A concise 1-2 sentence statement would suffice for JOSS.
+- [x] **Standardize BibTeX key naming** — All 11 inconsistent keys standardized to `author_year_keyword` format.
+- [x] **Shorten AI usage disclosure** — Reduced from 3 paragraphs to 2 sentences.
 
 ### Paper Technical Checks
 
@@ -217,17 +210,17 @@ Current: ~896 body words (limit: 750-1750)
 |------|--------|----------|
 | 6-month development history | ⏳ Waiting (July 2026) | Blocker |
 | testthat tests | ✅ Done (95 tests passing) | High |
-| GitHub Actions CI | ⚠️ Created locally, needs PAT update to push | High |
+| GitHub Actions CI | ✅ Pushed to remote | High |
 | CONTRIBUTING.md | ✅ Done | High |
 | CODE_OF_CONDUCT.md | ✅ Done | Medium |
-| Paper format (paper.md) | ❌ Not started | Medium |
+| Paper format (paper.md) | ✅ Done (renamed & converted) | Medium |
 | Paper date format | ✅ Done | Low |
-| JOSS PDF workflow | ⚠️ Created locally, needs PAT update to push | Medium |
+| JOSS PDF workflow | ✅ Pushed to remote | Medium |
 | README badge | ✅ Done | Low |
 | NEWS.md | ✅ Done | Low |
 | **Paper Content** | | |
-| Example usage decision | ❓ Needs decision | Medium |
-| Add figures to paper | ❓ Needs decision | Medium |
+| Example usage decision | ✅ Included (quality→gradient) | Medium |
+| Add figures to paper | ✅ Done (gradient figure) | Medium |
 | Research impact specifics | ✅ Done (Fu 2015, Menzel 2020) | Medium |
 | Logo image check | ✅ Verified (exists) | Low |
 | Bibliography DOI verification | ✅ All 11 DOIs valid (except opedal) | Low |
@@ -235,18 +228,18 @@ Current: ~896 body words (limit: 750-1750)
 | ROR identifiers check | ✅ Fixed | Low |
 | Fix opedal2024advancing ref | ❌ Fabricated reference | **High** |
 | **Paper Formatting (2026-02-14)** | | |
-| Remove `---` horizontal rules | ❌ 7 occurrences | **High** |
-| Fix citation syntax (Summary) | ❌ Invalid comma-separated bare `@` | **High** |
-| Remove logo HTML from paper | ❌ Won't render in JOSS PDF | **High** |
-| Fix Thackeray2016 "et al." | ❌ Must list real authors | **High** |
-| Fix DOI format (Parmesan2006) | ❌ Full URL in `doi` field | **High** |
-| Fix example parameter names | ❌ `ref_period`/`gradient_var` wrong | **High** |
-| Fix `volume = {online}` | ❌ Renders literally | **High** |
-| R package bib: `@article`→`@manual` | ❌ 7 entries | Medium |
-| Update stale "Jan 2023" date | ❌ 3 years old | Medium |
-| Clean up Parmesan2006 bib entry | ❌ Dup keywords, abstract, type | Medium |
-| Standardize BibTeX key naming | ❌ Mixed conventions | Low |
-| Shorten AI disclosure | ❌ 3 paragraphs → 1-2 sentences | Low |
+| Remove `---` horizontal rules | ✅ Done | **High** |
+| Fix citation syntax (Summary) | ✅ Done | **High** |
+| Remove logo HTML from paper | ✅ Done | **High** |
+| Fix Thackeray2016 "et al." | ✅ Done (31 authors) | **High** |
+| Fix DOI format (Parmesan2006) | ✅ Done | **High** |
+| Fix example parameter names | ✅ Done | **High** |
+| Fix `volume = {online}` | ✅ Done | **High** |
+| R package bib: `@article`→`@manual` | ✅ Done (7 entries) | Medium |
+| Update stale "Jan 2023" date | ✅ Done | Medium |
+| Clean up Parmesan2006 bib entry | ✅ Done | Medium |
+| Standardize BibTeX key naming | ✅ Done | Low |
+| Shorten AI disclosure | ✅ Done | Low |
 | **GitHub Issues** | | |
 | Open issues | 13 open | Various |
 | **R CMD Check** | | |
@@ -445,6 +438,6 @@ All 45 exported functions grouped by category. For each, verify: runs without er
 - [x] Bibliography file (paper.bib)
 - [x] Paper date format fixed (4 February 2026)
 - [x] Paper affiliation format fixed (quoted strings)
-- [x] JOSS PDF compilation workflow (`.github/workflows/draft-pdf.yaml`) - created locally, needs PAT update
-- [x] R CMD check CI workflow (`.github/workflows/R-CMD-check.yaml`) - created locally, needs PAT update
+- [x] JOSS PDF compilation workflow (`.github/workflows/draft-pdf.yaml`) - pushed to remote
+- [x] R CMD check CI workflow (`.github/workflows/R-CMD-check.yaml`) - pushed to remote
 - [x] CONTRIBUTING.md with community guidelines

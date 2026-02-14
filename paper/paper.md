@@ -39,40 +39,27 @@ The **pep725** R package provides a coherent framework for the spatio-temporal a
 
 Ground-based phenological datasets pose distinct analytical challenges: observation density varies across regions, long-term records are often incomplete, and data quality differs among contributors and time periods. Without explicit diagnostics and spatial characterization, such heterogeneity can bias spatial comparisons, trend analyses, and downstream model calibration. The **pep725** package addresses these challenges by providing a dedicated framework for characterizing station-based phenological datasets prior to modeling, separating data diagnostics from downstream inference to enable more robust and reproducible analyses.
 
-<!-- Example usage section commented out to meet JOSS word limit
 # Example usage
 
-The following code demonstrates a typical workflow for analyzing phenological gradients using **pep725**:
+The following example illustrates the quality-first workflow that **pep725** is designed to support: assess station-level data quality before estimating a spatial gradient.
 
 ```r
 library(pep725)
-
-# Download synthetic PEP data (or use pep_import() for real data)
 pep <- pep_download()
 
-# Subset to Alpine region and apple flowering
-pep_alpine <- pep[country %in% c("Switzerland", "Austria") &
-                  species == "Malus domestica"]
+# Alpine apple flowering
+apple <- pep[species == "Malus domestica" &
+             country %in% c("Switzerland", "Austria")]
 
-# Assess data quality
-quality <- pep_quality(pep_alpine, by = c("s_id", "phase_id"))
+# Grade each station's record quality (A-D)
+quality <- pep_quality(apple, by = c("s_id", "phase_id"))
 summary(quality)
 
-# Compute phenological normals (1991-2020 baseline)
-normals <- pheno_normals(pep_alpine, phase_id = 65,
-                         period = 1991:2020)
-
-# Analyze elevation gradient
-gradient <- pheno_gradient(pep_alpine, phase_id = 65,
-                           variable = "alt")
-plot(gradient)
-
-# Quantify spatial synchrony
-sync <- pheno_synchrony(pep_alpine, species = "Malus domestica",
-                        phase_id = 65)
-summary(sync)
+# Elevation gradient for flowering (BBCH 60), robust regression
+gradient <- pheno_gradient(apple, phase_id = 60,
+                           variable = "alt", method = "robust")
+plot(gradient)  # cf. Fig. 1
 ```
--->
 
 # State of the field
 
