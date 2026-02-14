@@ -43,9 +43,9 @@ The following sections introduce practical tools in pep725 package for diagnosin
 
 | Section | Topic | Key Functions |
 |---------|-------|---------------|
-| Part 1 | Detecting statistical outliers | `flag_outliers()`, `plot_outliers()` |
+| Part 1 | Detecting statistical outliers | `pep_flag_outliers()`, `pep_plot_outliers()` |
 | Part 2 | Temporal coverage and completeness | `pep_completeness()` |
-| Part 3 | Phase presence validation | `check_phases()` |
+| Part 3 | Phase presence validation | `pep_check_phases()` |
 | Part 4 | Integrated workflow | Combining all approaches |
 
 ### Prerequisites
@@ -98,7 +98,7 @@ others are scientifically valuable observations of unusual events.
 
 ## Statistical Methods for Outlier Detection
 
-The `flag_outliers()` function provides four statistical methods for identifying
+The `pep_flag_outliers()` function provides four statistical methods for identifying
 potential outliers. Each method has different assumptions and strengths:
 
 ### Method 1: 30-Day Rule (Simple Threshold)
@@ -108,7 +108,7 @@ for that species/phase combination.
 
 ```{r flag-basic}
 # Flag outliers using the default 30-day rule
-outliers <- flag_outliers(
+outliers <- pep_flag_outliers(
   pep = flowering,
   method = "30day",
   by = c("species", "phase_id")
@@ -149,7 +149,7 @@ mean-based methods.
 
 ```{r flag-methods, eval=FALSE}
 # MAD method: flag if > 3 MAD from median (robust)
-outliers_mad <- flag_outliers(flowering, method = "mad", threshold = 3)
+outliers_mad <- pep_flag_outliers(flowering, method = "mad", threshold = 3)
 ```
 
 **Why MAD is recommended:**
@@ -166,7 +166,7 @@ The IQR method uses quartiles and is familiar from boxplot "whiskers":
 
 ```{r iqr-method, eval=FALSE}
 # IQR method: flag if outside 1.5 * IQR (standard boxplot rule)
-outliers_iqr <- flag_outliers(flowering, method = "iqr", threshold = 1.5)
+outliers_iqr <- pep_flag_outliers(flowering, method = "iqr", threshold = 1.5)
 ```
 
 **How it works:**
@@ -180,7 +180,7 @@ The z-score method assumes normally distributed data:
 
 ```{r zscore-method, eval=FALSE}
 # Z-score method: flag if |z| > 3 (assumes normal distribution)
-outliers_zscore <- flag_outliers(flowering, method = "zscore", threshold = 3)
+outliers_zscore <- pep_flag_outliers(flowering, method = "zscore", threshold = 3)
 ```
 
 **Caution**: The z-score method is sensitive to existing outliers. If your data
@@ -212,7 +212,7 @@ or data quality:
 vine_flowering <- pep[species == "Vitis vinifera" & phase_id %in% c(60, 65)]
 
 if (nrow(vine_flowering) > 0) {
-  outliers_vine <- flag_outliers(
+  outliers_vine <- pep_flag_outliers(
     pep = vine_flowering,
     method = "30day",
     by = c("species", "phase_id")
@@ -229,7 +229,7 @@ if (nrow(vine_flowering) > 0) {
 ## Visualizing Outliers
 
 Visual inspection is essential for understanding outlier patterns. The
-`plot_outliers()` function provides four visualization types:
+`pep_plot_outliers()` function provides four visualization types:
 
 ### 1. Overview Plot
 
@@ -237,7 +237,7 @@ Shows the big picture: how many outliers, which species/phases are affected:
 
 ```{r plot-overview, fig.height=6}
 # Overview of outlier patterns
-plot_outliers(outliers, type = "overview")
+pep_plot_outliers(outliers, type = "overview")
 ```
 
 **What to look for:**
@@ -251,7 +251,7 @@ When in the year do outliers occur?
 
 ```{r plot-seasonal, fig.height=5}
 # When do outliers occur in the year?
-plot_outliers(outliers, type = "seasonal")
+pep_plot_outliers(outliers, type = "seasonal")
 ```
 
 **Interpretation guide:**
@@ -269,7 +269,7 @@ See outliers alongside normal observations:
 
 ```{r plot-detail, fig.height=5}
 # See outliers in context of all observations
-plot_outliers(outliers, type = "detail", n_top = 15)
+pep_plot_outliers(outliers, type = "detail", n_top = 15)
 ```
 
 **This plot shows:**
@@ -283,7 +283,7 @@ Where are outliers located?
 
 ```{r plot-map, fig.height=5}
 # Where are outliers located?
-plot_outliers(outliers, type = "map")
+pep_plot_outliers(outliers, type = "map")
 ```
 
 **What to look for:**
@@ -398,7 +398,7 @@ plot(completeness)
 ## Why Check Phase Presence?
 
 Before starting an analysis, it's important to verify that your data contains
-the phenological phases you need. The `check_phases()` function validates that
+the phenological phases you need. The `pep_check_phases()` function validates that
 expected BBCH phase codes are present in your data.
 
 **Common questions this helps answer:**
@@ -413,7 +413,7 @@ expected BBCH phase codes are present in your data.
 # Check if expected phases are present for apple
 apple <- pep[species == "Malus domestica"]
 
-phase_check <- check_phases(
+phase_check <- pep_check_phases(
   pep = apple,
   expected = c(60, 65, 87)  # flowering, full flowering, fruit maturity
 )
@@ -439,7 +439,7 @@ To check phase presence across multiple species at once:
 
 ```{r check-multi}
 # Check phases for multiple species
-multi_check <- check_phases_multi(
+multi_check <- pep_check_phases_multi(
   pep = pep,
   species_list = c("Malus domestica", "Vitis vinifera"),
   expected = c(60, 65, 87)
@@ -482,7 +482,7 @@ cat("Kept", length(good_stations), "stations with >= 50% completeness\n")
 # ══════════════════════════════════════════════════════════════════════════════
 # Why: Identify observations that deviate from expected patterns
 
-outliers_wf <- flag_outliers(fl_filtered, method = "mad", threshold = 3)
+outliers_wf <- pep_flag_outliers(fl_filtered, method = "mad", threshold = 3)
 
 cat("Flagged", sum(outliers_wf$is_outlier), "outliers",
     "(", round(100 * mean(outliers_wf$is_outlier), 1), "% )\n")
@@ -583,13 +583,13 @@ Data Quality Control:
 
 ## For Phase Presence Checking
 
-1. **Check early**: Run `check_phases()` at the start of your analysis to
+1. **Check early**: Run `pep_check_phases()` at the start of your analysis to
    verify required phases are available in your data.
 
 2. **Know required phases**: Different analyses need different phases -
    know which BBCH codes you need before starting.
 
-3. **Check across species**: Use `check_phases_multi()` to verify data
+3. **Check across species**: Use `pep_check_phases_multi()` to verify data
    availability for all species you plan to analyze.
 
 ---
@@ -600,10 +600,10 @@ This vignette covered data quality tools for phenological analysis:
 
 | Function | Purpose | Key Output |
 |----------|---------|------------|
-| `flag_outliers()` | Identify unusual observations | `is_outlier` flag, `deviation` in days |
-| `plot_outliers()` | Visualize outlier patterns | Four plot types: overview, seasonal, detail, map |
+| `pep_flag_outliers()` | Identify unusual observations | `is_outlier` flag, `deviation` in days |
+| `pep_plot_outliers()` | Visualize outlier patterns | Four plot types: overview, seasonal, detail, map |
 | `pep_completeness()` | Assess temporal coverage | Completeness %, gaps, year range |
-| `check_phases()` | Check phase presence | Missing phases, observation counts |
+| `pep_check_phases()` | Check phase presence | Missing phases, observation counts |
 
 ### Key Take-Home Messages
 

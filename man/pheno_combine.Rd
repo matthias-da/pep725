@@ -110,7 +110,7 @@ of phenological time series and outlier detection. Tree Physiology 22:973-982.
 \seealso{
 \code{\link{pheno_normals}} for climatological baselines,
 \code{\link{pheno_trend_turning}} for trend turning point detection,
-\code{\link{check_connectivity}} for connectivity assessment
+\code{\link{pep_check_connectivity}} for connectivity assessment
 }
 \author{
 Matthias Templ

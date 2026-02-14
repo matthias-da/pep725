@@ -12,7 +12,7 @@ pheno_plot_hh(
 )
 }
 \arguments{
-\item{data_list}{A named list returned by \code{\link{regional_box_ts_heading_harvest}},
+\item{data_list}{A named list returned by \code{\link{pheno_regional_hh}},
 containing \code{ts_tidy}.}
 
 \item{phase_select}{Character. Optional filter for a specific phenological phase
@@ -36,13 +36,13 @@ with month labels on the y-axis for easier interpretation.
 \examples{
 \dontrun{
 pep <- pep_download()
-out <- regional_box_ts_heading_harvest(pep,
+out <- pheno_regional_hh(pep,
          species_name = "Triticum aestivum")
 pheno_plot_hh(out)
 }
 }
 \seealso{
-\code{\link{regional_box_ts_heading_harvest}}
+\code{\link{pheno_regional_hh}}
 }
 \author{
 Matthias Templ

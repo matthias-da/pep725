@@ -68,7 +68,7 @@ pep <- pep_download(force = TRUE)
 
 }
 \seealso{
-\code{\link{simulate_pep}} for creating your own synthetic data,
+\code{\link{pep_simulate}} for creating your own synthetic data,
 \code{\link{pep_import}} for importing real PEP725 data
 }
 \author{

@@ -8,7 +8,7 @@ pheno_plot(data_list, alpha_lines = 0.6, linewidth = 0.7)
 }
 \arguments{
 \item{data_list}{A named list of prepared data objects, typically output from
-\code{\link{regional_box_ts}}. Must contain element \code{ts_tidy}.}
+\code{\link{pheno_regional}}. Must contain element \code{ts_tidy}.}
 
 \item{alpha_lines}{Alpha transparency for time series lines (default is \code{0.6}).}
 
@@ -28,13 +28,13 @@ This function visualizes DOY trends with faceting by phenophase and spatial scop
 \dontrun{
 pep <- pep_download()
 # Requires GISS temperature anomaly data
-# out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 10)
+# out <- pheno_regional(pep, giss, species_name = "Triticum aestivum", phase = 10)
 # pheno_plot(out)
 }
 
 }
 \seealso{
-\code{\link{regional_box_ts}}
+\code{\link{pheno_regional}}
 }
 \author{
 Matthias Templ

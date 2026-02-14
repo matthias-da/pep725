@@ -89,7 +89,7 @@ utils::globalVariables(c("year", "day", "s_id", "station", "year_effect",
 #' @seealso
 #' \code{\link{pheno_normals}} for climatological baselines,
 #' \code{\link{pheno_trend_turning}} for trend turning point detection,
-#' \code{\link{check_connectivity}} for connectivity assessment
+#' \code{\link{pep_check_connectivity}} for connectivity assessment
 #'
 #' @author Matthias Templ
 #' @export
@@ -523,7 +523,7 @@ check_connectivity_internal <- function(dt) {
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' conn <- check_connectivity(pep)
+#' conn <- pep_check_connectivity(pep)
 #' if (!conn$is_connected) {
 #'   warning("Data has ", conn$n_sets, " disconnected sets")
 #' }
@@ -532,7 +532,7 @@ check_connectivity_internal <- function(dt) {
 #' @seealso \code{\link{pheno_combine}} which uses this internally
 #' @author Matthias Templ
 #' @export
-check_connectivity <- function(pep, by = NULL) {
+pep_check_connectivity <- function(pep, by = NULL) {
   if (!inherits(pep, "data.table")) {
     pep <- data.table::as.data.table(pep)
   }

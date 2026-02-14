@@ -3,7 +3,7 @@
 #' Visualizes phenological time series for heading and harvest phases,
 #' comparing aggregated and spatially filtered PEP725 data.
 #'
-#' @param data_list A named list returned by \code{\link{regional_box_ts_heading_harvest}},
+#' @param data_list A named list returned by \code{\link{pheno_regional_hh}},
 #'   containing \code{ts_tidy}.
 #' @param phase_select Character. Optional filter for a specific phenological phase
 #'   (e.g., "Heading", "Harvest"). If NULL, all phases are shown.
@@ -18,12 +18,12 @@
 #'
 #' @importFrom ggplot2 ggplot aes geom_line facet_grid labs theme_bw theme scale_linetype_manual scale_y_continuous
 #'
-#' @seealso \code{\link{regional_box_ts_heading_harvest}}
+#' @seealso \code{\link{pheno_regional_hh}}
 #'
 #' @examples
 #' \dontrun{
 #' pep <- pep_download()
-#' out <- regional_box_ts_heading_harvest(pep,
+#' out <- pheno_regional_hh(pep,
 #'          species_name = "Triticum aestivum")
 #' pheno_plot_hh(out)
 #' }
@@ -49,7 +49,7 @@ pheno_plot_hh <- function(
   ts_tidy <- data_list$ts_tidy
 
   if (is.null(ts_tidy)) {
-    stop("data_list must contain 'ts_tidy'. Use regional_box_ts_heading_harvest() to prepare data.")
+    stop("data_list must contain 'ts_tidy'. Use pheno_regional_hh() to prepare data.")
   }
 
   # Filter by phase if specified

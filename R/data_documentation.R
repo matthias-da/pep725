@@ -1,6 +1,6 @@
 #' Minimal Seed Dataset for Synthetic Data Generation
 #'
-#' A small subset of phenological data suitable for use with \code{\link{simulate_pep}}
+#' A small subset of phenological data suitable for use with \code{\link{pep_simulate}}
 #' to generate synthetic phenological datasets. This dataset contains real structure
 #' but limited scope, making it suitable for package examples and testing.
 #'
@@ -42,13 +42,13 @@
 #' # Examine structure
 #' str(pep_seed)
 #'
-#' # Use with simulate_pep to create synthetic data
+#' # Use with pep_simulate to create synthetic data
 #' \donttest{
-#' pep_synthetic <- simulate_pep(pep_seed)
+#' pep_synthetic <- pep_simulate(pep_seed)
 #' }
 #'
 #' @seealso
-#' \code{\link{simulate_pep}} for generating synthetic data,
+#' \code{\link{pep_simulate}} for generating synthetic data,
 #' \code{\link{pep_download}} for downloading full synthetic dataset
 #'
 #' @name pep_seed

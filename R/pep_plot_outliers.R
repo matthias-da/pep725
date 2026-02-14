@@ -12,7 +12,7 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #' biologically meaningful extreme events (e.g., second flowering). Multiple
 #' plot types reveal different aspects of outlier patterns.
 #'
-#' @param x A \code{pep_outliers} object from \code{\link{flag_outliers}}.
+#' @param x A \code{pep_outliers} object from \code{\link{pep_flag_outliers}}.
 #' @param type Character. Type of plot to produce:
 #'   \describe{
 #'     \item{"overview"}{(Default) Multi-panel overview with distribution,
@@ -62,31 +62,31 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #'
 #' # Use Swiss subset for faster outlier detection
 #' pep_ch <- pep[country == "Switzerland"]
-#' pep_flagged <- flag_outliers(pep_ch)
+#' pep_flagged <- pep_flag_outliers(pep_ch)
 #'
 #' # Overview of all outliers
-#' plot_outliers(pep_flagged, type = "overview")
+#' pep_plot_outliers(pep_flagged, type = "overview")
 #'
 #' # Seasonal distribution - look for autumn outliers in flowering phases
-#' plot_outliers(pep_flagged, type = "seasonal", phase_id = c(60, 65))
+#' pep_plot_outliers(pep_flagged, type = "seasonal", phase_id = c(60, 65))
 #'
 #' # Geographic pattern
-#' plot_outliers(pep_flagged, type = "map")
+#' pep_plot_outliers(pep_flagged, type = "map")
 #'
 #' # Detailed view of most extreme outliers
-#' plot_outliers(pep_flagged, type = "detail", n_top = 30)
+#' pep_plot_outliers(pep_flagged, type = "detail", n_top = 30)
 #'
 #' # DOY context for flowering phase - spot potential second flowering
-#' plot_outliers(pep_flagged, type = "doy_context", phase_id = 65)
+#' pep_plot_outliers(pep_flagged, type = "doy_context", phase_id = 65)
 #' }
 #'
-#' @seealso \code{\link{flag_outliers}} for detecting outliers,
+#' @seealso \code{\link{pep_flag_outliers}} for detecting outliers,
 #'   \code{\link{pep_quality}} for comprehensive quality assessment
 #'
 #' @author Matthias Templ
 #' @export
 #' @import ggplot2
-plot_outliers <- function(x,
+pep_plot_outliers <- function(x,
                           type = c("overview", "seasonal", "map", "detail",
                                    "station", "doy_context"),
                           phase_id = NULL,
@@ -100,7 +100,7 @@ plot_outliers <- function(x,
   # Validate input
 
   if (!inherits(x, "pep_outliers")) {
-    stop("'x' must be a pep_outliers object from flag_outliers()", call. = FALSE)
+    stop("'x' must be a pep_outliers object from pep_flag_outliers()", call. = FALSE)
   }
 
   # Get attributes
@@ -149,42 +149,42 @@ plot_outliers <- function(x,
   # Plot type: OVERVIEW
   # ============================================================
   if (type == "overview") {
-    return(plot_outliers_overview(dt, method, threshold, late_threshold))
+    return(pep_plot_outliers_overview(dt, method, threshold, late_threshold))
   }
 
   # ============================================================
   # Plot type: SEASONAL
   # ============================================================
   if (type == "seasonal") {
-    return(plot_outliers_seasonal(dt, late_threshold))
+    return(pep_plot_outliers_seasonal(dt, late_threshold))
   }
 
   # ============================================================
   # Plot type: MAP
   # ============================================================
   if (type == "map") {
-    return(plot_outliers_map(dt))
+    return(pep_plot_outliers_map(dt))
   }
 
   # ============================================================
   # Plot type: DETAIL
   # ============================================================
   if (type == "detail") {
-    return(plot_outliers_detail(dt, n_top))
+    return(pep_plot_outliers_detail(dt, n_top))
   }
 
   # ============================================================
   # Plot type: STATION
   # ============================================================
   if (type == "station") {
-    return(plot_outliers_station(dt))
+    return(pep_plot_outliers_station(dt))
   }
 
   # ============================================================
   # Plot type: DOY_CONTEXT
   # ============================================================
   if (type == "doy_context") {
-    return(plot_outliers_doy_context(dt, late_threshold))
+    return(pep_plot_outliers_doy_context(dt, late_threshold))
   }
 }
 
@@ -194,7 +194,7 @@ plot_outliers <- function(x,
 # ============================================================
 
 #' @keywords internal
-plot_outliers_overview <- function(dt, method, threshold, late_threshold) {
+pep_plot_outliers_overview <- function(dt, method, threshold, late_threshold) {
 
   # Calculate summary statistics
   n_total <- nrow(dt)
@@ -301,7 +301,7 @@ plot_outliers_overview <- function(dt, method, threshold, late_threshold) {
 
 
 #' @keywords internal
-plot_outliers_seasonal <- function(dt, late_threshold) {
+pep_plot_outliers_seasonal <- function(dt, late_threshold) {
 
   outliers_only <- dt[is_outlier == TRUE]
 
@@ -342,7 +342,7 @@ plot_outliers_seasonal <- function(dt, late_threshold) {
 
 
 #' @keywords internal
-plot_outliers_map <- function(dt) {
+pep_plot_outliers_map <- function(dt) {
 
   if (!all(c("lon", "lat") %in% names(dt))) {
     stop("Map plot requires 'lon' and 'lat' columns", call. = FALSE)
@@ -382,7 +382,7 @@ plot_outliers_map <- function(dt) {
 
 
 #' @keywords internal
-plot_outliers_detail <- function(dt, n_top) {
+pep_plot_outliers_detail <- function(dt, n_top) {
 
   outliers_only <- dt[is_outlier == TRUE]
 
@@ -435,7 +435,7 @@ plot_outliers_detail <- function(dt, n_top) {
 
 
 #' @keywords internal
-plot_outliers_station <- function(dt) {
+pep_plot_outliers_station <- function(dt) {
 
   if (!all(c("year", "s_id") %in% names(dt))) {
     stop("Station plot requires 'year' and 's_id' columns", call. = FALSE)
@@ -472,7 +472,7 @@ plot_outliers_station <- function(dt) {
 
 
 #' @keywords internal
-plot_outliers_doy_context <- function(dt, late_threshold) {
+pep_plot_outliers_doy_context <- function(dt, late_threshold) {
 
   # Show full DOY distribution with outliers marked
   p <- ggplot(dt, aes(x = day)) +

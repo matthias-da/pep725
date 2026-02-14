@@ -121,8 +121,8 @@ pep725_demo <- function(which = "all", pause = interactive()) {
 
     wait("\nPress [Enter] to see data coverage...")
 
-    cat("\n>>> coverage(pep)\n\n")
-    cov <- coverage(pep)
+    cat("\n>>> pep_coverage(pep)\n\n")
+    cov <- pep_coverage(pep)
 
     results$class <- list(summary_species = s1, summary_phase = s2, coverage = cov)
 
@@ -304,7 +304,7 @@ pep725_demo <- function(which = "all", pause = interactive()) {
 * pep_download()     - Download synthetic PEP725 data
 * print(pep)         - Smart data overview
 * summary(pep)       - Detailed summaries by species/phase/country
-* coverage(pep)      - Assess data coverage
+* pep_coverage(pep)  - Assess data coverage
 * plot(pep)          - Quick visualizations (map, histogram, timeseries)
 * pheno_normals()    - Calculate climatological baselines
 * pheno_anomaly()    - Detect deviations from normal

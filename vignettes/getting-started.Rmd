@@ -167,12 +167,12 @@ it's too small for meaningful statistical analyses.
 ### Option 3: Generate Your Own Synthetic Data
 
 If you have real PEP725 data and want to create a shareable synthetic version
-(e.g., for teaching or supplementary materials), use `simulate_pep()`:
+(e.g., for teaching or supplementary materials), use `pep_simulate()`:
 
 ```{r simulate, eval = FALSE}
 # Generate synthetic data based on your real data
 # This preserves statistical properties while anonymizing observations
-pep_synthetic <- simulate_pep(your_real_pep_data)
+pep_synthetic <- pep_simulate(your_real_pep_data)
 
 # You can then share pep_synthetic freely
 ```
@@ -470,13 +470,13 @@ cat("Harvest observations:", nrow(harvest), "\n")
 ## Exploring Data Coverage
 
 Before diving into analysis, it's crucial to understand what your dataset
-contains. The `coverage()` function provides a comprehensive overview.
+contains. The `pep_coverage()` function provides a comprehensive overview.
 
 ### Full Coverage Report
 
 ```{r coverage-all}
 # Get a complete coverage report
-coverage(pep)
+pep_coverage(pep)
 ```
 
 This report shows you three dimensions of coverage:
@@ -491,7 +491,7 @@ You can focus on specific aspects and optionally generate plots:
 
 ```{r coverage-temporal}
 # Temporal coverage with a visualization
-coverage(pep, kind = "temporal", plot = TRUE)
+pep_coverage(pep, kind = "temporal", plot = TRUE)
 ```
 
 The temporal plot shows observation density over time. Look for:
@@ -502,7 +502,7 @@ The temporal plot shows observation density over time. Look for:
 
 ```{r coverage-geo}
 # Geographical coverage - which countries have most data
-coverage(pep, kind = "geographical", top = 5)
+pep_coverage(pep, kind = "geographical", top = 5)
 ```
 
 Geographic coverage tells you where your data comes from. This is important
@@ -514,7 +514,7 @@ because:
 
 ```{r coverage-species}
 # Species coverage - which species are best represented
-coverage(pep, kind = "species", top = 5)
+pep_coverage(pep, kind = "species", top = 5)
 ```
 
 Species coverage shows which plants have enough data for robust analyses. As a
@@ -530,7 +530,7 @@ You can break down coverage by grouping variables:
 
 ```{r coverage-by-country}
 # Temporal coverage broken down by country
-cov_by_country <- coverage(pep, kind = "temporal", by = "country")
+cov_by_country <- pep_coverage(pep, kind = "temporal", by = "country")
 # Show observations by group
 cov_by_country$temporal$obs_by_group
 ```
@@ -683,7 +683,7 @@ Analyze how phenology varies across landscapes:
 
 - `pheno_gradient()` - Quantify elevation and latitude effects
 - `pheno_synchrony()` - Measure spatial coherence
-- `map_pep()` - Create maps of phenological patterns
+- `pheno_map()` - Create maps of phenological patterns
 
 ```{r eval = FALSE}
 vignette("spatial-patterns", package = "pep725")
@@ -693,8 +693,8 @@ vignette("spatial-patterns", package = "pep725")
 
 Ensure your data is reliable and investigate unusual observations:
 
-- `flag_outliers()` - Identify suspicious observations
-- `plot_outliers()` - Visualize outliers in context
+- `pep_flag_outliers()` - Identify suspicious observations
+- `pep_plot_outliers()` - Visualize outliers in context
 
 ```{r eval = FALSE}
 vignette("data-quality", package = "pep725")

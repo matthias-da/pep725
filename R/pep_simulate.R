@@ -44,13 +44,13 @@ utils::globalVariables(c("med_day", "i.med_day"))
 #' pep_ch <- pep[country == "Switzerland"]
 #'
 #' # Generate synthetic data
-#' pep_synth <- simulate_pep(pep_ch)
+#' pep_synth <- pep_simulate(pep_ch)
 #'
 #' # Use with analysis functions
 #' normals <- pheno_normals(pep_synth, period = 1990:2015,
 #'                          by = c("country", "phase_id"))
 #' }
-simulate_pep <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
+pep_simulate <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
 
   # Input validation
   if (!inherits(pep, "data.frame")) {

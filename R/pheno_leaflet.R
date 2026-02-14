@@ -16,7 +16,7 @@
 #' \preformatted{
 #' # Filter to a specific species first
 #' wheat <- pep[genus == "Triticum"]
-#' selected <- leaflet_pep(wheat)
+#' selected <- pheno_leaflet(wheat)
 #' }
 #'
 #' @examples
@@ -30,7 +30,7 @@
 #'
 #' if (nrow(pep_subset) > 0) {
 #'   # Launch interactive selection gadget
-#'   selected <- leaflet_pep(pep_subset, label_col = "species")
+#'   selected <- pheno_leaflet(pep_subset, label_col = "species")
 #'
 #'   # Inspect selected subset
 #'   print(selected)
@@ -38,12 +38,12 @@
 #' }
 #' @author Matthias Templ
 #' @export
-leaflet_pep <- function(pep, label_col = NULL, quiet = FALSE) {
+pheno_leaflet <- function(pep, label_col = NULL, quiet = FALSE) {
   pkgs <- c("shiny", "miniUI", "leaflet", "leaflet.extras")
   missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
   if (length(missing) > 0) {
     stop("Package(s) ", paste(missing, collapse = ", "),
-         " required for leaflet_pep(). Install with: install.packages(c(",
+         " required for pheno_leaflet(). Install with: install.packages(c(",
          paste0('"', missing, '"', collapse = ", "), "))", call. = FALSE)
   }
 
