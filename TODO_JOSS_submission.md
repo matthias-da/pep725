@@ -95,7 +95,7 @@ jobs:
 
 - [x] **Figures**: Added elevation gradient figure (`paper/figures/gradient_example.png`)
   - [x] Example plot output (gradient analysis with robust regression)
-  - [ ] Workflow diagram showing package structure (optional)
+  - [x] Workflow diagram showing package structure (optional)
   - [ ] Map visualization example (optional)
 
 ### Paper Content Improvements
