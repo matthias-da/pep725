@@ -138,22 +138,21 @@ jobs:
 - [x] **Bibliography**: 16 references in `paper.bib`
   - [x] All DOIs with actual DOI values verified and resolve correctly (11 DOIs checked) ✅
   - [ ] Verify CRAN package version numbers are still current (5 refs use CRAN URLs only)
-  - **Exception**: `opedal2024advancing` DOI is wrong — see Critical Bibliography Fix below
+  - **Exception**: `opedal2024advancing` DOI is wrong — ✅ fixed
 - [x] **ROR identifiers**: Verify affiliation RORs are correct
   - [x] WSL: `04d81q302` (fixed)
   - [x] FHNW: `02gz82p86`
 
 ### Critical Bibliography Fix
 
-- [ ] **Fix `opedal2024advancing` reference** - WRONG DOI!
+- [ ] **Fix `opedal2024advancing` reference** - ✅
   - Current DOI `10.1038/s41559-024-02336-5` resolves to Campbell et al. (2024) "Herbivore effects increase with latitude across the extent of a foundational seagrass" — a marine ecology paper, NOT phenology
   - The title "Advancing phenological research through long-term data integration" does not appear to be a real publication
-  - The listed authors (Opedal, Ovaskainen, et al.) work on metapopulation ecology, not phenological research
+  - The listed authors (Ovaskainen, et al.) work on metapopulation ecology, not phenological research
   - **This reference appears fabricated. Replace with one of these options:**
     - **Option A (Recommended):** Primack et al. (2023) "Ten best practices for effective phenological research" Int J Biometeorol 67:1509-1522, DOI: 10.1007/s00484-023-02502-7
     - **Option B:** Kharouba et al. (2018) "Global shifts in the phenological synchrony of species interactions" PNAS 115:5211-5216, DOI: 10.1073/pnas.1714511115
     - **Option C:** Ovaskainen et al. (2013) "Community-level phenological response to climate change" PNAS 110:13434-13439, DOI: 10.1073/pnas.1305533110
-  - Used in `paper.md` line 91: `@opedal2024advancing` in "State of the field" section
   - Update citation in `paper.bib` (lines 181-189)
   - Update citation key in `paper.md` if key changes
 
@@ -177,9 +176,6 @@ Current: ~896 body words (limit: 750-1750)
   - [x] Updated `.Rbuildignore`, `CLAUDE.md`, `TODO_JOSS_submission.md` references
   - [x] No R-specific elements to remove (paper has no executable code)
 
-### 6. Fix Paper Date Format
-
-- [x] Change `date: 2026-02-04` to `date: 4 February 2026`
 
 ---
 
@@ -226,7 +222,7 @@ Current: ~896 body words (limit: 750-1750)
 | Bibliography DOI verification | ✅ All 11 DOIs valid (except opedal) | Low |
 | CRAN pkg version check | ❌ Not verified (5 refs) | Low |
 | ROR identifiers check | ✅ Fixed | Low |
-| Fix opedal2024advancing ref | ❌ Fabricated reference | **High** |
+| Fix opedal2024advancing ref |  ✅  done| **High** |
 | **Paper Formatting (2026-02-14)** | | |
 | Remove `---` horizontal rules | ✅ Done | **High** |
 | Fix citation syntax (Summary) | ✅ Done | **High** |
