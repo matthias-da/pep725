@@ -141,7 +141,7 @@ jobs:
 
 ### Paper Technical Checks
 
-- [x] **Logo image**: `pep725_logo_cpt.png` exists in `pep725_JOSS-Paper/` ✅
+- [x] **Logo image**: `pep725_logo_cpt.png` exists in `paper/` ✅
 - [x] **Bibliography**: 16 references in `paper.bib`
   - [x] All DOIs with actual DOI values verified and resolve correctly (11 DOIs checked) ✅
   - [ ] Verify CRAN package version numbers are still current (5 refs use CRAN URLs only)
@@ -160,9 +160,9 @@ jobs:
     - **Option A (Recommended):** Primack et al. (2023) "Ten best practices for effective phenological research" Int J Biometeorol 67:1509-1522, DOI: 10.1007/s00484-023-02502-7
     - **Option B:** Kharouba et al. (2018) "Global shifts in the phenological synchrony of species interactions" PNAS 115:5211-5216, DOI: 10.1073/pnas.1714511115
     - **Option C:** Ovaskainen et al. (2013) "Community-level phenological response to climate change" PNAS 110:13434-13439, DOI: 10.1073/pnas.1305533110
-  - Used in `JOSS_packagePaper.Rmd` line 91: `@opedal2024advancing` in "State of the field" section
+  - Used in `paper.md` line 91: `@opedal2024advancing` in "State of the field" section
   - Update citation in `paper.bib` (lines 181-189)
-  - Update citation key in `JOSS_packagePaper.Rmd` if key changes
+  - Update citation key in `paper.md` if key changes
 
 
 
@@ -179,10 +179,10 @@ Current: ~896 body words (limit: 750-1750)
 
 ### 5. Convert Paper to Markdown
 
-- [ ] Convert `pep725_JOSS-Paper/JOSS_packagePaper.Rmd` to `paper.md`
-  - [ ] Remove R Markdown specific elements
-  - [ ] Keep YAML frontmatter
-  - [ ] Ensure pure Pandoc Markdown syntax
+- [x] Renamed `pep725_JOSS-Paper/` → `paper/`, `JOSS_packagePaper.Rmd` → `paper.md`
+  - [x] Removed stale HTML build artifact
+  - [x] Updated `.Rbuildignore`, `CLAUDE.md`, `TODO_JOSS_submission.md` references
+  - [x] No R-specific elements to remove (paper has no executable code)
 
 ### 6. Fix Paper Date Format
 
@@ -292,7 +292,7 @@ Current: ~896 body words (limit: 750-1750)
 
 ### NOTEs to Fix
 - [x] Add `.github` to `.Rbuildignore`
-- [x] Add non-standard files to `.Rbuildignore`: `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper`, `CLAUDE.md`
+- [x] Add non-standard files to `.Rbuildignore`: `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `paper`, `CLAUDE.md`
 - [x] Fix `simulate_pep.R:52` - change `gam()` to `mgcv::gam()`
 - [x] Add global variable bindings for `grade_num`, `worst_grade_num` in `plot.pep_quality()`
 - [x] Add global variable binding for `..na_cols` in `print.pheno_anomaly()`

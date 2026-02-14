@@ -179,7 +179,7 @@ Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()
 ## Current Status
 
 ### JOSS Submission
-- **Paper location**: `pep725_JOSS-Paper/JOSS_packagePaper.Rmd`
+- **Paper location**: `paper/paper.md`
 - **TODO tracker**: `TODO_JOSS_submission.md` - comprehensive checklist of remaining tasks
 - **Submission timeline**: July 2026 (requires 6 months public development history)
 - **Key pending items**:
@@ -200,7 +200,7 @@ GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
 - All fixed (`.Rbuildignore`, `mgcv::gam()`, `globalVariables()` declarations)
 
 ### Known Issues
-- Non-standard files at top level: `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `pep725_JOSS-Paper/`
+- Non-standard files at top level: `CLAUDE.md`, `CONTRIBUTING.md`, `TODO_JOSS_submission.md`, `paper/`
 
 ### Community Files
 - `CONTRIBUTING.md` - Contribution guidelines (bug reports, PRs, code style)
