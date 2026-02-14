@@ -116,6 +116,29 @@ jobs:
   - [x] Referenced PEP725 publication impact (115 papers, 17 Nature, 2 Science) from @templetal2026a
   - [x] Added fu2015declining and menzel2020climate to paper.bib
 
+### Paper Formatting & Rendering Issues (2026-02-14)
+
+**High priority — will cause rendering failures or reviewer rejection:**
+
+- [ ] **Remove horizontal rules (`---`) between sections** — Lines 43, 49, 85, 93, 101, 109, 119 have `---` separators. JOSS papers should not use horizontal rules; they render as `<hr>` lines in the PDF. Use heading levels only.
+- [ ] **Fix citation syntax in Summary** — Line 39: `(PEP725; @templ2018pep725, @templetal2026a)` uses invalid comma-separated bare citations. Should be `[PEP725; @templ2018pep725; @templetal2026a]` (semicolons inside square brackets).
+- [ ] **Remove logo HTML from paper body** — Lines 32-34: `<p align="center"><img ...>` won't render in JOSS PDF (Pandoc → LaTeX pipeline). The logo belongs in the repository README only.
+- [ ] **Fix Thackeray2016 "et al." in paper.bib** — Line 39: `author = {Thackeray, S. J. et al.}` will render literally. BibTeX must list actual author names (the paper has 47 authors; include at least the first 5-10).
+- [ ] **Fix DOI format in Parmesan2006** — paper.bib line 24: `doi = "https://doi.org/10.1146/..."` includes the full URL. The `doi` field should contain only the identifier (`10.1146/annurev.ecolsys.37.091305.110100`). Most styles auto-prepend the URL, so this produces a doubled link.
+- [ ] **Fix wrong parameter names in commented-out Example usage** — Lines 51-83: `ref_period` → `period`, `gradient_var` → `variable`. If this section is uncommented, the code will not work.
+- [ ] **Fix `volume = {online}` in templetal2026a** — paper.bib line 64: renders as volume "online". Either remove the `volume` field or use `note = {Advance online publication}`.
+
+**Medium priority — reviewers would flag:**
+
+- [ ] **Change R package bib entries from `@article` to `@manual`** — Entries: `tschurr2025dymep`, `tanigu2025phenolocrop`, `phenesse2025`, `Schaberpheno2026`, `Gomezsephora2024`, `Langephenex2017`, `phenomap2020` use `@article` with `journal = {R package version X.Y.Z}`. Should be `@manual` or `@misc`.
+- [ ] **Update stale "January 2023" date in research impact** — Line 105: "which as of January 2023 had contributed to at least 115 peer-reviewed publications" is 3 years stale for a Feb 2026 submission. Update with most recent count from @templetal2026a.
+- [ ] **Clean up Parmesan2006 bib entry** — (1) Six duplicate `keywords` fields (only last is used); combine into one. (2) Full abstract embedded — remove. (3) Non-standard `type = "Journal Article"` field — remove.
+
+**Low priority — polish:**
+
+- [ ] **Standardize BibTeX key naming** — Mixed conventions (`Piao2019`, `templ2018pep725`, `luedeling2012chillR`, `Schaberpheno2026`). Adopt consistent scheme.
+- [ ] **Shorten AI usage disclosure** — Current 3-paragraph disclosure (lines 111-117) is verbose. A concise 1-2 sentence statement would suffice for JOSS.
+
 ### Paper Technical Checks
 
 - [x] **Logo image**: `pep725_logo_cpt.png` exists in `pep725_JOSS-Paper/` ✅
@@ -211,6 +234,19 @@ Current: ~896 body words (limit: 750-1750)
 | CRAN pkg version check | ❌ Not verified (5 refs) | Low |
 | ROR identifiers check | ✅ Fixed | Low |
 | Fix opedal2024advancing ref | ❌ Fabricated reference | **High** |
+| **Paper Formatting (2026-02-14)** | | |
+| Remove `---` horizontal rules | ❌ 7 occurrences | **High** |
+| Fix citation syntax (Summary) | ❌ Invalid comma-separated bare `@` | **High** |
+| Remove logo HTML from paper | ❌ Won't render in JOSS PDF | **High** |
+| Fix Thackeray2016 "et al." | ❌ Must list real authors | **High** |
+| Fix DOI format (Parmesan2006) | ❌ Full URL in `doi` field | **High** |
+| Fix example parameter names | ❌ `ref_period`/`gradient_var` wrong | **High** |
+| Fix `volume = {online}` | ❌ Renders literally | **High** |
+| R package bib: `@article`→`@manual` | ❌ 7 entries | Medium |
+| Update stale "Jan 2023" date | ❌ 3 years old | Medium |
+| Clean up Parmesan2006 bib entry | ❌ Dup keywords, abstract, type | Medium |
+| Standardize BibTeX key naming | ❌ Mixed conventions | Low |
+| Shorten AI disclosure | ❌ 3 paragraphs → 1-2 sentences | Low |
 | **GitHub Issues** | | |
 | Open issues | 13 open | Various |
 | **R CMD Check** | | |
@@ -243,7 +279,7 @@ Current: ~896 body words (limit: 750-1750)
 
 ### Package Development
 - [ ] **#3** Package check (CRAN version)
-- [ ] **#8** phenological analysis/quality() plotting the extreme events?
+- [x] **#8** phenological analysis/quality() plotting the extreme events?
 - [ ] **#2** Data repository GitHub to Zenodo
 
 ### Outreach

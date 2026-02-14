@@ -29,24 +29,15 @@ date: 4 February 2026
 bibliography: paper.bib
 ---
 
-<p align="center">
-  <img src="pep725_logo_cpt.png" alt="pep725 logo" width="180"/>
-</p>
-
-
 # Summary
 
-Phenological observations are a key source of evidence for biological responses to climate variability and change [@Parmesan2006; @Thackeray2016; @Piao2019]. The Pan European Phenology database (PEP725; @templ2018pep725, @templetal2026a) is an open-access infrastructure for plant phenology data, unifying more than 13 million observations from over 30 countries, spanning the period from 1868 to the present and covering approximately 265 plant species and 46 phenophases. While these datasets offer exceptional scientific value, their analysis is challenged by uneven spatial coverage, heterogeneous data quality, temporal gaps, and changes in observation protocols over time.
+Phenological observations are a key source of evidence for biological responses to climate variability and change [@Parmesan2006; @Thackeray2016; @Piao2019]. The Pan European Phenology database [PEP725; @templ2018pep725; @templetal2026a] is an open-access infrastructure for plant phenology data, unifying more than 13 million observations from over 30 countries, spanning the period from 1868 to the present and covering approximately 265 plant species and 46 phenophases. While these datasets offer exceptional scientific value, their analysis is challenged by uneven spatial coverage, heterogeneous data quality, temporal gaps, and changes in observation protocols over time.
 
 The **pep725** R package provides a coherent framework for the spatio-temporal analysis of phenological data from PEP725 and similar ground-based datasets. It supports systematic data quality diagnostics, the computation of phenological normals and anomalies, the estimation of spatial gradients along environmental axes, the assessment of phenological synchrony across space and time, and both interactive and publication-ready spatial visualization. Additional capabilities include partial least squares (PLS) regression for identifying temperature-sensitive periods affecting phenological timing, sequential Mann-Kendall analysis for detecting trend turning points, and detection of second flowering or repeated phenological events linked to climate anomalies. The package emphasizes reproducibility and transparency and is designed to complement phenological modeling and remote-sensing tools by enabling a phenology-first exploration of spatial structure and variability in large, heterogeneous observation networks.
-
----
 
 # Statement of need
 
 Ground-based phenological datasets pose distinct analytical challenges: observation density varies across regions, long-term records are often incomplete, and data quality differs among contributors and time periods. Without explicit diagnostics and spatial characterization, such heterogeneity can bias spatial comparisons, trend analyses, and downstream model calibration. The **pep725** package addresses these challenges by providing a dedicated framework for characterizing station-based phenological datasets prior to modeling, separating data diagnostics from downstream inference to enable more robust and reproducible analyses.
-
----
 
 <!-- Example usage section commented out to meet JOSS word limit
 # Example usage
@@ -64,25 +55,24 @@ pep_alpine <- pep[country %in% c("Switzerland", "Austria") &
                   species == "Malus domestica"]
 
 # Assess data quality
-quality <- pep_quality(pep_alpine, phase_id = 65)
+quality <- pep_quality(pep_alpine, by = c("s_id", "phase_id"))
 summary(quality)
 
 # Compute phenological normals (1991-2020 baseline)
 normals <- pheno_normals(pep_alpine, phase_id = 65,
-                         ref_period = 1991:2020)
+                         period = 1991:2020)
 
 # Analyze elevation gradient
 gradient <- pheno_gradient(pep_alpine, phase_id = 65,
-                           gradient_var = "alt")
+                           variable = "alt")
 plot(gradient)
 
 # Quantify spatial synchrony
-sync <- pheno_synchrony(pep_alpine, phase_id = 65)
+sync <- pheno_synchrony(pep_alpine, species = "Malus domestica",
+                        phase_id = 65)
 summary(sync)
 ```
 -->
-
----
 
 # State of the field
 
@@ -90,23 +80,17 @@ Phenological analysis in R is supported by packages addressing process-based mod
 
 Despite this rich ecosystem, few tools focus on quality-aware spatial analysis of ground-based phenological observation networks. Large databases such as PEP725 combine millions of records collected across heterogeneous environments and national protocols [@templ2018pep725; @templetal2026a], requiring explicit handling of data quality issues before spatial patterns can be interpreted reliably. Building on the PEP725 infrastructure and complementary to modeling-oriented tools, **pep725** enables systematic diagnostics, estimation of spatial gradients, and quantification of phenological synchrony—key derived quantities in contemporary phenological research [e.g. @liu2016temperature; @opedal2024advancing].
 
----
-
 # Software design
 
 The design of **pep725** is guided by three principles: (i) explicit treatment of data quality and uncertainty, (ii) transparent and reproducible spatial analysis workflows, and (iii) modular integration with the broader R ecosystem.
 
 The package implements an object-oriented design using S3 classes, with dedicated `print`, `summary`, and `plot` methods for all analysis outputs. Functions operate on tabular phenological data with explicit spatial and temporal attributes and return structured objects that can be reused across analytical steps. Gradient and synchrony analyses share consistent interfaces and support robust estimation methods (including `lmrob` and quantile regression) to reduce sensitivity to outliers and heterogeneous sampling. Visualization tools are integrated directly into the workflow to support iterative exploration, region definition, and communication of results. Four vignettes provide reproducible workflows covering data access, phenological analysis, spatial patterns, and data quality assessment.
 
----
-
 # Research impact statement
 
 The **pep725** package has been developed in close connection with the PEP725 database, which as of January 2023 had contributed to at least 115 peer-reviewed publications, including 17 in *Nature* and 2 in *Science* [@templetal2026a]. These studies address phenological questions that the package's analytical functions directly support: climate sensitivity analyses such as @fu2015declining, who demonstrated declining warming effects on spring leaf unfolding at 1,245 PEP725 sites across Europe; and pan-European trend detection as in @menzel2020climate, who identified attributable climate change fingerprints in 97,000 PEP725 time series spanning 1951--2018.
 
 By implementing the methods described in @templetal2026a as reproducible R workflows with explicit quality diagnostics, **pep725** lowers the barrier to conducting such analyses on large phenological observation networks. Four vignettes support both research applications and teaching in phenology and environmental data analysis.
-
----
 
 # AI usage disclosure
 
@@ -115,8 +99,6 @@ Artificial intelligence–based tools were used in a limited and supportive role
 All scientific concepts, methodological design, statistical reasoning, software architecture, implementation, testing, and validation were conceived, developed, and verified by the authors. No code, analytical methods, or results were generated automatically by AI systems, and all examples and workflows were reviewed and executed by the authors to ensure correctness and reproducibility.
 
 The use of AI tools did not replace scholarly judgment or software development practices but served solely as an editorial aid.
-
----
 
 # Acknowledgements
 
