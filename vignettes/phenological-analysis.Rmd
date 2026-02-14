@@ -792,7 +792,7 @@ You now understand the core analytical functions. Continue to:
 vignette("spatial-patterns", package = "pep725")
 ```
 
-- **Data Quality & Irregular Events**: How to detect outliers and identify abnormal events.
+- **Data Quality Assessment**: How to detect outliers and validate data completeness.
 
 ```{r eval = FALSE}
 vignette("data-quality", package = "pep725")

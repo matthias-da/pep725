@@ -1,11 +1,11 @@
 ---
-title: "Data Quality & Irregular Events"
+title: "Data Quality Assessment"
 author: "Matthias Templ"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 vignette: >
-  %\VignetteIndexEntry{Data Quality & Irregular Events}
+  %\VignetteIndexEntry{Data Quality Assessment}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -526,7 +526,7 @@ Data Quality Control:
 
 3. Outlier disposition:
    - Excluded: Z observations with deviations > 60 days (likely errors)
-   - Retained: W observations identified as abnormal events (e.g second flowering)
+   - Retained: W observations identified as abnormal events (e.g., second flowering)
 
 4. Phase validation: Checked for sequence violations in [species list]
    (identified V cases for manual review)
@@ -624,6 +624,28 @@ This vignette covered data quality tools for phenological analysis:
 
 5. **Visual inspection matters** - plots often reveal patterns that summary
    statistics miss.
+
+## Next Steps
+
+Explore the other vignettes for complementary analyses:
+
+- **Getting Started**: Data access, the `pep` class, and basic exploration
+
+```{r eval = FALSE}
+vignette("getting-started", package = "pep725")
+```
+
+- **Phenological Analysis**: Normals, anomalies, quality grading, and trends
+
+```{r eval = FALSE}
+vignette("phenological-analysis", package = "pep725")
+```
+
+- **Spatial Phenological Patterns**: Gradients, synchrony, and mapping
+
+```{r eval = FALSE}
+vignette("spatial-patterns", package = "pep725")
+```
 
 ---
 

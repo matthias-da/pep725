@@ -883,7 +883,7 @@ vignette("getting-started", package = "pep725")
 vignette("phenological-analysis", package = "pep725")
 ```
 
-- **Data Quality & Irregular Events**: Outlier detection and data validation
+- **Data Quality Assessment**: Outlier detection and data validation
 
 ```{r eval = FALSE}
 vignette("data-quality", package = "pep725")

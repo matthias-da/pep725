@@ -689,7 +689,7 @@ Analyze how phenology varies across landscapes:
 vignette("spatial-patterns", package = "pep725")
 ```
 
-### Data Quality & Irregular Events Vignette
+### Data Quality Assessment Vignette
 
 Ensure your data is reliable and investigate unusual observations:
 
