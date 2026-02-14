@@ -1,9 +1,11 @@
 ---
 title: "Data Quality & Irregular Events"
+author: "Matthias Templ"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Data Quality & Irregular Events}
-
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -391,7 +393,7 @@ plot(completeness)
 
 ---
 
-# Part 4: Phase Presence Validation
+# Part 3: Phase Presence Validation
 
 ## Why Check Phase Presence?
 
@@ -456,7 +458,7 @@ print(multi_check)
 
 ---
 
-# Part 5: Integrated Quality Workflow
+# Part 4: Integrated Quality Workflow
 
 ## Putting It All Together
 
