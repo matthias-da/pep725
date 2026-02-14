@@ -179,19 +179,26 @@ Note: The full `pep` synthetic dataset (~64MB) is downloaded via `pep_download()
 ## Current Status
 
 ### JOSS Submission
-- **Paper location**: `paper/paper.md`
+- **Paper location**: `paper/paper.md` with `paper/paper.bib`
+- **Paper figures**: `paper/figures/workflow_diagram.png`, `paper/figures/quality_overview.png`
 - **TODO tracker**: `TODO_JOSS_submission.md` - comprehensive checklist of remaining tasks
 - **Submission timeline**: July 2026 (requires 6 months public development history)
+- **Completed**:
+  - testthat tests (95 tests passing)
+  - GitHub Actions workflows pushed to remote
+  - CODE_OF_CONDUCT.md and CONTRIBUTING.md created
+  - Paper converted to JOSS format (paper.md), all formatting issues fixed
+  - Two figures: workflow diagram + quality overview
+  - Example usage section with quality-first workflow
+  - All BibTeX entries cleaned and standardized
 - **Key pending items**:
-  - Add testthat tests
-  - Push GitHub Actions workflows (needs PAT with `workflow` scope)
-  - Create CODE_OF_CONDUCT.md
-  - Fix `opedal2024advancing` reference (wrong DOI)
+  - Fix `opedal2024advancing` reference (fabricated — needs replacement)
   - Co-author review (Barbara Templ)
+  - Wait until July 2026 (6-month public development history requirement)
 
-### GitHub Actions (local only - need PAT workflow scope to push)
+### GitHub Actions
 - `.github/workflows/R-CMD-check.yaml` - R CMD check on macOS/Ubuntu with R release/devel
-- `.github/workflows/draft-pdf.yaml` - JOSS paper PDF compilation
+- `.github/workflows/draft-pdf.yaml` - JOSS paper PDF compilation (triggered by changes to `paper/`)
 
 ### License
 GPL-3 (specified in DESCRIPTION with full text in LICENSE file)
