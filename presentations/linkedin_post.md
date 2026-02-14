@@ -37,7 +37,7 @@ After years of working with phenological data, we've developed a comprehensive t
 library(pep725)
 pep <- pep_download()
 normals <- pheno_normals(pep, period = 1991:2020)
-map_pep(pep, background = "none", color_by = "mean_doy")
+pheno_map(pep, background = "none", color_by = "mean_doy")
 ```
 
 The package includes four comprehensive vignettes guiding you from basics to advanced spatial analysis.
@@ -81,8 +81,8 @@ normals <- pheno_normals(pep, period = 1991:2020)
 ## Image Suggestions
 
 For the post, consider attaching:
-1. `mindmap_pep725.png` – Shows package structure at a glance
-2. A map output from `map_pep()` showing European stations
+1. `mindpheno_map725.png` – Shows package structure at a glance
+2. A map output from `pheno_map()` showing European stations
 3. A trend plot showing phenological shifts over time
 
 ---

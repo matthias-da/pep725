@@ -37,7 +37,7 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' @param max_iter Integer. Maximum iterations for robust method. Default 20.
 #' @param tol Numeric. Convergence tolerance for robust method. Default 1e-4.
 #'
-#' @return An object of class \code{pls_phenology} containing:
+#' @return An object of class \code{pheno_pls} containing:
 #'   \describe{
 #'     \item{vip}{Data.frame with Variable Importance in Projection scores
 #'       for each day of the phenological year.}
@@ -91,7 +91,7 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' )
 #'
 #' # Run standard PLS (fast: no CV, fixed components)
-#' result <- pls_phenology(pep_seed, temp, method = "standard", ncomp = 2)
+#' result <- pheno_pls(pep_seed, temp, method = "standard", ncomp = 2)
 #' print(result)
 #' }
 #'
@@ -109,7 +109,7 @@ utils::globalVariables(c("day", "year", "JDay", "Tmean", "Tmin", "Tmax",
 #' @author Matthias Templ
 #' @importFrom stats mad weighted.mean median coef predict
 #' @export
-pls_phenology <- function(pep,
+pheno_pls <- function(pep,
                           temp_data,
                           by = NULL,
                           method = c("robust", "standard"),
@@ -326,7 +326,7 @@ pls_phenology <- function(pep,
     runn_mean = runn_mean
   )
 
-  class(result) <- c("pls_phenology", "list")
+  class(result) <- c("pheno_pls", "list")
   result
 }
 
@@ -473,11 +473,11 @@ create_day_labels <- function(split_month, n_days) {
 
 #' Print Method for PLS Phenology Results
 #'
-#' @param x A \code{pls_phenology} object
+#' @param x A \code{pheno_pls} object
 #' @param ... Additional arguments (unused)
 #' @return Invisibly returns \code{x}
 #' @export
-print.pls_phenology <- function(x, ...) {
+print.pheno_pls <- function(x, ...) {
   cat("PLS Phenology-Temperature Analysis\n")
   cat(strrep("=", 45), "\n")
   cat("Method:", x$method, "\n")
@@ -503,13 +503,13 @@ print.pls_phenology <- function(x, ...) {
 
 #' Summary Method for PLS Phenology Results
 #'
-#' @param object A \code{pls_phenology} object
+#' @param object A \code{pheno_pls} object
 #' @param vip_threshold Numeric. VIP threshold for identifying important
 #'   periods. Default 0.8.
 #' @param ... Additional arguments (unused)
 #' @return Invisibly returns a summary data.frame
 #' @export
-summary.pls_phenology <- function(object, vip_threshold = 0.8, ...) {
+summary.pheno_pls <- function(object, vip_threshold = 0.8, ...) {
   cat("PLS Phenology-Temperature Analysis Summary\n")
   cat(strrep("=", 50), "\n\n")
 
@@ -587,14 +587,14 @@ summary.pls_phenology <- function(object, vip_threshold = 0.8, ...) {
 
 #' Plot Method for PLS Phenology Results
 #'
-#' @param x A \code{pls_phenology} object
+#' @param x A \code{pheno_pls} object
 #' @param type Character. Plot type: "vip" for VIP scores (default),
 #'   "coef" for coefficients, "both" for combined plot.
 #' @param vip_threshold Numeric. Threshold line for VIP plot. Default 0.8.
 #' @param ... Additional arguments passed to plotting functions
 #' @return A ggplot object (invisibly)
 #' @export
-plot.pls_phenology <- function(x, type = c("vip", "coef", "both"),
+plot.pheno_pls <- function(x, type = c("vip", "coef", "both"),
                                 vip_threshold = 0.8, ...) {
   type <- match.arg(type)
 

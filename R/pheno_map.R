@@ -109,22 +109,22 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #' pep <- pep_download()
 #'
 #' # Simple map without Google Maps (no API key needed)
-#' map_pep(pep, background = "none", color_by = "n_obs")
+#' pheno_map(pep, background = "none", color_by = "n_obs")
 #'
 #' # Map with mean phenological timing
-#' map_pep(pep, background = "none", color_by = "mean_doy", phase_id = 60)
+#' pheno_map(pep, background = "none", color_by = "mean_doy", phase_id = 60)
 #'
 #' # Map with trends (blue = earlier, red = later)
-#' map_pep(pep, background = "none", color_by = "trend",
+#' pheno_map(pep, background = "none", color_by = "trend",
 #'         phase_id = 60, period = 1990:2020)
 #'
 #' # With Google Maps background (requires API key)
 #' ggmap::register_google(key = "your_api_key_here")
-#' map_pep(pep, background = "google", color_by = "n_species", zoom = 5)
+#' pheno_map(pep, background = "google", color_by = "n_species", zoom = 5)
 #' }
 #' @author Matthias Templ
 #' @export
-map_pep <- function(
+pheno_map <- function(
     pep,
     location = c(lon = 6.233, lat = 46.400),
     zoom = 4,

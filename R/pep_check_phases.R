@@ -57,15 +57,15 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #' pep_ch <- pep[country == "Switzerland"]
 #'
 #' # Basic check for common phases
-#' check <- check_phases(pep_ch)
+#' check <- pep_check_phases(pep_ch)
 #'
 #' # Check specific phases for grapevine (longest historical records)
-#' check <- check_phases(pep_ch,
+#' check <- pep_check_phases(pep_ch,
 #'                       expected = c(60, 65, 81),
 #'                       species = "Vitis vinifera")
 #'
 #' # Check within analysis window
-#' check <- check_phases(pep_ch,
+#' check <- pep_check_phases(pep_ch,
 #'                       expected = c(60, 65),
 #'                       year_min = 1991,
 #'                       year_max = 2020)
@@ -73,12 +73,12 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #' # Use in pipeline with custom label
 #' vine_data <- pep_ch[species == "Vitis vinifera"]
 #' if (nrow(vine_data) > 0) {
-#'   check_phases(vine_data, expected = c(60, 65),
+#'   pep_check_phases(vine_data, expected = c(60, 65),
 #'                label = "Grapevine analysis")
 #' }
 #'
 #' # Silent check (no warnings)
-#' result <- check_phases(pep_ch, warn = FALSE)
+#' result <- pep_check_phases(pep_ch, warn = FALSE)
 #' if (!result$complete) {
 #'   # Handle missing phases programmatically
 #' }
@@ -91,7 +91,7 @@ utils::globalVariables(c("phase_id", "total_obs", "n_present"))
 #'
 #' @author Matthias Templ
 #' @export
-check_phases <- function(pep,
+pep_check_phases <- function(pep,
                           expected = NULL,
                           species = NULL,
                           year_min = NULL,
@@ -330,18 +330,18 @@ print.phase_check <- function(x, ...) {
 #' # Check multiple species (use subset for speed)
 #' pep <- pep_download()
 #' pep_subset <- pep[country %in% c("Switzerland", "Austria")]
-#' result <- check_phases_multi(pep_subset,
+#' result <- pep_check_phases_multi(pep_subset,
 #'                              species_list = c("Malus domestica",
 #'                                               "Vitis vinifera"),
 #'                              expected = c(60, 65))
 #' print(result)
 #' }
 #'
-#' @seealso \code{\link{check_phases}} for single-species checking
+#' @seealso \code{\link{pep_check_phases}} for single-species checking
 #'
 #' @author Matthias Templ
 #' @export
-check_phases_multi <- function(pep,
+pep_check_phases_multi <- function(pep,
                                 species_list,
                                 expected = c(60, 65, 100),
                                 year_min = NULL,
@@ -351,7 +351,7 @@ check_phases_multi <- function(pep,
   species_list <- as.character(species_list)
 
   results <- lapply(species_list, function(sp) {
-    check <- check_phases(pep,
+    check <- pep_check_phases(pep,
                           expected = expected,
                           species = sp,
                           year_min = year_min,

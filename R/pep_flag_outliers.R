@@ -68,20 +68,20 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #' data(pep_seed)
 #'
 #' # Flag outliers using 30-day rule
-#' pep_flagged <- flag_outliers(pep_seed)
+#' pep_flagged <- pep_flag_outliers(pep_seed)
 #' table(pep_flagged$is_outlier)
 #'
 #' # View flagged observations
 #' pep_flagged[is_outlier == TRUE]
 #'
 #' # Remove outliers instead of flagging
-#' pep_clean <- flag_outliers(pep_seed, flag_only = FALSE)
+#' pep_clean <- pep_flag_outliers(pep_seed, flag_only = FALSE)
 #'
 #' # Use MAD method with stricter threshold
-#' pep_flagged <- flag_outliers(pep_seed, method = "mad", threshold = 2.5)
+#' pep_flagged <- pep_flag_outliers(pep_seed, method = "mad", threshold = 2.5)
 #'
 #' # Group by country instead of station
-#' pep_flagged <- flag_outliers(pep_seed,
+#' pep_flagged <- pep_flag_outliers(pep_seed,
 #'                               by = c("country", "genus", "phase_id"))
 #' }
 #'
@@ -94,7 +94,7 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #'
 #' @author Matthias Templ
 #' @export
-flag_outliers <- function(pep,
+pep_flag_outliers <- function(pep,
                            by = c("s_id", "genus", "species", "phase_id"),
                            method = c("30day", "mad", "iqr", "zscore"),
                            threshold = NULL,

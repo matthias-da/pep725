@@ -40,7 +40,7 @@ This vignette covers spatial analysis and visualization functions in the
 | Part 1: Gradients | How phenology changes with altitude & latitude | `pheno_gradient()` |
 | Part 2: Synchrony | Spatial coherence of phenological events | `pheno_synchrony()` |
 | Part 3: Combined | Integrating gradient and synchrony results | `pheno_gradient()`, `pheno_synchrony()` |
-| Part 4: Mapping | Visualizing station networks and patterns | `leaflet_pep()`, `map_pep()` |
+| Part 4: Mapping | Visualizing station networks and patterns | `pheno_leaflet()`, `pheno_map()` |
 
 ### Prerequisites
 
@@ -579,11 +579,11 @@ Spatial visualization is a critical component of phenological analysis. Before f
 
 | Function | Type | Best suited for |
 |----------|------|----------|
-| `leaflet_pep()` | Interactive | Data exploration and station selection |
-| `map_pep()` | Static | Analysis summaries and publication-quality figures |
+| `pheno_leaflet()` | Interactive | Data exploration and station selection |
+| `pheno_map()` | Static | Analysis summaries and publication-quality figures |
 
-## Interactive Maps with leaflet_pep()
-The `leaflet_pep()` function launches an interactive Shiny-based map for exploring
+## Interactive Maps with pheno_leaflet()
+The `pheno_leaflet()` function launches an interactive Shiny-based map for exploring
 phenological station networks. It is particularly useful during the early stages of analysis for:
 
 - exploring spatial coverage and station density,
@@ -593,15 +593,15 @@ phenological station networks. It is particularly useful during the early stages
 ```{r leaflet-example, eval=FALSE}
 # Launch interactive map (opens in viewer)
 # Draw rectangles or polygons to select stations
-selected_stations <- leaflet_pep(pep, label_col = "species")
+selected_stations <- pheno_leaflet(pep, label_col = "species")
 
 # The function returns a data.frame of selected stations
 print(selected_stations)
 ```
 
-```{r leaflet-screenshot, echo=FALSE, out.width="100%", fig.cap="The leaflet_pep() interface showing station locations with drawing tools for selection."}
+```{r leaflet-screenshot, echo=FALSE, out.width="100%", fig.cap="The pheno_leaflet() interface showing station locations with drawing tools for selection."}
 # Display screenshot if it exists
-screenshot_path <- "leaflet_pep_screenshot.png"
+screenshot_path <- "pheno_leaflet_screenshot.png"
 if (file.exists(screenshot_path)) {
   knitr::include_graphics(screenshot_path)
 } else {
@@ -610,7 +610,7 @@ if (file.exists(screenshot_path)) {
 }
 ```
 
-### Features of leaflet_pep()
+### Features of pheno_leaflet()
 
 The interactive map supports multiple selection and inspection tools:
 
@@ -632,7 +632,7 @@ coordinates and metadata, which can then be directly reused in subsequent analys
 ```{r leaflet-filtered, eval=FALSE}
 # Filter to a specific species for faster loading (recommended)
 apple <- pep[species == "Malus domestica"]
-selected <- leaflet_pep(apple, label_col = "s_id")
+selected <- pheno_leaflet(apple, label_col = "s_id")
 
 # Use selected stations for focused analysis
 apple_subset <- apple[s_id %in% selected$s_id]
@@ -641,9 +641,9 @@ apple_subset <- apple[s_id %in% selected$s_id]
 **Why filter first?** The full PEP725 dataset contains millions of observations.
 Rendering all these points in an interactive map can take long. Restricting the dataset to a species or region of interest results in faster loading and smoother interaction.
 
-## Static Maps with map_pep()
+## Static Maps with pheno_map()
 
-The `map_pep()` function creates static maps suitable for reporting and publication. Two background options are supported:
+The `pheno_map()` function creates static maps suitable for reporting and publication. Two background options are supported:
 
 | `background` | Description | API Key Required? |
 |--------------|-------------|-------------------|
@@ -659,7 +659,7 @@ For most applications, the `background = "none"` option is recommended because i
 
 ```{r map-basic, fig.height=6, fig.width=8}
 # Basic station map with country borders (no API key needed)
-map_pep(pep, background = "none", color_by = "none", point_size = 1.5)
+pheno_map(pep, background = "none", color_by = "none", point_size = 1.5)
 ```
 
 This view is useful for assessing overall network coverage and geographic gaps.
@@ -668,12 +668,12 @@ This view is useful for assessing overall network coverage and geographic gaps.
 
 ```{r map-nobs, fig.height=6, fig.width=8}
 # Color stations by number of observations
-map_pep(pep, background = "none", color_by = "n_obs", point_size = 1.5)
+pheno_map(pep, background = "none", color_by = "n_obs", point_size = 1.5)
 ```
 
 ```{r map-nspecies, fig.height=6, fig.width=8}
 # Color by species diversity at each station
-map_pep(pep, background = "none", color_by = "n_species", point_size = 1.5)
+pheno_map(pep, background = "none", color_by = "n_species", point_size = 1.5)
 ```
 
 ### Using Google Maps Background
@@ -685,10 +685,10 @@ For satellite imagery (requires API key from Google Cloud Console):
 ggmap::register_google(key = "your_api_key_here")
 
 # Then use background = "google"
-map_pep(pep, background = "google", color_by = "n_obs", zoom = 5)
+pheno_map(pep, background = "google", color_by = "n_obs", zoom = 5)
 
 # Regional focus with Google Maps
-map_pep(
+pheno_map(
   pep,
   background = "google",
   location = c(lon = 8.2, lat = 46.8),
@@ -701,14 +701,14 @@ These maps help identify well-monitored stations and multi-species observation s
 
 ## Mapping Phenological Patterns
 
-Beyond station metadata, `map_pep()` can visualize derived phenological quantities, allowing spatial interpretation of biological signals.
+Beyond station metadata, `pheno_map()` can visualize derived phenological quantities, allowing spatial interpretation of biological signals.
 
 ### Mean Phenological Timing
 
 ```{r map-mean-doy, fig.height=6, fig.width=8}
 # Map mean phenological timing for flowering (phase 60)
 # Earlier timing = darker colors, later = lighter (plasma scale)
-map_pep(pep, background = "none", color_by = "mean_doy",
+pheno_map(pep, background = "none", color_by = "mean_doy",
         phase_id = 60, point_size = 1.5)
 ```
 
@@ -719,7 +719,7 @@ This representation reveals spatial gradients in average phenological timing.
 ```{r map-trend, fig.height=6, fig.width=8}
 # Map trends per station
 # Blue = phenology getting earlier, Red = getting later
-map_pep(pep, background = "none", color_by = "trend",
+pheno_map(pep, background = "none", color_by = "trend",
         phase_id = 60, period = 1990:2020, min_years = 10, point_size = 1.5)
 ```
 
@@ -730,7 +730,7 @@ Trend maps highlight regions where phenology is advancing or delaying over time.
 ```{r map-species-cv, fig.height=6, fig.width=8}
 # Map species variation at each station
 # Higher CV = more variation in timing among species
-map_pep(pep, background = "none", color_by = "species_cv",
+pheno_map(pep, background = "none", color_by = "species_cv",
         phase_id = 60, min_species = 3, point_size = 1.5)
 ```
 
@@ -747,7 +747,7 @@ High inter-species variability may indicate ecological heterogeneity or mixed ha
 | `"trend"` | Temporal change | Climate impact assessment |
 | `"species_cv"` | Inter-species variability | Find stations with consistent timing |
 
-### Parameter Reference for map_pep()
+### Parameter Reference for pheno_map()
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
@@ -768,7 +768,7 @@ A typical workflow integrates mapping with spatial analysis:
 
 ```{r mapping-workflow, eval=FALSE}
 # 1. Explore stations interactively
-selected <- leaflet_pep(pep[genus == "Malus"])
+selected <- pheno_leaflet(pep[genus == "Malus"])
 
 # 2. Subset data to selected region
 pep_region <- pep[s_id %in% selected$s_id]
@@ -782,7 +782,7 @@ synchrony <- pheno_synchrony(pep_region, species = "Malus domestica",
                               phase_id = 60)
 
 # 5. Create publication map of the region (no API needed)
-map_pep(pep_region, background = "none", color_by = "mean_doy",
+pheno_map(pep_region, background = "none", color_by = "mean_doy",
         phase_id = 60, output_file = "regional_phenology.pdf")
 ```
 
@@ -826,7 +826,7 @@ map_pep(pep_region, background = "none", color_by = "mean_doy",
 
 ## For Mapping
 
-1. **Start with exploration**: Use `leaflet_pep()` to understand your data
+1. **Start with exploration**: Use `pheno_leaflet()` to understand your data
    before formal analysis
 
 2. **Choose appropriate zoom**: Match zoom level to your study area
@@ -850,8 +850,8 @@ This vignette demonstrated how `pep725` supports spatial phenological analysis t
 | Elevation gradients | `pheno_gradient()` | Days delay per 100m |
 | Latitude gradients | `pheno_gradient()` | Days delay per degree |
 | Spatial synchrony | `pheno_synchrony()` | SD/CV of timing across stations |
-| Interactive mapping | `leaflet_pep()` | Selected station data.frame |
-| Static mapping | `map_pep()` | Publication-quality maps |
+| Interactive mapping | `pheno_leaflet()` | Selected station data.frame |
+| Static mapping | `pheno_map()` | Publication-quality maps |
 
 ### Key Take-Home Messages
 

@@ -476,7 +476,7 @@ plot.pep <- function(x, type = c("map", "timeseries", "histogram"), ...) {
 
 # Internal named vector of BBCH codes -> descriptions.
 # Single source of truth used by bbch_description(), summary.pep(),
-# select_phase(), and regional_box_ts().
+# select_phase(), and pheno_regional().
 .bbch_lookup <- c(
   "0" = "Dry seed / Dormancy",
   "1" = "Seed imbibition",
@@ -623,24 +623,24 @@ bbch_description <- function(codes, na.rm = TRUE, sort = TRUE) {
 #' pep <- pep_download()
 #'
 #' # Full coverage report
-#' coverage(pep)
+#' pep_coverage(pep)
 #'
 #' # Temporal coverage only
-#' coverage(pep, kind = "temporal")
+#' pep_coverage(pep, kind = "temporal")
 #'
 #' # Geographical coverage with plot
-#' coverage(pep, kind = "geographical", plot = TRUE)
+#' pep_coverage(pep, kind = "geographical", plot = TRUE)
 #'
 #' # Species coverage, top 5
-#' coverage(pep, kind = "species", top = 5)
+#' pep_coverage(pep, kind = "species", top = 5)
 #'
 #' # Temporal coverage by country
-#' coverage(pep, kind = "temporal", by = "country")
+#' pep_coverage(pep, kind = "temporal", by = "country")
 #' }
 #'
 #' @author Matthias Templ
 #' @export
-coverage <- function(x, kind = c("all", "temporal", "geographical", "species"),
+pep_coverage <- function(x, kind = c("all", "temporal", "geographical", "species"),
                      top = 10, plot = FALSE, by = NULL) {
 
 kind <- match.arg(kind)

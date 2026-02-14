@@ -41,7 +41,7 @@ studying climate change impacts, agricultural timing, or ecosystem dynamics.
 | Anomalies | "Which years are unusual?" | `pheno_anomaly()` |
 | Quality | "Can I trust this data?" | `pep_quality()` |
 | Trends | "Is timing changing?" | `pheno_trend_turning()` |
-| Climate links | "Why is it changing?" | `regional_box_ts()` |
+| Climate links | "Why is it changing?" | `pheno_regional()` |
 
 ### Prerequisites
 
@@ -727,14 +727,14 @@ if (tau < -2.58) {
 ### Linking Phenology to Climate
 
 A central goal of phenological research is to understand how climate drives
-the timing of biological events. The `regional_box_ts()` function compiles
+the timing of biological events. The `pheno_regional()` function compiles
 multi-station phenological data into regional time series and links them to
 global temperature anomalies, enabling you to assess **climate sensitivity** -
 how many days earlier (or later) phenology occurs per degree of warming.
 
 ```{r regional-climate, eval=FALSE}
 # Compile regional data and link to temperature anomalies
-regional_data <- regional_box_ts(
+regional_data <- pheno_regional(
   pep = pep,
   species_name = "Malus domestica",
   year_min = 1961

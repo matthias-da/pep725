@@ -45,16 +45,16 @@
 #' pep <- pep_download()
 #'
 #' # PEP data only
-#' out <- regional_box_ts_heading_harvest(pep,
+#' out <- pheno_regional_hh(pep,
 #'          species_name = "Triticum aestivum")
 #' pheno_plot_hh(out)
 #'
 #' # With GISS temperature anomalies
-#' # out <- regional_box_ts_heading_harvest(pep, giss = giss)
+#' # out <- pheno_regional_hh(pep, giss = giss)
 #' }
 #' @author Matthias Templ
 #' @export
-regional_box_ts_heading_harvest <- function(pep,
+pheno_regional_hh <- function(pep,
                             giss = NULL,
     lon_min = 4.2,  lon_max = 8.1,
     lat_min = 44.7, lat_max = 48.1,

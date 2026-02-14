@@ -4,7 +4,7 @@
 #' filters by species, year, and phenophase ID, and attaches meaningful phase labels based on standard BBCH codes.
 #'
 #' @param dt A \code{data.table} containing columns \code{species}, \code{year}, \code{phase_id}, and \code{mean_day}.
-#' Typically produced by aggregating PEP725 data (e.g., via \code{\link{regional_box_ts}}).
+#' Typically produced by aggregating PEP725 data (e.g., via \code{\link{pheno_regional}}).
 #' @param label A character string used as identifier for source and site columns in the output.
 #' @param sp Species name (as character string) to filter, e.g., \code{"Triticum aestivum"}.
 #' @param yrmin Minimum year (inclusive) for filtering.
@@ -25,14 +25,14 @@
 #'
 #' The function is particularly useful for visualizing specific growth stages or comparing phenological trends across datasets and locations.
 #'
-#' @seealso \code{\link{regional_box_ts}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
+#' @seealso \code{\link{pheno_regional}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
 #'
 #' @examples
 #' \dontrun{
-#' # Requires pep_download() data - see regional_box_ts()
+#' # Requires pep_download() data - see pheno_regional()
 #' pep <- pep_download()
 #'
-#' agg <- regional_box_ts(pep, giss, species_name = "Triticum aestivum")$pep_agg
+#' agg <- pheno_regional(pep, giss, species_name = "Triticum aestivum")$pep_agg
 #' df <- select_phase(agg, label = "PEP725", sp = "Triticum aestivum", yrmin = 1961)
 #' head(df)
 #' }

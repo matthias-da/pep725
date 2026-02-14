@@ -51,16 +51,16 @@
 #' pep <- pep_download()
 #'
 #' # PEP data only
-#' out <- regional_box_ts(pep, species_name = "Triticum aestivum", phase = 60)
+#' out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
 #' str(out)
 #'
 #' # With GISS temperature anomalies
-#' # out <- regional_box_ts(pep, giss, species_name = "Triticum aestivum", phase = 60)
+#' # out <- pheno_regional(pep, giss, species_name = "Triticum aestivum", phase = 60)
 #' }
 #'
 #' @author Matthias Templ
 #' @export
-regional_box_ts <- function(
+pheno_regional <- function(
     pep,
     giss = NULL,
     lon_min = 4.2, lon_max = 8.1,

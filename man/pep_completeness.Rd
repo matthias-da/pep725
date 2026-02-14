@@ -101,9 +101,9 @@ plot(comp)
 
 }
 \seealso{
-\code{\link{check_phases}} for validating expected phases exist,
+\code{\link{pep_check_phases}} for validating expected phases exist,
 \code{\link{pep_quality}} for quality grading,
-\code{\link{coverage}} for overall data coverage
+\code{\link{pep_coverage}} for overall data coverage
 }
 \author{
 Matthias Templ

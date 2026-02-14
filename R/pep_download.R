@@ -53,7 +53,7 @@
 #' }
 #'
 #' @seealso
-#' \code{\link{simulate_pep}} for creating your own synthetic data,
+#' \code{\link{pep_simulate}} for creating your own synthetic data,
 #' \code{\link{pep_import}} for importing real PEP725 data
 #'
 #' @author Matthias Templ
@@ -121,7 +121,7 @@ pep_download <- function(url = NULL,
       "Failed to download synthetic PEP data.\n",
       "Please check your internet connection and try again.\n",
       "URL: ", url, "\n\n",
-      "Alternatively, you can create synthetic data using simulate_pep() ",
+      "Alternatively, you can create synthetic data using pep_simulate() ",
       "if you have access to real PEP725 data.",
       call. = FALSE
     )

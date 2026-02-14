@@ -395,7 +395,7 @@ Data quality is critical in phenology. The package provides robust outlier detec
 ```{r}
 #| eval: false
 # Find potential second flowering events
-second <- detect_second_events(
+second <- pep_second_events(
   pep,
   phases = c(60, 65),
   late_threshold = 250  # After September 7

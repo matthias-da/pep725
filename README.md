@@ -33,19 +33,19 @@ Templ et al. (2018). Pan European Phenological database (PEP725): a single point
 
 **Quality & Validation:**
 - `pep_completeness()` - Assess species/phase coverage across stations
-- `check_phases()` - Validate phenological phase sequences
-- `flag_outliers()` - Detect outliers (30-day rule, MAD, IQR, z-score)
+- `pep_check_phases()` - Validate phenological phase sequences
+- `pep_flag_outliers()` - Detect outliers (30-day rule, MAD, IQR, z-score)
 
 **Advanced Analysis:**
 - `pheno_combine()` - Combined time series from multi-station data (robust/mixed/OLS)
 - `pheno_trend_turning()` - Sequential Mann-Kendall trend turning point detection
-- `pls_phenology()` - PLS regression for temperature-sensitive phenological periods
+- `pheno_pls()` - PLS regression for temperature-sensitive phenological periods
 
 **Visualization:**
 - `pheno_plot_timeseries()` - DOY trend plots over time
 - `plot_phenology_trends()` - Robust regression trend analysis
-- `leaflet_pep()` - Interactive maps for station exploration and selection
-- `map_pep()` - Static maps of station networks
+- `pheno_leaflet()` - Interactive maps for station exploration and selection
+- `pheno_map()` - Static maps of station networks
 
 ## Installation
 
@@ -66,7 +66,7 @@ pep <- pep_download()
 # Explore the data
 print(pep)
 summary(pep)
-coverage(pep)
+pep_coverage(pep)
 
 # Filter to a species
 wheat <- pep[species == "Triticum aestivum"]
@@ -99,7 +99,7 @@ summary(quality)
 |--------|----------|-------------------|
 | `pep_download()` | Learning, tutorials, reproducible examples | First use only |
 | `data(pep_seed)` | Quick offline tests, minimal examples | No |
-| `simulate_pep()` | Creating shareable datasets from your own data | No |
+| `pep_simulate()` | Creating shareable datasets from your own data | No |
 | `pep_import()` | Research with actual PEP725 observations | For download |
 | `as.pep()` | Working with your own phenological data | No |
 
@@ -161,7 +161,7 @@ summary(synchrony)
 
 ```r
 # Launch interactive map for station selection
-selected <- leaflet_pep(pep, label_col = "species")
+selected <- pheno_leaflet(pep, label_col = "species")
 
 # Use selected stations for analysis
 pep_subset <- pep[s_id %in% selected$s_id]
@@ -192,7 +192,7 @@ vignette("data-quality", package = "pep725")
 ## Requirements
 
 - R >= 4.1
-- Google Maps API key required for `map_pep()` static maps:
+- Google Maps API key required for `pheno_map()` static maps:
   ```r
   ggmap::register_google(key = "your_api_key")
   ```

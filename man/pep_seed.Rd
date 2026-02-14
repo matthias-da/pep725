@@ -23,7 +23,7 @@ A data.table with 1,319 rows and 10 variables:
 Derived from PEP725 Pan European Phenology Database \url{http://www.pep725.eu/}
 }
 \description{
-A small subset of phenological data suitable for use with \code{\link{simulate_pep}}
+A small subset of phenological data suitable for use with \code{\link{pep_simulate}}
 to generate synthetic phenological datasets. This dataset contains real structure
 but limited scope, making it suitable for package examples and testing.
 }
@@ -48,14 +48,14 @@ data(pep_seed)
 # Examine structure
 str(pep_seed)
 
-# Use with simulate_pep to create synthetic data
+# Use with pep_simulate to create synthetic data
 \donttest{
-pep_synthetic <- simulate_pep(pep_seed)
+pep_synthetic <- pep_simulate(pep_seed)
 }
 
 }
 \seealso{
-\code{\link{simulate_pep}} for generating synthetic data,
+\code{\link{pep_simulate}} for generating synthetic data,
 \code{\link{pep_download}} for downloading full synthetic dataset
 }
 \keyword{datasets}

@@ -87,7 +87,7 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #'
 #' if (nrow(pep_subset) > 0) {
 #'   # Method 1: Detect late-season flowering events (default)
-#'   second <- detect_second_events(pep_subset, phases = c(60, 65))
+#'   second <- pep_second_events(pep_subset, phases = c(60, 65))
 #'   print(second)
 #'   summary(second)
 #'
@@ -96,20 +96,20 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #'   plot(second, type = "overview", scale = "relative", from_year = 1980)
 #'
 #'   # Method 2: Detect repeated observations at same station
-#'   repeated <- detect_second_events(pep_subset, method = "multiple_per_year")
+#'   repeated <- pep_second_events(pep_subset, method = "multiple_per_year")
 #'   print(repeated)
 #'   plot(repeated, type = "timeline", from_year = 1980)
 #'
 #'   # Method 3: Combine both detection methods
-#'   all_events <- detect_second_events(pep_subset, method = "both")
+#'   all_events <- pep_second_events(pep_subset, method = "both")
 #'   summary(all_events)
 #'   plot(all_events)
 #'   plot(all_events, scale = "relative")
 #' }
 #' }
 #'
-#' @seealso \code{\link{flag_outliers}} for general outlier detection,
-#'   \code{\link{plot_outliers}} for outlier visualization
+#' @seealso \code{\link{pep_flag_outliers}} for general outlier detection,
+#'   \code{\link{pep_plot_outliers}} for outlier visualization
 #'
 #' @references
 #' Related to emerging research on phenological irregularity and climate
@@ -117,7 +117,7 @@ utils::globalVariables(c("day", "year", "s_id", "phase_id", "genus", "species",
 #'
 #' @author Matthias Templ
 #' @export
-detect_second_events <- function(pep,
+pep_second_events <- function(pep,
                                   phases = c(60, 65),
                                   method = c("late_season", "multiple_per_year", "both"),
                                   late_threshold = 250,
