@@ -217,6 +217,25 @@ you can use most of the functionality in **pep725** with minimal adaptation.
 
 The key requirement is a *PEP725-like tabular structure* — one row per observation. This structure can usually be achieved with straightforward preprocessing (e.g., renaming columns and ensuring consistent DOY formatting).
 
+Once your data has the required columns, convert it to a `pep` object:
+
+```{r own-data, eval = FALSE}
+# Prepare your data with the required columns
+my_data <- data.frame(
+  s_id = c("MY001", "MY001", "MY002"),
+  lon = c(10.1, 10.1, 11.3),
+  lat = c(47.5, 47.5, 48.1),
+  genus = c("Malus", "Malus", "Malus"),
+  species = c("Malus domestica", "Malus domestica", "Malus domestica"),
+  phase_id = c(60, 65, 60),
+  year = c(2020, 2020, 2020),
+  day = c(110, 125, 108)
+)
+
+# Convert to a pep object — validates required columns automatically
+my_pep <- as.pep(my_data)
+```
+
 
 
 > **Important Note for Research**
@@ -238,6 +257,18 @@ Now that we have data loaded, let's understand what we're working with. The
 ```{r structure}
 # View the data - the print method shows a summary
 print(pep)
+```
+
+Let's get a quick visual overview. The `plot()` method for `pep` objects
+provides three built-in views — a station map, a time series, and a DOY
+histogram:
+
+```{r first-look, fig.height = 4}
+# Where are the stations?
+plot(pep, type = "map")
+
+# How are phenological events distributed across the year?
+plot(pep, type = "histogram")
 ```
 
 ### What You See in the Output
@@ -542,30 +573,29 @@ print(annual_mean)
 Now let's visualize the trend:
 
 ```{r quick-analysis-plot}
-# Step 4: Plot the trend
-if (nrow(annual_mean) > 1) {
-  plot(annual_mean$year, annual_mean$mean_doy,
-       type = "b",  # Both points and lines
-       xlab = "Year",
-       ylab = "Mean Day of Year",
-       main = "Apple Flowering Date Over Time",
-       pch = 19,    # Solid circles
-       col = "steelblue")
+# Step 4: Plot the trend with ggplot2
+library(ggplot2)
 
-  # Step 5: Add a trend line
-  if (nrow(annual_mean) >= 3) {
-    trend <- lm(mean_doy ~ year, data = annual_mean)
-    abline(trend, col = "red", lty = 2)
+p <- ggplot(annual_mean, aes(x = year, y = mean_doy)) +
+  geom_point(aes(size = n_obs), color = "steelblue", alpha = 0.6) +
+  geom_line(color = "steelblue", alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red", linetype = 2, se = FALSE) +
+  labs(
+    title = "Apple Flowering Date Over Time",
+    x = "Year", y = "Mean Day of Year",
+    size = "Observations"
+  ) +
+  theme_minimal()
+print(p)
 
-    # Calculate and display the trend
-    slope <- coef(trend)[2]
-    cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
-    if (slope < 0) {
-      cat("Interpretation: Flowering is getting EARLIER\n")
-    } else {
-      cat("Interpretation: Flowering is getting LATER\n")
-    }
-  }
+# Step 5: Quantify the trend
+trend <- lm(mean_doy ~ year, data = annual_mean)
+slope <- coef(trend)[2]
+cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
+if (slope < 0) {
+  cat("Interpretation: Flowering is getting EARLIER\n")
+} else {
+  cat("Interpretation: Flowering is getting LATER\n")
 }
 ```
 
@@ -583,39 +613,32 @@ time series in the database (records back to 1775 in some regions):
 # Step 1: Filter to grapevine flowering (BBCH 65 = full flowering)
 vine_flowering <- pep[species == "Vitis vinifera" & phase_id == 65]
 
-# Always verify the subset contains data
-if (nrow(vine_flowering) > 0) {
-  cat("Grapevine flowering observations:", nrow(vine_flowering), "\n")
-  cat("Year range:", min(vine_flowering$year), "-", max(vine_flowering$year), "\n")
-  cat("Countries:", length(unique(vine_flowering$country)), "\n")
+cat("Grapevine flowering observations:", nrow(vine_flowering), "\n")
+cat("Year range:", min(vine_flowering$year), "-", max(vine_flowering$year), "\n")
+cat("Countries:", length(unique(vine_flowering$country)), "\n")
 
-  # Step 2: Calculate annual mean DOY
-  vine_annual <- vine_flowering[, .(
-    mean_doy = mean(day, na.rm = TRUE),
-    n_obs = .N
-  ), by = year][order(year)]
+# Step 2: Calculate annual mean DOY
+vine_annual <- vine_flowering[, .(
+  mean_doy = mean(day, na.rm = TRUE),
+  n_obs = .N
+), by = year][order(year)]
 
-  # Step 3: Plot the trend
-  if (nrow(vine_annual) > 1) {
-    plot(vine_annual$year, vine_annual$mean_doy,
-         type = "b",
-         xlab = "Year",
-         ylab = "Mean Day of Year",
-         main = "Grapevine Flowering Date Over Time",
-         pch = 19,
-         col = "purple")
+# Step 3: Plot the trend
+p <- ggplot(vine_annual, aes(x = year, y = mean_doy)) +
+  geom_point(aes(size = n_obs), color = "purple", alpha = 0.6) +
+  geom_line(color = "purple", alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red", linetype = 2, se = FALSE) +
+  labs(
+    title = "Grapevine Flowering Date Over Time",
+    x = "Year", y = "Mean Day of Year",
+    size = "Observations"
+  ) +
+  theme_minimal()
+print(p)
 
-    if (nrow(vine_annual) >= 3) {
-      trend <- lm(mean_doy ~ year, data = vine_annual)
-      abline(trend, col = "red", lty = 2)
-
-      slope <- coef(trend)[2]
-      cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
-    }
-  }
-} else {
-  cat("No grapevine flowering data available in this subset.\n")
-}
+trend <- lm(mean_doy ~ year, data = vine_annual)
+slope <- coef(trend)[2]
+cat("\nTrend:", round(slope * 10, 2), "days per decade\n")
 ```
 
 **Why grapevine?** *Vitis vinifera* is economically important (wine production),
@@ -655,6 +678,10 @@ Learn to calculate phenological normals (long-term averages), detect anomalies
 - `pheno_anomaly()` - Identify deviations from normal
 - `pheno_trend_turning()` - Detect changes in trend direction
 
+```{r eval = FALSE}
+vignette("phenological-analysis", package = "pep725")
+```
+
 ### Spatial Phenological Patterns Vignette
 
 Analyze how phenology varies across landscapes:
@@ -663,12 +690,20 @@ Analyze how phenology varies across landscapes:
 - `pheno_synchrony()` - Measure spatial coherence
 - `map_pep()` - Create maps of phenological patterns
 
+```{r eval = FALSE}
+vignette("spatial-patterns", package = "pep725")
+```
+
 ### Data Quality & Irregular Events Vignette
 
 Ensure your data is reliable and investigate unusual observations:
 
 - `flag_outliers()` - Identify suspicious observations
 - `plot_outliers()` - Visualize outliers in context
+
+```{r eval = FALSE}
+vignette("data-quality", package = "pep725")
+```
 
 ## Getting Help
 
