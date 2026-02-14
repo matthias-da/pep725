@@ -1,5 +1,7 @@
 ---
 title: "Getting Started with pep725"
+author: "Matthias Templ"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 vignette: >
@@ -201,7 +203,7 @@ The `pep_import()` function automatically cleans and formats the data:
 - Optionally adds country names based on coordinates
 
 
-### Option 5: Use Your Own Plant phenological Data
+### Option 5: Use Your Own Plant Phenological Data
 
 Although **pep725** is designed around the structure and conventions of the PEP725 database, it is not limited to PEP725 data.
 
@@ -303,16 +305,9 @@ Phenological data uses **Day of Year (DOY)** rather than calendar dates. This
 simplifies calculations and comparisons:
 
 - DOY 1 = January 1
-- DOY 60 = March 1 (approximately)
 - DOY 91 = April 1 (approximately)
-- DOY 121 = May 1 (approximately)
-- DOY 152 = June 1 (approximately)
 - DOY 182 = July 1 (approximately)
-- DOY 213 = August 1 (approximately)
-- DOY 244 = September 1 (approximately)
 - DOY 274 = October 1 (approximately)
-- DOY 305 = November 1 (approximately)
-- DOY 335 = December 1 (approximately)
 - DOY 365/366 = December 31
 
 **Why DOY?** It makes it easy to calculate things like "flowering advanced by
@@ -439,7 +434,7 @@ codes <- unique(pep$phase_id)
 bbch_description(codes)
 ```
 
-### Commonly Used BBCH Codes in Phenological research
+### Commonly Used BBCH Codes in Phenological Research
 
 | Code | Stage | What to Look For |
 |------|-------|------------------|
