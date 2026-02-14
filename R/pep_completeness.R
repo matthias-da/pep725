@@ -26,7 +26,7 @@ utils::globalVariables(c("n_obs", "completeness_pct", ".data"))
 #'
 #' @return A \code{data.table} of class \code{pep_completeness} with columns:
 #'   \describe{
-#'     \item{<by variables>}{Grouping variables as specified}
+#'     \item{by variables}{Grouping variables as specified in \code{by}}
 #'     \item{n_obs}{Total number of observations}
 #'     \item{n_stations}{Number of unique stations}
 #'     \item{n_years}{Number of years with data}

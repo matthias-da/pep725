@@ -38,7 +38,7 @@ Either \code{"tukey"} (default, uses 1.5*IQR rule) or \code{"zscore"}
 \value{
 A \code{data.table} with the following columns:
 \describe{
-\item{\if{html}{\out{<by variables>}}}{Grouping variables as specified}
+\item{by variables}{Grouping variables as specified in \code{by}}
 \item{n_obs}{Total number of observations}
 \item{year_min}{First year of observations}
 \item{year_max}{Last year of observations}

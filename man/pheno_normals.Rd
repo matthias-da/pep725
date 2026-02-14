@@ -48,7 +48,7 @@ Default is \code{c(0.05, 0.10, 0.25, 0.75, 0.90, 0.95)}.}
 \value{
 A \code{data.table} with the following columns:
 \describe{
-\item{\if{html}{\out{<by variables>}}}{Grouping variables as specified}
+\item{by variables}{Grouping variables as specified in \code{by}}
 \item{n_years}{Number of years with data in the period}
 \item{n_obs}{Total number of observations}
 \item{mean_doy}{Arithmetic mean DOY}

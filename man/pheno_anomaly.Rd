@@ -55,7 +55,7 @@ baseline statistics are taken from this object instead of being computed.}
 \value{
 A \code{data.table} with the following columns:
 \describe{
-\item{\if{html}{\out{<by variables>}}}{Grouping variables as specified}
+\item{by variables}{Grouping variables as specified in \code{by}}
 \item{year}{Year of observation}
 \item{observed_doy}{Observed mean day-of-year for the group/year}
 \item{baseline_doy}{Long-term baseline (median if robust, mean otherwise)}

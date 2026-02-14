@@ -21,7 +21,7 @@ utils::globalVariables(c("grade_num", "worst_grade_num"))
 #'
 #' @return A \code{data.table} with the following columns:
 #'   \describe{
-#'     \item{<by variables>}{Grouping variables as specified}
+#'     \item{by variables}{Grouping variables as specified in \code{by}}
 #'     \item{n_obs}{Total number of observations}
 #'     \item{year_min}{First year of observations}
 #'     \item{year_max}{Last year of observations}

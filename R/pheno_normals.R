@@ -28,7 +28,7 @@
 #'
 #' @return A \code{data.table} with the following columns:
 #'   \describe{
-#'     \item{<by variables>}{Grouping variables as specified}
+#'     \item{by variables}{Grouping variables as specified in \code{by}}
 #'     \item{n_years}{Number of years with data in the period}
 #'     \item{n_obs}{Total number of observations}
 #'     \item{mean_doy}{Arithmetic mean DOY}
