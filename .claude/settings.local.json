@@ -50,7 +50,15 @@
       "Bash(python3:*)",
       "Bash(R CMD build:*)",
       "Bash(_R_CHECK_FORCE_SUGGESTS_=false R CMD check:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(gh api:*)",
+      "Bash(dot:*)",
+      "Bash(while read hash msg)",
+      "Bash(do if git log -1 --format=\"%B\" \"$hash\")",
+      "Bash(then echo \"$hash $msg\")",
+      "Bash(fi)"
     ]
   }
 }

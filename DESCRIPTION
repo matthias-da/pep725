@@ -18,7 +18,8 @@ Description: Provides a framework for quality-aware analysis of ground-based
     for identifying temperature-sensitive periods, and sequential
     Mann-Kendall trend analysis. Supports data import from PEP725 files,
     conversion of user-supplied data, and downloadable synthetic datasets
-    for teaching. All analysis outputs provide 'print', 'summary', and
+    for teaching without barriers of registration. 
+    All analysis outputs provide 'print', 'summary', and
     'plot' methods. Interactive spatial visualization is available via
     'leaflet'.
 License: GPL-3 + file LICENSE
