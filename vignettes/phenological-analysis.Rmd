@@ -1,6 +1,9 @@
 ---
 title: "Phenological Analysis"
+author: "Matthias Templ"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Phenological Analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -188,17 +191,17 @@ A bar chart variant is also available with `plot(normals, which = "bar")`.
 Often you want normals for a specific phenological phase:
 
 ```{r normals-filtered}
-# Normals for apple flowering (BBCH 60) only
-heading_normals <- pheno_normals(
+# Normals for apple first flowering (BBCH 60) only
+flowering_normals <- pheno_normals(
   pep = pep,                          # Can use full dataset
   period = 1990:2015,
   species = "Malus domestica",         # Filter by species
-  phase_id = 60,                      # Filter by phase (heading)
+  phase_id = 60,                      # Filter by phase (first flowers)
   by = "country",                     # Group only by country
   min_years = 5                       # Lower threshold for more countries
 )
 
-print(heading_normals)
+print(flowering_normals)
 ```
 
 **Note on NA values:** You'll notice some countries show `NA` for all
@@ -235,16 +238,23 @@ period2 <- pheno_normals(
   min_years = 10
 )
 
-# Compare the two periods
+# Compare the two periods by merging on country
 # Negative shift = flowering got earlier
 # Positive shift = flowering got later
 if (nrow(period1) > 0 && nrow(period2) > 0) {
-  shift <- period2$mean_doy - period1$mean_doy
-  cat("Mean shift across countries:", round(mean(shift, na.rm = TRUE), 1), "days\n")
-  cat("Range of shifts:", round(min(shift, na.rm = TRUE), 1), "to",
-      round(max(shift, na.rm = TRUE), 1), "days\n")
+  comparison <- merge(
+    period1[, .(country, mean_doy_early = mean_doy)],
+    period2[, .(country, mean_doy_recent = mean_doy)],
+    by = "country"
+  )
+  comparison[, shift := mean_doy_recent - mean_doy_early]
 
-  if (mean(shift, na.rm = TRUE) < 0) {
+  cat("Countries compared:", nrow(comparison), "\n")
+  cat("Mean shift:", round(mean(comparison$shift, na.rm = TRUE), 1), "days\n")
+  cat("Range of shifts:", round(min(comparison$shift, na.rm = TRUE), 1), "to",
+      round(max(comparison$shift, na.rm = TRUE), 1), "days\n")
+
+  if (mean(comparison$shift, na.rm = TRUE) < 0) {
     cat("\nInterpretation: On average, flowering has shifted EARLIER\n")
   } else {
     cat("\nInterpretation: On average, flowering has shifted LATER\n")
@@ -635,7 +645,7 @@ apple_annual <- apple[, .(
 # Add human-readable phase labels
 apple_annual[, phase := factor(phase_id,
   levels = c(60, 65, 100),
-  labels = c("Heading", "Flowering", "Harvest"))]
+  labels = c("First flowers", "Full flowering", "Harvest"))]
 
 # Remove rows where phase mapping failed
 apple_annual <- apple_annual[!is.na(phase)]
