@@ -29,6 +29,8 @@ date: 14 February 2026
 bibliography: paper.bib
 ---
 
+![](pep725_logo_cpt.png){ width=20% }
+
 # Summary
 
 Phenological observations are a key source of evidence for biological responses to climate variability and change [@parmesan2006ecological; @thackeray2016phenological; @piao2019phenology]. The Pan European Phenology database [PEP725; @templ2018pep725; @templ2026pep725] is an open-access infrastructure for plant phenology data, unifying more than 13 million observations from over 30 countries, spanning the period from 1868 to the present and covering approximately 265 plant species and 46 phenophases. While these datasets offer exceptional scientific value, their analysis is challenged by uneven spatial coverage, heterogeneous data quality and temporal gaps.
