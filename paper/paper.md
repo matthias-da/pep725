@@ -41,7 +41,7 @@ Ground-based phenological datasets pose distinct analytical challenges: observat
 
 # Example usage
 
-The following example illustrates the quality-first workflow that **pep725** is designed to support: assess station-level data quality before estimating a spatial gradient.
+The following example illustrates the quality-first workflow that **pep725** is designed to support: assess station-level data quality before further analysis.
 
 ```r
 library(pep725)
@@ -54,11 +54,7 @@ apple <- pep[species == "Malus domestica" &
 # Grade each station's record quality (A-D)
 quality <- pep_quality(apple, by = c("s_id", "phase_id"))
 summary(quality)
-
-# Elevation gradient for flowering (BBCH 60), robust regression
-gradient <- pheno_gradient(apple, phase_id = 60,
-                           variable = "alt", method = "robust")
-plot(gradient)  # cf. Fig. 1
+plot(quality, which = "overview", pep = apple)  # cf. Fig. 1
 ```
 
 # State of the field
@@ -71,9 +67,9 @@ Despite this rich ecosystem, few tools focus on quality-aware spatial analysis o
 
 The design of **pep725** is guided by three principles: (i) explicit treatment of data quality and uncertainty, (ii) transparent and reproducible spatial analysis workflows, and (iii) modular integration with the broader R ecosystem.
 
-The package implements an object-oriented design using S3 classes, with dedicated `print`, `summary`, and `plot` methods for all analysis outputs. Functions operate on tabular phenological data with explicit spatial and temporal attributes and return structured objects that can be reused across analytical steps. Gradient and synchrony analyses share consistent interfaces and support robust estimation methods (including `lmrob` and quantile regression) to reduce sensitivity to outliers and heterogeneous sampling. Visualization tools are integrated directly into the workflow to support iterative exploration, region definition, and communication of results. \autoref{fig:gradient} shows an example of the `pheno_gradient()` output: the elevation gradient for apple flowering estimated by robust regression. Four vignettes provide reproducible workflows covering data access, phenological analysis, spatial patterns, and data quality assessment.
+The package implements an object-oriented design using S3 classes, with dedicated `print`, `summary`, and `plot` methods for all analysis outputs. Functions operate on tabular phenological data with explicit spatial and temporal attributes and return structured objects that can be reused across analytical steps. Gradient and synchrony analyses share consistent interfaces and support robust estimation methods (including `lmrob` and quantile regression) to reduce sensitivity to outliers and heterogeneous sampling. Visualization tools are integrated directly into the workflow to support iterative exploration, region definition, and communication of results. \autoref{fig:quality} shows an example of the `pep_quality()` output: a quality overview for apple flowering stations in Austria and Switzerland, combining grade distribution with a geographic map that reveals substantial spatial variation in data reliability across the Alpine observation network. Four vignettes provide reproducible workflows covering data access, phenological analysis, spatial patterns, and data quality assessment.
 
-![Elevation gradient for apple flowering (BBCH 60) estimated with robust regression. Each point represents a station-level mean day-of-year; the fitted line shows the phenological lapse rate.\label{fig:gradient}](figures/gradient_example.png){ width=80% }
+![Data quality overview for apple flowering stations in Austria and Switzerland. Left: distribution of quality grades (A = best, D = poorest) across 6,394 station-phase combinations. Right: geographic distribution of 1,402 stations colored by quality grade.\label{fig:quality}](figures/quality_overview.png){ width=95% }
 
 # Research impact statement
 
