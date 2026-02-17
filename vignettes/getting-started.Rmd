@@ -1,6 +1,8 @@
 ---
 title: "Getting Started with pep725"
-author: "Matthias Templ"
+author:
+  - Matthias Templ^[University of Applied Sciences Northwestern Switzerland (FHNW)]
+  - Barbara Templ^[Swiss Federal Institute for Forest, Snow and Landscape Research (WSL)]
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
@@ -9,6 +11,11 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+*Vignette 1 of 4 for the **pep725** R package.
+The most current version is available on
+[GitHub](https://github.com/matthias-da/pep725) and
+[CRAN](https://CRAN.R-project.org/package=pep725).*
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
