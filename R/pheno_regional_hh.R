@@ -41,16 +41,12 @@
 #' @seealso \code{\link{pep_import}}, \code{\link{pheno_plot_hh}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #'
-#' # PEP data only
 #' out <- pheno_regional_hh(pep,
 #'          species_name = "Triticum aestivum")
 #' pheno_plot_hh(out)
-#'
-#' # With GISS temperature anomalies
-#' # out <- pheno_regional_hh(pep, giss = giss)
 #' }
 #' @author Matthias Templ
 #' @export

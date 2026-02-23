@@ -25,11 +25,10 @@ with faceting by phenophase and spatial scope.
 This function visualizes DOY trends with faceting by phenophase and spatial scope.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
-# Requires GISS temperature anomaly data
-# out <- pheno_regional(pep, giss, species_name = "Triticum aestivum", phase = 10)
-# pheno_plot(out)
+out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
+pheno_plot(out)
 }
 
 }

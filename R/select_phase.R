@@ -28,11 +28,9 @@
 #' @seealso \code{\link{pheno_regional}}, \code{\link{pep_download}}, \code{\link{pheno_plot}}
 #'
 #' @examples
-#' \dontrun{
-#' # Requires pep_download() data - see pheno_regional()
+#' \donttest{
 #' pep <- pep_download()
-#'
-#' agg <- pheno_regional(pep, giss, species_name = "Triticum aestivum")$pep_agg
+#' agg <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)$pep_agg
 #' df <- select_phase(agg, label = "PEP725", sp = "Triticum aestivum", yrmin = 1961)
 #' head(df)
 #' }
