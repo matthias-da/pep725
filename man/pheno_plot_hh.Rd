@@ -34,7 +34,7 @@ This function shows DOY trends by phase and data source across years,
 with month labels on the y-axis for easier interpretation.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 out <- pheno_regional_hh(pep,
          species_name = "Triticum aestivum")

@@ -44,19 +44,10 @@ Groups below the \code{min_obs} threshold are left unchanged.  A message
 reports how many rows were not simulated.
 }
 \examples{
-\dontrun{
-# Download PEP data first
+\donttest{
 pep <- pep_download()
-
-# Use subset for faster simulation
 pep_ch <- pep[country == "Switzerland"]
-
-# Generate synthetic data
 pep_synth <- pep_simulate(pep_ch)
-
-# Use with analysis functions
-normals <- pheno_normals(pep_synth, period = 1990:2015,
-                         by = c("country", "phase_id"))
 }
 }
 \author{

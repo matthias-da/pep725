@@ -76,15 +76,11 @@ If GISS data is provided, temperature anomalies are merged with the selected
 PEP time series to support phenology-climate analysis.
 }
 \examples{
-\dontrun{
+\donttest{
 pep <- pep_download()
 
-# PEP data only
 out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
 str(out)
-
-# With GISS temperature anomalies
-# out <- pheno_regional(pep, giss, species_name = "Triticum aestivum", phase = 60)
 }
 
 }

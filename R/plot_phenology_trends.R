@@ -61,31 +61,13 @@ utils::globalVariables(c("a"))
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
-#'
-#' # Grapevine (Vitis vinifera) - longest historical records
-#' # phases BBCH 65 (flowering) & 81 (veraison), DACH only:
 #' plot_phenology_trends(
 #'   pep,
 #'   species_name = "Vitis vinifera",
 #'   phases = c(65, 81),
 #'   layout = "country_phase"
-#' )
-#'
-#' # Same data, but facets flipped:
-#' plot_phenology_trends(
-#'   pep,
-#'   species_name = "Vitis vinifera",
-#'   phases = c(65, 81),
-#'   layout = "phase_country"
-#' )
-#'
-#' # Genus-level plot (all species of the genus Vitis)
-#' plot_phenology_trends(
-#'   pep,
-#'   genus_name = "Vitis",
-#'   phases = c(65, 81)
 #' )
 #' }
 plot_phenology_trends <- function(

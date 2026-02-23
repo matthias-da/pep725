@@ -36,19 +36,10 @@ utils::globalVariables(c("med_day", "i.med_day"))
 #' @author Matthias Templ
 #' @export
 #' @examples
-#' \dontrun{
-#' # Download PEP data first
+#' \donttest{
 #' pep <- pep_download()
-#'
-#' # Use subset for faster simulation
 #' pep_ch <- pep[country == "Switzerland"]
-#'
-#' # Generate synthetic data
 #' pep_synth <- pep_simulate(pep_ch)
-#'
-#' # Use with analysis functions
-#' normals <- pheno_normals(pep_synth, period = 1990:2015,
-#'                          by = c("country", "phase_id"))
 #' }
 pep_simulate <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
 

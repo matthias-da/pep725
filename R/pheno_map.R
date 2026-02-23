@@ -105,19 +105,12 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #' @importFrom stats sd coef lm na.omit
 #' @importFrom sf st_as_sf st_bbox
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
-#'
-#' # Simple map without Google Maps (no API key needed)
-#' pheno_map(pep, background = "none", color_by = "n_obs")
-#'
-#' # Map with mean phenological timing
-#' pheno_map(pep, background = "none", color_by = "mean_doy", phase_id = 60)
-#'
-#' # Map with trends (blue = earlier, red = later)
-#' pheno_map(pep, background = "none", color_by = "trend",
-#'         phase_id = 60, period = 1990:2020)
-#'
+#' pep_alpine <- pep[country %in% c("Switzerland", "Austria")]
+#' pheno_map(pep_alpine, background = "none", color_by = "n_obs")
+#' }
+#' \dontrun{
 #' # With Google Maps background (requires API key)
 #' ggmap::register_google(key = "your_api_key_here")
 #' pheno_map(pep, background = "google", color_by = "n_species", zoom = 5)

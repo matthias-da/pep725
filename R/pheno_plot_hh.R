@@ -21,7 +21,7 @@
 #' @seealso \code{\link{pheno_regional_hh}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pep <- pep_download()
 #' out <- pheno_regional_hh(pep,
 #'          species_name = "Triticum aestivum")
