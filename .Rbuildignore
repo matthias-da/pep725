@@ -13,4 +13,5 @@ CLAUDE.md
 ^\.github$
 ^CONTRIBUTING\.md$
 ^TODO_JOSS_submission\.md$
+^TODO_JSS_paper\.md$
 ^paper$
