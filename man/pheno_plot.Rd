@@ -25,7 +25,7 @@ with faceting by phenophase and spatial scope.
 This function visualizes DOY trends with faceting by phenophase and spatial scope.
 }
 \examples{
-\donttest{
+\dontrun{
 pep <- pep_download()
 out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
 pheno_plot(out)

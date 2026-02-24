@@ -99,9 +99,6 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #'   \code{\link{pheno_synchrony}} for synchrony analysis
 #'
 #' @import ggplot2
-#' @import ggmap
-#' @importFrom dplyr group_by summarise n n_distinct
-#' @importFrom ggmap register_google get_map
 #' @importFrom stats sd coef lm na.omit
 #' @importFrom sf st_as_sf st_bbox
 #' @examples
@@ -175,12 +172,16 @@ pheno_map <- function(
   # Create base map depending on background type
   if (background == "google") {
     # Google Maps background (requires API key)
+    if (!requireNamespace("ggmap", quietly = TRUE)) {
+      stop("Package 'ggmap' is required for background = \"google\". ",
+           "Install it with: install.packages(\"ggmap\")", call. = FALSE)
+    }
     if (!is.null(key)) {
-      register_google(key = key)
+      ggmap::register_google(key = key)
     }
 
-    gmap <- get_map(location = location, zoom = zoom)
-    g <- ggmap(gmap) +
+    gmap <- ggmap::get_map(location = location, zoom = zoom)
+    g <- ggmap::ggmap(gmap) +
       theme_minimal()
 
   } else {

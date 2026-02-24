@@ -34,7 +34,8 @@ the disconnected parts.
 \examples{
 \donttest{
 pep <- pep_download()
-conn <- pep_check_connectivity(pep)
+pep_alpine <- pep[country \%in\% c("Switzerland", "Austria")]
+conn <- pep_check_connectivity(pep_alpine)
 if (!conn$is_connected) {
   warning("Data has ", conn$n_sets, " disconnected sets")
 }

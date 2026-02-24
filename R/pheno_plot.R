@@ -16,7 +16,7 @@
 #' @seealso \code{\link{pheno_regional}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' pep <- pep_download()
 #' out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
 #' pheno_plot(out)

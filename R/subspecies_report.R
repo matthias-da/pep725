@@ -39,8 +39,8 @@
 #'
 #' @author Matthias Templ
 #' @export
-#' @import dplyr
-#' @import tidyr
+#' @importFrom dplyr filter mutate select group_by summarise arrange left_join rename coalesce across any_of n n_distinct recode %>%
+#' @importFrom tidyr pivot_wider pivot_longer unite
 #' @import ggplot2
 #' @importFrom stats na.omit
 #' @importFrom tibble tibble
@@ -175,8 +175,8 @@ subspecies_report <- function(
 #'
 #' @author Matthias Templ
 #' @export
-#' @import dplyr
-#' @import tidyr
+#' @importFrom dplyr filter mutate group_by summarise left_join rename across any_of n n_distinct coalesce
+#' @importFrom tidyr pivot_wider
 #' @importFrom tibble tibble
 #' @importFrom stats median
 #'
@@ -372,9 +372,8 @@ summarize_subspecies_availability <- function(
 #' observations per subspecies and country.
 #'
 #' @inheritParams subspecies_report
-#' @import dplyr
-#' @import tidyr
-#' @import ggplot2
+#' @importFrom dplyr filter mutate group_by summarise n_distinct recode
+#' @importFrom tidyr pivot_wider
 plot_subspecies_missingness_heatmap <- function(
     pep,
     species_name = NULL,
@@ -468,8 +467,8 @@ plot_subspecies_missingness_heatmap <- function(
 #' into a wide publication-ready table.
 #'
 #' @inheritParams subspecies_report
-#' @import dplyr
-#' @import tidyr
+#' @importFrom dplyr arrange
+#' @importFrom tidyr pivot_longer unite pivot_wider
 format_subspecies_wide_table <- function(
     df,
     phases = c(65,87),

@@ -39,7 +39,7 @@
 #' @author Matthias Templ
 #' @export
 pheno_leaflet <- function(pep, label_col = NULL, quiet = FALSE) {
-  pkgs <- c("shiny", "miniUI", "leaflet", "leaflet.extras")
+  pkgs <- c("shiny", "miniUI", "leaflet", "leaflet.extras", "sp")
   missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
   if (length(missing) > 0) {
     msg <- paste0("Package(s) ", paste(missing, collapse = ", "),

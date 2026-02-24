@@ -1,7 +1,7 @@
-Rplots.pdf
-Claude.md
-CLAUDE.md
-.claude
+^Rplots\.pdf$
+^Claude\.md$
+^CLAUDE\.md$
+^\.claude
 ^pepperPaper$
 ^inst/scripts$
 ^presentations$
@@ -15,3 +15,6 @@ CLAUDE.md
 ^TODO_JOSS_submission\.md$
 ^TODO_JSS_paper\.md$
 ^paper$
+^cran-comments\.md$
+\.Rcheck$
+\.tar\.gz$
