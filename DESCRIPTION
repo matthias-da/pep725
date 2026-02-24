@@ -1,5 +1,5 @@
 Package: pep725
-Title: pep725 Pan-European Phenological Data Analysis
+Title: Pan-European Phenological Data Analysis
 Version: 0.1.0
 Authors@R: 
     c(person("Matthias", "Templ", , "matthias.templ@gmail.com", role = c("aut", "cre"),
@@ -18,16 +18,16 @@ Description: Provides a framework for quality-aware analysis of ground-based
     for identifying temperature-sensitive periods, and sequential
     Mann-Kendall trend analysis. Supports data import from PEP725 files,
     conversion of user-supplied data, and downloadable synthetic datasets
-    for teaching without barriers of registration. 
+    for teaching without barriers of registration.
     All analysis outputs provide 'print', 'summary', and
     'plot' methods. Interactive spatial visualization is available via
     'leaflet'.
-License: GPL-3 
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.1), data.table, ggplot2
-Imports: dplyr, mgcv, ggmap, methods, patchwork, purrr, robustbase, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: knitr, leaflet, leaflet.extras, miniUI, nlme, quantreg, rmarkdown, devtools, rnaturalearthdata, pls, shiny, testthat (>= 3.0.0)
+Imports: dplyr, mgcv, methods, patchwork, purrr, robustbase, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Suggests: ggmap, knitr, leaflet, leaflet.extras, miniUI, nlme, quantreg, rmarkdown, rnaturalearthdata, pls, shiny, sp, testthat (>= 3.0.0)
 Additional_repositories: https://trafficonese.r-universe.dev
 Config/testthat/edition: 3
 VignetteBuilder: knitr

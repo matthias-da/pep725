@@ -1,5 +1,5 @@
 # Prevent R CMD check notes for data.table columns
-utils::globalVariables(c("phase_id", "total_obs", "n_present"))
+utils::globalVariables(c("phase_id", "total_obs", "n_present", "complete"))
 
 #' Check for Expected Phenological Phases
 #'
