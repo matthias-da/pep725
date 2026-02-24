@@ -129,6 +129,18 @@ if (nrow(vine_ch) > 0) {
 }
 
 }
+\references{
+Menzel, A. et al. (2006). European phenological response to climate
+change matches the warming pattern.
+\emph{Global Change Biology}, 12(10), 1969--1976.
+\doi{10.1111/j.1365-2486.2006.01193.x}
+
+Templ, M., Templ, B., and Filzmoser, P. (2018).
+Modelling and prediction of phenological data of the beginning of
+flowering: Austrian indicators of climate change.
+\emph{International Journal of Biometeorology}, 62, 1319--1334.
+\doi{10.1007/s00484-018-1534-2}
+}
 \seealso{
 \code{\link{pheno_normals}} for calculating baseline statistics,
 \code{\link{pep_download}} for obtaining the main dataset

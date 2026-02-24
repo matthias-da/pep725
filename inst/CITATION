@@ -1,0 +1,43 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Enhancing Reproducibility in Phenology Research: The {pep725} {R} Package for Quality-Aware Analysis of {PEP725} Data",
+  author   = c(
+    person("Matthias", "Templ"),
+    person("Barbara", "Templ")
+  ),
+  journal  = "New Phytologist",
+  year     = "2026",
+  doi      = "10.1111/nph.70869",
+  header   = "To cite pep725 in publications use:"
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Pan {European} Phenological database ({PEP725}): a single point of access for {European} data",
+  author   = c(
+    person("Barbara", "Templ"),
+    person("Elisabeth", "Koch"),
+    person("Kjell", "Bolmgren"),
+    person("Markus", given = "Ungersb\\u{00f6}ck"),
+    person("Anita", "Paul"),
+    person("Helfried", "Scheifinger"),
+    person("This", "Rutishauser"),
+    person("Montserrat", "Busto"),
+    person("Frank-M.", "Chmielewski"),
+    person("Lenka", given = "H\\u{00e1}jkov\\u{00e1}"),
+    person("Sabina", given = "Hod\\u{017e}i\\u{0107}"),
+    person("Frank", "Kaspar"),
+    person("Barbara", "Pietragalla"),
+    person("Ramiro", "Romero-Fresneda"),
+    person("Anne", "Tolvanen"),
+    person("Vi\\u{0161}nja", given = "Vu\\u{010d}eti\\u{0107}"),
+    person("Kirsten", "Zimmermann"),
+    person("Ana", "Zust")
+  ),
+  journal  = "International Journal of Biometeorology",
+  year     = "2018",
+  volume   = "62",
+  pages    = "1109--1113",
+  doi      = "10.1007/s00484-018-1512-8",
+  header   = "For the underlying PEP725 database, also cite:"
+)

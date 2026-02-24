@@ -114,6 +114,12 @@ modern_quality
 }
 
 }
+\references{
+Schaber, J. and Badeck, F.-W. (2002). Evaluation of methods for the
+combination of phenological time series and outlier detection.
+\emph{Tree Physiology}, 22, 973--982.
+\doi{10.1093/treephys/22.14.973}
+}
 \seealso{
 \code{\link{pheno_normals}} for calculating climatological normals,
 \code{\link{pheno_anomaly}} for anomaly detection

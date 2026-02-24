@@ -80,6 +80,12 @@
 #' sync_detailed
 #' }
 #'
+#' @references
+#' Rosenzweig, C. et al. (2008). Attributing physical and biological
+#' impacts to anthropogenic climate change.
+#' \emph{Nature}, 453, 353--357.
+#' \doi{10.1038/nature06937}
+#'
 #' @seealso
 #' \code{\link{pheno_normals}} for climatological statistics,
 #' \code{\link{pheno_anomaly}} for anomaly detection
