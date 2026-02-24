@@ -42,9 +42,19 @@ pheno_leaflet <- function(pep, label_col = NULL, quiet = FALSE) {
   pkgs <- c("shiny", "miniUI", "leaflet", "leaflet.extras")
   missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
   if (length(missing) > 0) {
-    stop("Package(s) ", paste(missing, collapse = ", "),
-         " required for pheno_leaflet(). Install with: install.packages(c(",
-         paste0('"', missing, '"', collapse = ", "), "))", call. = FALSE)
+    msg <- paste0("Package(s) ", paste(missing, collapse = ", "),
+         " required for pheno_leaflet().")
+    if ("leaflet.extras" %in% missing) {
+      msg <- paste0(msg,
+        "\nInstall leaflet.extras from r-universe: ",
+        'install.packages("leaflet.extras", repos = "https://trafficonese.r-universe.dev")')
+    }
+    other <- setdiff(missing, "leaflet.extras")
+    if (length(other) > 0) {
+      msg <- paste0(msg, "\nInstall from CRAN: install.packages(c(",
+        paste0('"', other, '"', collapse = ", "), "))")
+    }
+    stop(msg, call. = FALSE)
   }
 
   if (!all(c("lon", "lat") %in% names(pep))) stop("pep must contain 'lon' and 'lat' columns.")

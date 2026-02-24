@@ -28,6 +28,7 @@ LazyData: true
 Depends: R (>= 4.1), data.table, ggplot2
 Imports: dplyr, mgcv, ggmap, methods, patchwork, purrr, robustbase, sp, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
 Suggests: knitr, leaflet, leaflet.extras, miniUI, nlme, quantreg, rmarkdown, devtools, rnaturalearthdata, pls, shiny, testthat (>= 3.0.0)
+Additional_repositories: https://trafficonese.r-universe.dev
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
