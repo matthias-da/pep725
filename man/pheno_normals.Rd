@@ -125,6 +125,16 @@ shift <- period2$mean_doy - period1$mean_doy
 }
 
 }
+\references{
+WMO (2017). \emph{WMO Guidelines on the Calculation of Climate Normals}.
+WMO-No. 1203, World Meteorological Organization, Geneva.
+
+Templ, M., Templ, B., and Filzmoser, P. (2018).
+Modelling and prediction of phenological data of the beginning of
+flowering: Austrian indicators of climate change.
+\emph{International Journal of Biometeorology}, 62, 1319--1334.
+\doi{10.1007/s00484-018-1534-2}
+}
 \seealso{
 \code{\link{pheno_anomaly}} for calculating anomalies relative to normals,
 \code{\link{pep_download}} for obtaining the main dataset

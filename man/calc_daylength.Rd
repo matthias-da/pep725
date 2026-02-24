@@ -58,6 +58,13 @@ plot(yearly$doy, yearly$daylength, type = "l",
      xlab = "Day of Year", ylab = "Daylength (hours)")
 
 }
+\references{
+Forsythe, W. C., Rykiel, E. J., Stahl, R. S., Wu, H., and
+Schoolfield, R. M. (1995). A model comparison for daylength as a
+function of latitude and day of year.
+\emph{Ecological Modelling}, 80(1), 87--95.
+\doi{10.1016/0304-3800(94)00034-F}
+}
 \author{
 Matthias Templ
 }

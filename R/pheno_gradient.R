@@ -95,6 +95,16 @@
 #' print(grad_by_country)
 #' }
 #'
+#' @references
+#' Defila, C. and Clot, B. (2001). Phytophenological trends in Switzerland.
+#' \emph{International Journal of Biometeorology}, 45, 203--207.
+#' \doi{10.1007/s004840100101}
+#'
+#' Ziello, C. et al. (2009). Influence of altitude on phenology of selected
+#' plant species in the Alpine region (1971--2000).
+#' \emph{Climate Research}, 39, 227--234.
+#' \doi{10.3354/cr00822}
+#'
 #' @seealso
 #' \code{\link{pheno_normals}} for calculating climatological normals,
 #' \code{\link[robustbase]{lmrob}} for robust regression details
