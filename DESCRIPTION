@@ -27,8 +27,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 4.1), data.table, ggplot2
 Imports: dplyr, mgcv, methods, patchwork, purrr, robustbase, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
-Suggests: ggmap, knitr, leaflet, leaflet.extras, miniUI, nlme, quantreg, rmarkdown, rnaturalearthdata, pls, shiny, sp, testthat (>= 3.0.0)
-Additional_repositories: https://trafficonese.r-universe.dev
+Suggests: ggmap, knitr, leaflet, miniUI, nlme, quantreg, rmarkdown, rnaturalearthdata, pls, shiny, sp, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

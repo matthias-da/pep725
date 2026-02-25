@@ -15,17 +15,8 @@ This is a resubmission. In the previous submission we received:
 >
 > but no declaration where to get this from?
 
-The package `leaflet.extras` was recently archived from CRAN (2026-02-19) but
-remains available from its r-universe repository. We have declared this in
-DESCRIPTION via:
-
-```
-Additional_repositories: https://trafficonese.r-universe.dev
-```
-
-`leaflet.extras` is listed in Suggests only and is used in a single interactive
-function (`pheno_leaflet()`), whose example is wrapped in `\dontrun{}`. The
-dependency is guarded at runtime with `requireNamespace()` and provides a clear
-installation message pointing users to the r-universe repository if the package
-is not installed. No other functionality in the package depends on
-`leaflet.extras`.
+We have removed `leaflet.extras` from Suggests entirely. It is no longer
+declared as a dependency. The single function that uses it (`pheno_leaflet()`,
+an interactive Shiny gadget) checks for its availability at runtime via
+`requireNamespace()` and provides a clear installation message pointing to
+the r-universe repository if the package is not installed.
