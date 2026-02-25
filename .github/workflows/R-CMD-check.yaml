@@ -33,11 +33,6 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Add r-universe repo for leaflet.extras
-        run: |
-          cat('options(repos = c(trafficonese = "https://trafficonese.r-universe.dev", getOption("repos")))\n', file = "~/.Rprofile", append = TRUE)
-        shell: Rscript {0}
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck

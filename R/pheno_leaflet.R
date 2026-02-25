@@ -157,14 +157,14 @@ pheno_leaflet <- function(pep, label_col = NULL, quiet = FALSE) {
           label = label,
           layerId = ~paste(lon, lat)
         ) %>%
-        leaflet.extras::addDrawToolbar(
+        getExportedValue("leaflet.extras", "addDrawToolbar")(
           targetGroup = "draw",
           polylineOptions = FALSE,
           polygonOptions = TRUE,
           rectangleOptions = TRUE,
           circleOptions = FALSE,
           markerOptions = FALSE,
-          editOptions = leaflet.extras::editToolbarOptions(),
+          editOptions = getExportedValue("leaflet.extras", "editToolbarOptions")(),
           singleFeature = FALSE
         )
 
