@@ -6,15 +6,26 @@
 
 There are currently no downstream dependencies for this package.
 
-## Note on leaflet.extras
+## Resubmission
 
-The package `leaflet.extras` is listed in Suggests and declared via
-`Additional_repositories: https://trafficonese.r-universe.dev` in DESCRIPTION.
+This is a resubmission. In the previous submission we received:
 
-`leaflet.extras` was recently archived from CRAN (2026-02-19) but remains
-available from the r-universe repository above. It is used only in a single
-interactive function (`pheno_leaflet()`) whose example is wrapped in
-`\dontrun{}`. The package is checked at runtime via `requireNamespace()` and
-the function provides a clear installation message pointing to the r-universe
-if the package is not available. No other functionality in the package depends
-on `leaflet.extras`.
+> Suggests or Enhances not in mainstream repositories:
+>   leaflet.extras
+>
+> but no declaration where to get this from?
+
+The package `leaflet.extras` was recently archived from CRAN (2026-02-19) but
+remains available from its r-universe repository. We have declared this in
+DESCRIPTION via:
+
+```
+Additional_repositories: https://trafficonese.r-universe.dev
+```
+
+`leaflet.extras` is listed in Suggests only and is used in a single interactive
+function (`pheno_leaflet()`), whose example is wrapped in `\dontrun{}`. The
+dependency is guarded at runtime with `requireNamespace()` and provides a clear
+installation message pointing users to the r-universe repository if the package
+is not installed. No other functionality in the package depends on
+`leaflet.extras`.
