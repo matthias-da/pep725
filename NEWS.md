@@ -1,4 +1,4 @@
-# pep725 0.1.0
+# pep725 1.0.0
 
 * Initial JOSS and CRAN submission on Valentin`s day, 14. February 2026
 * Data access: `pep_download()`, `pep_import()`, `pep_simulate()`
