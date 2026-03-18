@@ -1,3 +1,9 @@
+# pep725 1.0.1
+
+* Fixed CRAN additional check: `pep_download()` no longer writes to user cache
+  directory during `R CMD check` (uses `tempdir()` instead to avoid
+  `_R_CHECK_THINGS_IN_OTHER_DIRS_` note)
+
 # pep725 1.0.0
 
 * Initial JOSS and CRAN submission on Valentin`s day, 14. February 2026

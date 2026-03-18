@@ -8,15 +8,16 @@ There are currently no downstream dependencies for this package.
 
 ## Resubmission
 
-This is a resubmission. In the previous submission we received:
+This is a resubmission. Changes since the previous submission:
 
-> Suggests or Enhances not in mainstream repositories:
->   leaflet.extras
->
-> but no declaration where to get this from?
+1. **Fixed cache directory NOTE**: `pep_download()` caches synthetic data
+   to the user cache directory via `tools::R_user_dir()`. During R CMD check
+   this triggered a NOTE from `_R_CHECK_THINGS_IN_OTHER_DIRS_`. We now
+   detect the check environment and use `tempdir()` instead, so no files
+   are written outside the package/temp directories during checks.
 
-We have removed `leaflet.extras` from Suggests entirely. It is no longer
-declared as a dependency. The single function that uses it (`pheno_leaflet()`,
-an interactive Shiny gadget) checks for its availability at runtime via
-`requireNamespace()` and provides a clear installation message pointing to
-the r-universe repository if the package is not installed.
+2. **`leaflet.extras` removed from Suggests** (previous feedback):
+   It is no longer declared as a dependency. The single function that uses
+   it (`pheno_leaflet()`) checks availability at runtime via
+   `requireNamespace()` and provides a clear installation message pointing
+   to the r-universe repository.

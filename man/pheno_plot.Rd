@@ -25,11 +25,15 @@ with faceting by phenophase and spatial scope.
 This function visualizes DOY trends with faceting by phenophase and spatial scope.
 }
 \examples{
-\dontrun{
-pep <- pep_download()
-out <- pheno_regional(pep, species_name = "Triticum aestivum", phase = 60)
-pheno_plot(out)
-}
+# Construct a minimal data_list with ts_tidy
+ts_tidy <- data.frame(
+  year = rep(1990:1995, 2),
+  DOY = c(120, 118, 115, 119, 113, 110, 125, 122, 120, 124, 118, 115),
+  source = rep(c("PEP725 (aggregated)", "PEP725 (near Changins)"), each = 6),
+  phase = "Heading",
+  panel = "DOY"
+)
+pheno_plot(list(ts_tidy = ts_tidy))
 
 }
 \seealso{

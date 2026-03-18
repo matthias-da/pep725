@@ -24,12 +24,10 @@
 #' @seealso \code{\link[data.table]{fread}}, \code{\link[data.table]{rbindlist}}
 #' @author Matthias Templ (FHNW)
 #' @examples
-#' \dontrun{
-#' # path to all csv files from pep725
-#' mypath <- "~/data/Data_PEP725_all/"
-#' pep_data <- pep_import(path = mypath)
-#' str(pep_data)
-#' }
+#' # Small example files shipped with the package
+#' path <- system.file("extdata", package = "pep725")
+#' pep_data <- pep_import(path = path, add_country = FALSE)
+#' print(pep_data)
 #' @export
 pep_import <- function(path = "data/Data_PEP725_all", flags = FALSE, add_country = TRUE){
 

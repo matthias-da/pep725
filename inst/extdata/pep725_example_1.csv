@@ -1,0 +1,7 @@
+provider_id;s_id;gss_id;lat;lon;alt;alt_dem;genus;species;subspecies;phase_id;year;day;date;cult_season
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;60;1990;81;1990-03-22;0
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;65;1990;89;1990-03-30;0
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;60;1991;85;1991-03-26;0
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;65;1991;93;1991-04-03;0
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;60;1992;79;1992-03-19;0
+1;2902;100;48.7333;9.36667;270;268;Malus;Malus domestica;;65;1992;87;1992-03-27;0

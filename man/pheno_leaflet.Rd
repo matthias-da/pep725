@@ -32,8 +32,7 @@ selected <- pheno_leaflet(wheat)
 }
 }
 \examples{
-\dontrun{
-# Download synthetic data first
+if (interactive()) {
 pep <- pep_download()
 
 # For faster loading, filter the data first (recommended)

@@ -69,7 +69,16 @@ pep_download <- function(url = NULL,
   }
 
   # Determine cache directory
- cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  # Use tempdir() during R CMD check to avoid writing to user directories
+  # (flagged by _R_CHECK_THINGS_IN_OTHER_DIRS_)
+  in_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    nzchar(Sys.getenv("_R_CHECK_THINGS_IN_OTHER_DIRS_")) ||
+    !identical(Sys.getenv("R_TESTS"), "")
+  if (in_check) {
+    cache_dir <- tempdir()
+  } else {
+    cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  }
   cache_file <- file.path(cache_dir, "pep_synth.rda")
 
   # Check if cached version exists
@@ -192,7 +201,14 @@ pep_download <- function(url = NULL,
 #' @author Matthias Templ
 #' @export
 pep_cache_clear <- function(quiet = FALSE) {
-  cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  in_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    nzchar(Sys.getenv("_R_CHECK_THINGS_IN_OTHER_DIRS_")) ||
+    !identical(Sys.getenv("R_TESTS"), "")
+  if (in_check) {
+    cache_dir <- tempdir()
+  } else {
+    cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  }
   cache_file <- file.path(cache_dir, "pep_synth.rda")
 
   if (file.exists(cache_file)) {
@@ -225,7 +241,14 @@ pep_cache_clear <- function(quiet = FALSE) {
 #' @author Matthias Templ
 #' @export
 pep_cache_info <- function() {
-  cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  in_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    nzchar(Sys.getenv("_R_CHECK_THINGS_IN_OTHER_DIRS_")) ||
+    !identical(Sys.getenv("R_TESTS"), "")
+  if (in_check) {
+    cache_dir <- tempdir()
+  } else {
+    cache_dir <- tools::R_user_dir("pep725", which = "cache")
+  }
   cache_file <- file.path(cache_dir, "pep_synth.rda")
 
   if (file.exists(cache_file)) {
