@@ -95,7 +95,7 @@ utils::globalVariables(c("lon", "lat", "n", "n_species", "mean_doy", "trend",
 #' }
 #'
 #' @seealso \code{\link{pheno_normals}} for detailed normal calculations,
-#'   \code{\link{kendall_tau}} for trend calculation,
+#'   \code{\link{mann_kendall_z}} for trend calculation,
 #'   \code{\link{pheno_synchrony}} for synchrony analysis
 #'
 #' @import ggplot2
@@ -281,8 +281,8 @@ pheno_map <- function(
     # Calculate trend for each station
     station_trends <- annual_data[, {
       if (.N >= min_years) {
-        # Use kendall_tau for robust trend estimation
-        tau <- kendall_tau(annual_mean)
+        # Use Mann-Kendall Z-statistic for robust trend estimation
+        tau <- mann_kendall_z(annual_mean)
         list(trend = tau, n_years = .N)
       } else {
         list(trend = NA_real_, n_years = .N)

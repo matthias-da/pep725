@@ -2,7 +2,7 @@
 % Please edit documentation in R/pheno_trend_turning.R
 \name{kendall_tau}
 \alias{kendall_tau}
-\title{Mann-Kendall Z-Statistic}
+\title{Mann-Kendall Z-Statistic (deprecated alias for \code{mann_kendall_z})}
 \usage{
 kendall_tau(x)
 }
@@ -11,23 +11,24 @@ kendall_tau(x)
 \code{NA} values are silently removed.}
 }
 \value{
-Numeric. The Mann-Kendall Z-statistic (\code{S / sqrt(Var(S))}).
-Positive values indicate increasing trend, negative values decreasing.
-Compare against standard normal quantiles (e.g., |Z| > 1.96 for p < 0.05).
-Returns \code{NA} if fewer than 3 non-missing values.
+Numeric. Identical output shape to \code{mann_kendall_z()}.
 }
 \description{
-Computes the Mann-Kendall Z-statistic for a time series,
-providing a non-parametric test of monotonic trend. The Z-statistic
-is approximately standard normal under the no-trend null hypothesis.
+This function was misnamed in pep725 <= 1.0.2: it returned the
+Mann-Kendall Z-statistic, not Kendall's \eqn{\tau = S / (n(n-1)/2)}.
+Please call \code{\link{mann_kendall_z}} instead for identical (and
+better: tie-corrected, continuity-corrected) behaviour.
+}
+\details{
+Note that this function is now a thin wrapper and will continue to
+return the Z-statistic until a future major release.
 }
 \examples{
-# Decreasing trend (earlier phenology)
-kendall_tau(c(120, 118, 115, 112, 110, 108, 105))
+suppressWarnings(kendall_tau(c(120, 118, 115, 112, 110, 108, 105)))
 
-# No clear trend
-kendall_tau(c(120, 115, 122, 118, 121, 116, 119))
-
+}
+\seealso{
+\code{\link{mann_kendall_z}}
 }
 \author{
 Matthias Templ

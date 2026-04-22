@@ -138,7 +138,7 @@ pheno_map(pep, background = "google", color_by = "n_species", zoom = 5)
 }
 \seealso{
 \code{\link{pheno_normals}} for detailed normal calculations,
-\code{\link{kendall_tau}} for trend calculation,
+\code{\link{mann_kendall_z}} for trend calculation,
 \code{\link{pheno_synchrony}} for synchrony analysis
 }
 \author{

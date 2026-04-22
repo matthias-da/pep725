@@ -696,7 +696,7 @@ plot(turning)
 
 ### Simple Trend Statistics
 
-For a single trend value, use `kendall_tau()`:
+For a single trend value, use `mann_kendall_z()`:
 
 ```{r kendall-simple}
 # Aggregate to annual means
@@ -704,10 +704,14 @@ annual_doy <- apple_flowering[, .(
   mean_doy = mean(day, na.rm = TRUE)
 ), by = year][order(year)]
 
-# Calculate Mann-Kendall test statistic
-# Note: kendall_tau() returns the standardized z-statistic, not Kendall's
-# tau correlation. Values beyond ±1.96 indicate significant trends.
-tau <- kendall_tau(annual_doy$mean_doy)
+# Calculate Mann-Kendall test statistic. Values beyond +/- 1.96 indicate
+# significant trends at the 5% level (standard normal approximation).
+# The implementation includes the tie correction and continuity correction.
+# Note: pep725 (<= 1.0.2) exported this as kendall_tau(), which was a
+# misnomer — it returned the Z-statistic, not Kendall's tau. kendall_tau()
+# still works (with a deprecation warning); mann_kendall_z() is the new
+# recommended name.
+tau <- mann_kendall_z(annual_doy$mean_doy)
 
 cat("Mann-Kendall z-statistic:", round(tau, 3), "\n")
 cat("\nInterpretation:\n")

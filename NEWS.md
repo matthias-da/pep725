@@ -15,9 +15,21 @@
   `plot.pheno_normals()` falls back to the nearest available quantile pair
   when the default `q25/q75` are not present.
 
+## Deprecations
+
+* `kendall_tau()` is deprecated in favour of `mann_kendall_z()`. The old
+  function was misnamed: it returned the Mann-Kendall Z-statistic, not
+  Kendall's τ (which is bounded in [-1, 1]). `kendall_tau()` still works
+  (now as a thin wrapper that emits a deprecation warning) and returns the
+  same value it always did; please update callers to `mann_kendall_z()`.
+
 ## New features and improvements
 
-* *(pending — see improvement audit 2026-04-22)*
+* New `mann_kendall_z()` function — the correctly named replacement for
+  `kendall_tau()`. Adds a tie correction to `Var(S)` (so tied DOY values do
+  not inflate the statistic) and the continuity correction
+  `Z = (S - sign(S))/sqrt(Var(S))`, matching `Kendall::MannKendall()`. The
+  vectorised implementation replaces the previous O(n²) R loop.
 
 # pep725 1.0.2
 

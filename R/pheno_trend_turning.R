@@ -284,28 +284,49 @@ sequential_mk <- function(x) {
 
 #' Mann-Kendall Z-Statistic
 #'
-#' Computes the Mann-Kendall Z-statistic for a time series,
-#' providing a non-parametric test of monotonic trend. The Z-statistic
-#' is approximately standard normal under the no-trend null hypothesis.
+#' Computes the Mann-Kendall Z-statistic for a time series, a non-parametric
+#' test of monotonic trend. The Z-statistic is approximately standard normal
+#' under the no-trend null hypothesis.
+#'
+#' The implementation uses the standard tie correction for \code{Var(S)} (so
+#' that tied observations do not inflate the test) and the continuity
+#' correction \code{Z = (S - sign(S))/sqrt(Var(S))}, matching
+#' \code{Kendall::MannKendall()}.
 #'
 #' @param x Numeric vector (time series assumed to be equidistant).
 #'   \code{NA} values are silently removed.
 #'
-#' @return Numeric. The Mann-Kendall Z-statistic (\code{S / sqrt(Var(S))}).
-#'   Positive values indicate increasing trend, negative values decreasing.
-#'   Compare against standard normal quantiles (e.g., |Z| > 1.96 for p < 0.05).
-#'   Returns \code{NA} if fewer than 3 non-missing values.
+#' @return Numeric. The Mann-Kendall Z-statistic. Positive values indicate an
+#'   increasing trend, negative values decreasing. Compare against standard
+#'   normal quantiles (e.g., \code{|Z| > 1.96} for \code{p < 0.05}).
+#'   Returns \code{NA} if fewer than three non-missing values.
+#'
+#' @section Note on \code{kendall_tau()}:
+#' Earlier versions of pep725 exported a function called \code{kendall_tau()}
+#' that actually returned this Mann-Kendall Z-statistic (not the true
+#' Kendall's \eqn{\tau} = \eqn{S / (n(n-1)/2)}). \code{kendall_tau()} is now
+#' a deprecated alias of \code{mann_kendall_z()}; please update callers.
+#'
+#' @references
+#' Mann, H.B. (1945). Nonparametric tests against trend. \emph{Econometrica}
+#' 13, 245-259.
+#'
+#' Kendall, M.G. (1975). \emph{Rank Correlation Methods}. 4th ed. London:
+#' Charles Griffin.
 #'
 #' @examples
 #' # Decreasing trend (earlier phenology)
-#' kendall_tau(c(120, 118, 115, 112, 110, 108, 105))
+#' mann_kendall_z(c(120, 118, 115, 112, 110, 108, 105))
 #'
 #' # No clear trend
-#' kendall_tau(c(120, 115, 122, 118, 121, 116, 119))
+#' mann_kendall_z(c(120, 115, 122, 118, 121, 116, 119))
 #'
+#' @seealso \code{\link{kendall_tau}} (deprecated alias);
+#'   \code{\link{pheno_trend_turning}} for a full sequential Mann-Kendall
+#'   analysis.
 #' @author Matthias Templ
 #' @export
-kendall_tau <- function(x) {
+mann_kendall_z <- function(x) {
   x <- x[!is.na(x)]
   n <- length(x)
 
@@ -313,21 +334,66 @@ kendall_tau <- function(x) {
     return(NA_real_)
   }
 
-  # Calculate Kendall's S
-  s <- 0
-  for (i in 1:(n - 1)) {
-    for (j in (i + 1):n) {
-      s <- s + sign(x[j] - x[i])
-    }
+  # Vectorised S = sum over i<j of sign(x_j - x_i).
+  #   outer(x, x, "-")[i, j] = x[i] - x[j]
+  # The *lower* triangle holds entries with i > j, i.e. sign(x[i] - x[j])
+  # for i > j, which after re-labelling is the same multiset of pairs we
+  # want (sign(x[j] - x[i]) for i < j).
+  d <- outer(x, x, "-")
+  s <- sum(sign(d[lower.tri(d)]))
+
+  # Tie correction: if ties are present, reduce Var(S) by
+  #   sum over tie groups g of t_g (t_g - 1) (2 t_g + 5) / 18.
+  tie_counts <- tabulate(match(x, unique(x)))
+  tie_counts <- tie_counts[tie_counts > 1]
+  tie_term <- sum(tie_counts * (tie_counts - 1) * (2 * tie_counts + 5)) / 18
+
+  var_s <- (n * (n - 1) * (2 * n + 5) - tie_term * 18) / 18
+
+  # Continuity correction: subtract/add 1 from S before standardising.
+  if (s > 0) {
+    z <- (s - 1) / sqrt(var_s)
+  } else if (s < 0) {
+    z <- (s + 1) / sqrt(var_s)
+  } else {
+    z <- 0
   }
 
-  # Variance under null hypothesis
-  var_s <- n * (n - 1) * (2 * n + 5) / 18
+  z
+}
 
-  # Normalized tau
-  tau <- s / sqrt(var_s)
 
-  tau
+#' Mann-Kendall Z-Statistic (deprecated alias for \code{mann_kendall_z})
+#'
+#' This function was misnamed in pep725 <= 1.0.2: it returned the
+#' Mann-Kendall Z-statistic, not Kendall's \eqn{\tau = S / (n(n-1)/2)}.
+#' Please call \code{\link{mann_kendall_z}} instead for identical (and
+#' better: tie-corrected, continuity-corrected) behaviour.
+#'
+#' Note that this function is now a thin wrapper and will continue to
+#' return the Z-statistic until a future major release.
+#'
+#' @param x Numeric vector (time series assumed to be equidistant).
+#'   \code{NA} values are silently removed.
+#' @return Numeric. Identical output shape to \code{mann_kendall_z()}.
+#'
+#' @examples
+#' suppressWarnings(kendall_tau(c(120, 118, 115, 112, 110, 108, 105)))
+#'
+#' @seealso \code{\link{mann_kendall_z}}
+#' @author Matthias Templ
+#' @export
+kendall_tau <- function(x) {
+  .Deprecated(
+    new = "mann_kendall_z",
+    package = "pep725",
+    msg = paste(
+      "kendall_tau() is deprecated because it is misnamed: it returns the",
+      "Mann-Kendall Z-statistic, not Kendall's tau. Use mann_kendall_z()",
+      "for identical (and improved: tie-corrected) behaviour."
+    )
+  )
+  mann_kendall_z(x)
 }
 
 
