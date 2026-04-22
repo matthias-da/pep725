@@ -211,72 +211,97 @@ pheno_trend_turning <- function(pep,
 }
 
 
-#' Sequential Mann-Kendall Test (Internal)
+#' Sequential Mann-Kendall Test (Sneyers 1975, internal)
 #'
-#' Computes progressive and retrograde normalized Kendall tau series
-#' and identifies potential trend turning points.
+#' Computes the Sneyers (1975) progressive and retrograde standardised
+#' rank-count statistics \eqn{u(t)} and \eqn{u'(t)} for a time series, and
+#' identifies potential trend turning points as intersections of the two
+#' curves inside the non-significance band.
 #'
-#' @param x Numeric vector (time series)
-#' @return List with progressive, retrograde, and turning_points
+#' Let \eqn{n_i} denote the number of \eqn{j < i} with \eqn{x_i > x_j},
+#' and \eqn{t_i = \sum_{k=1}^{i} n_k}. Under the null hypothesis of no
+#' trend, \eqn{E[t_i] = i(i-1)/4} and \eqn{\mathrm{Var}[t_i] = i(i-1)(2i+5)/72}.
+#' The progressive statistic is
+#' \eqn{u(t_i) = (t_i - E[t_i])/\sqrt{\mathrm{Var}[t_i]}}.
+#' The retrograde \eqn{u'(t)} is the same procedure applied to the
+#' reversed series, then reversed and negated so both curves fluctuate
+#' around zero under stationarity.
+#'
+#' A turning point is flagged where the sign of \eqn{u - u'} changes
+#' between two consecutive indices and both curves are within the 95\%
+#' non-significance band \eqn{|z| < 1.96} at the crossing.
+#'
+#' Previous versions of this function (pep725 <= 1.0.2) used
+#' \eqn{\mathrm{Var} = i(i-1)(2i+5)/18} with a per-index (non-cumulative)
+#' \eqn{S} statistic and an ad-hoc \eqn{|u| > 0.5} threshold for the
+#' turning-point filter. That formulation did not match Sneyers' procedure.
+#'
+#' @param x Numeric vector (time series assumed to be equidistant;
+#'   callers should drop or impute NAs beforehand).
+#' @return List with \code{progressive}, \code{retrograde} (both length
+#'   \code{length(x)}), and \code{turning_points} (logical).
+#' @references
+#' Sneyers, R. (1975). Sur l'analyse statistique des séries d'observations.
+#' WMO Technical Note No. 143, WMO No. 415. Geneva: WMO.
+#'
+#' Moraes, J. M. et al. (1998). Trends in hydrological parameters of a
+#' Southern Brazilian watershed. \emph{Ambio} 27:302-307.
 #' @keywords internal
 sequential_mk <- function(x) {
   n <- length(x)
   if (n < 4) {
     return(list(
       progressive = rep(NA_real_, n),
-      retrograde = rep(NA_real_, n),
+      retrograde  = rep(NA_real_, n),
       turning_points = rep(FALSE, n)
     ))
   }
 
-  # Compute progressive series (forward)
-  prog <- numeric(n)
-  for (i in 2:n) {
-    s <- 0
-    for (j in 1:(i - 1)) {
-      s <- s + sign(x[i] - x[j])
+  # Rank-count helper: n_i = number of j < i with x_i > x_j.
+  rank_counts <- function(v) {
+    m <- length(v)
+    out <- integer(m)
+    for (i in seq_len(m)) {
+      if (i == 1L) next
+      out[i] <- sum(v[i] > v[seq_len(i - 1L)])
     }
-    # Normalize: E[S] = 0, Var[S] = i*(i-1)*(2i+5)/18
-    var_s <- i * (i - 1) * (2 * i + 5) / 18
-    prog[i] <- s / sqrt(var_s)
+    out
   }
-  prog[1] <- 0
 
-  # Compute retrograde series (backward on reversed series)
-  x_rev <- rev(x)
-  retr_rev <- numeric(n)
-  for (i in 2:n) {
-    s <- 0
-    for (j in 1:(i - 1)) {
-      s <- s + sign(x_rev[i] - x_rev[j])
-    }
-    var_s <- i * (i - 1) * (2 * i + 5) / 18
-    retr_rev[i] <- s / sqrt(var_s)
-  }
+  i_seq <- seq_len(n)
+  E_t <- i_seq * (i_seq - 1) / 4
+  V_t <- i_seq * (i_seq - 1) * (2 * i_seq + 5) / 72
+
+  # Progressive series
+  t_prog <- cumsum(rank_counts(x))
+  prog <- (t_prog - E_t) / sqrt(V_t)
+  prog[1] <- 0  # Var is zero at i = 1; by convention the curve starts at 0
+
+  # Retrograde: compute u on the reversed series, then reverse the
+  # resulting curve (no negation). Under H0 both u and u' fluctuate
+  # around zero; under a monotone trend they diverge in opposite
+  # directions and do not cross; at a trend change point (transition
+  # from stationary to trending, or vice versa) they intersect inside
+  # the 95% confidence band.
+  t_retr_rev <- cumsum(rank_counts(rev(x)))
+  retr_rev <- (t_retr_rev - E_t) / sqrt(V_t)
   retr_rev[1] <- 0
-  # Reverse back and negate (retrograde should be negative of reversed progressive)
-  retr <- -rev(retr_rev)
+  retr <- rev(retr_rev)
 
-  # Find turning points (where lines cross)
+  # Turning points: u and u' cross inside the 95% non-significance band.
   turning <- rep(FALSE, n)
+  diff_pr <- prog - retr
   for (i in 2:(n - 1)) {
-    # Check for sign change in the difference
-    diff_prev <- prog[i - 1] - retr[i - 1]
-    diff_curr <- prog[i] - retr[i]
-    diff_next <- prog[i + 1] - retr[i + 1]
-
-    # Crossing occurs when sign changes
-    if ((diff_prev * diff_curr <= 0) || (diff_curr * diff_next <= 0)) {
-      # Additional check: both series should be non-trivial
-      if (abs(prog[i]) > 0.5 || abs(retr[i]) > 0.5) {
-        turning[i] <- TRUE
-      }
+    if (!is.finite(diff_pr[i]) || !is.finite(diff_pr[i + 1])) next
+    if (diff_pr[i] * diff_pr[i + 1] <= 0 &&
+        abs(prog[i]) < 1.96 && abs(retr[i]) < 1.96) {
+      turning[i] <- TRUE
     }
   }
 
   list(
     progressive = prog,
-    retrograde = retr,
+    retrograde  = retr,
     turning_points = turning
   )
 }

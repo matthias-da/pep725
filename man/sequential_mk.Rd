@@ -2,18 +2,48 @@
 % Please edit documentation in R/pheno_trend_turning.R
 \name{sequential_mk}
 \alias{sequential_mk}
-\title{Sequential Mann-Kendall Test (Internal)}
+\title{Sequential Mann-Kendall Test (Sneyers 1975, internal)}
 \usage{
 sequential_mk(x)
 }
 \arguments{
-\item{x}{Numeric vector (time series)}
+\item{x}{Numeric vector (time series assumed to be equidistant;
+callers should drop or impute NAs beforehand).}
 }
 \value{
-List with progressive, retrograde, and turning_points
+List with \code{progressive}, \code{retrograde} (both length
+\code{length(x)}), and \code{turning_points} (logical).
 }
 \description{
-Computes progressive and retrograde normalized Kendall tau series
-and identifies potential trend turning points.
+Computes the Sneyers (1975) progressive and retrograde standardised
+rank-count statistics \eqn{u(t)} and \eqn{u'(t)} for a time series, and
+identifies potential trend turning points as intersections of the two
+curves inside the non-significance band.
+}
+\details{
+Let \eqn{n_i} denote the number of \eqn{j < i} with \eqn{x_i > x_j},
+and \eqn{t_i = \sum_{k=1}^{i} n_k}. Under the null hypothesis of no
+trend, \eqn{E[t_i] = i(i-1)/4} and \eqn{\mathrm{Var}[t_i] = i(i-1)(2i+5)/72}.
+The progressive statistic is
+\eqn{u(t_i) = (t_i - E[t_i])/\sqrt{\mathrm{Var}[t_i]}}.
+The retrograde \eqn{u'(t)} is the same procedure applied to the
+reversed series, then reversed and negated so both curves fluctuate
+around zero under stationarity.
+
+A turning point is flagged where the sign of \eqn{u - u'} changes
+between two consecutive indices and both curves are within the 95\\%
+non-significance band \eqn{|z| < 1.96} at the crossing.
+
+Previous versions of this function (pep725 <= 1.0.2) used
+\eqn{\mathrm{Var} = i(i-1)(2i+5)/18} with a per-index (non-cumulative)
+\eqn{S} statistic and an ad-hoc \eqn{|u| > 0.5} threshold for the
+turning-point filter. That formulation did not match Sneyers' procedure.
+}
+\references{
+Sneyers, R. (1975). Sur l'analyse statistique des séries d'observations.
+WMO Technical Note No. 143, WMO No. 415. Geneva: WMO.
+
+Moraes, J. M. et al. (1998). Trends in hydrological parameters of a
+Southern Brazilian watershed. \emph{Ambio} 27:302-307.
 }
 \keyword{internal}

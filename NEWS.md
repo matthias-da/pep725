@@ -5,6 +5,19 @@
 * `pheno_plot_timeseries()` no longer mutates the caller's data. Previously
   a `setDT(data)` call would convert a caller-supplied `data.frame` into a
   `data.table` by reference.
+* `pheno_trend_turning()` — the internal `sequential_mk()` helper now
+  implements the published Sneyers (1975) sequential Mann-Kendall
+  procedure: cumulative rank-count statistic
+  \eqn{t_i = \sum_{k \le i} n_k} with
+  \eqn{E[t_i] = i(i-1)/4} and
+  \eqn{\mathrm{Var}[t_i] = i(i-1)(2i+5)/72}, plus turning-point
+  detection as a sign change of \eqn{u(t) - u'(t)} inside the 95%
+  non-significance band. Previous versions used a per-index
+  (non-cumulative) \eqn{S} statistic with \eqn{\mathrm{Var}/18} and an
+  ad-hoc \eqn{|u| > 0.5} threshold — neither matching Sneyers' method.
+  Output of `pheno_trend_turning()` therefore changes numerically for
+  v1.1.0. Vectorised rank counting replaces the previous O(n²) R loop.
+
 * `calc_daylength()` gains a `method` argument. The default `"brock"` matches
   pep725 <= 1.0.2 (Brock 1981 / Spencer 1971 simple declination formula).
   A new `"cbm"` option implements the Forsythe et al. (1995) Climate-Budget-
