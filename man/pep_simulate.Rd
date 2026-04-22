@@ -46,8 +46,9 @@ reports how many rows were not simulated.
 \examples{
 \donttest{
 pep <- pep_download()
-pep_ch <- pep[country == "Switzerland"]
-pep_synth <- pep_simulate(pep_ch)
+# Single species + country for fast example
+vine_ch <- pep[species == "Vitis vinifera" & country == "Switzerland"]
+pep_synth <- pep_simulate(vine_ch)
 }
 }
 \author{

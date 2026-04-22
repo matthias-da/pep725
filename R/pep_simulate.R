@@ -38,8 +38,9 @@ utils::globalVariables(c("med_day", "i.med_day"))
 #' @examples
 #' \donttest{
 #' pep <- pep_download()
-#' pep_ch <- pep[country == "Switzerland"]
-#' pep_synth <- pep_simulate(pep_ch)
+#' # Single species + country for fast example
+#' vine_ch <- pep[species == "Vitis vinifera" & country == "Switzerland"]
+#' pep_synth <- pep_simulate(vine_ch)
 #' }
 pep_simulate <- function(pep, min_obs = 20, seed = 42, progress = TRUE) {
 

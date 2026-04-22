@@ -1,3 +1,8 @@
+# pep725 1.0.2
+
+* Reduced example sizes for `pep_simulate()` and `pep_coverage()` to avoid
+  high CPU/elapsed time ratios on multi-core CRAN check machines
+
 # pep725 1.0.1
 
 * Fixed CRAN additional check: `pep_download()` no longer writes to user cache

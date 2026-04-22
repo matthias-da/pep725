@@ -48,21 +48,16 @@ including temporal, geographical, and species dimensions.
 \examples{
 \donttest{
 pep <- pep_download()
+pep_ch <- pep[country == "Switzerland"]
 
 # Full coverage report
-pep_coverage(pep)
+pep_coverage(pep_ch)
 
 # Temporal coverage only
-pep_coverage(pep, kind = "temporal")
-
-# Geographical coverage with plot
-pep_coverage(pep, kind = "geographical", plot = TRUE)
+pep_coverage(pep_ch, kind = "temporal")
 
 # Species coverage, top 5
-pep_coverage(pep, kind = "species", top = 5)
-
-# Temporal coverage by country
-pep_coverage(pep, kind = "temporal", by = "country")
+pep_coverage(pep_ch, kind = "species", top = 5)
 }
 
 }
