@@ -56,7 +56,13 @@ A \code{data.table} with the following columns:
 \item{sd_doy}{Standard deviation}
 \item{iqr_doy}{Interquartile range}
 \item{mad_doy}{Median absolute deviation (robust spread)}
-\item{q05, q10, q25, q75, q90, q95}{Percentiles (or as specified in \code{probs})}
+\item{q05, q10, q25, q75, q90, q95}{Percentiles with the default
+\code{probs}. Custom \code{probs} produce column names derived from
+the actual levels — integer percents pad to two digits
+(e.g., \code{q05}, \code{q10}), fractional percents use an
+underscore in place of the decimal point (e.g., \code{q02_5} for
+the 2.5\\% quantile, \code{q97_5} for the 97.5\\% quantile).
+The mapping is also stored in \code{attr(result, "q_names")}.}
 \item{period}{Character string describing the reference period}
 }
 }

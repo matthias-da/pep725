@@ -5,6 +5,15 @@
 * `pheno_plot_timeseries()` no longer mutates the caller's data. Previously
   a `setDT(data)` call would convert a caller-supplied `data.frame` into a
   `data.table` by reference.
+* `pheno_normals()` now derives quantile column names from the supplied
+  `probs` levels. Previously custom `probs` were rejected unless exactly six
+  values were supplied, and even then the output columns were hard-coded to
+  `q05..q95` regardless of the actual levels — silently mislabelling
+  quantiles. Default `probs` still produce `q05, q10, q25, q75, q90, q95`;
+  custom `probs` now produce e.g. `q02_5, q97_5` for the 2.5% / 97.5%
+  quantiles. The mapping is stored in `attr(result, "q_names")`, and
+  `plot.pheno_normals()` falls back to the nearest available quantile pair
+  when the default `q25/q75` are not present.
 
 ## New features and improvements
 

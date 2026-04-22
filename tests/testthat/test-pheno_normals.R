@@ -83,6 +83,53 @@ test_that("pheno_normals() statistics are plausible", {
   expect_true(all(valid$q25 <= valid$q75))
 })
 
+test_that("pheno_normals() default probs produce q05/q10/q25/q75/q90/q95", {
+  data(pep_seed, package = "pep725")
+  p <- new_pep(pep_seed)
+  result <- pheno_normals(p, period = 1990:2015, by = c("genus", "phase_id"),
+                          min_years = 10)
+  expect_true(all(c("q05", "q10", "q25", "q75", "q90", "q95") %in% names(result)))
+})
+
+test_that("pheno_normals() custom probs generate correctly named columns", {
+  data(pep_seed, package = "pep725")
+  p <- new_pep(pep_seed)
+  # Non-default probs must produce column names derived from the levels,
+  # not silently re-use q05..q95.
+  result <- pheno_normals(p, period = 1990:2015, by = c("genus", "phase_id"),
+                          min_years = 10,
+                          probs = c(0.025, 0.25, 0.75, 0.975))
+  expect_true("q02_5"  %in% names(result))
+  expect_true("q25"    %in% names(result))
+  expect_true("q75"    %in% names(result))
+  expect_true("q97_5"  %in% names(result))
+  # The old hardcoded names must not be present when the user did not ask.
+  expect_false("q05" %in% names(result))
+  expect_false("q95" %in% names(result))
+  # Values must correspond to actual quantile levels.
+  valid <- result[!is.na(q25)]
+  expect_true(all(valid$q02_5 <= valid$q25))
+  expect_true(all(valid$q75   <= valid$q97_5))
+})
+
+test_that("pheno_normals() stores probs as attribute", {
+  data(pep_seed, package = "pep725")
+  p <- new_pep(pep_seed)
+  result <- pheno_normals(p, period = 1990:2015, by = c("genus", "phase_id"),
+                          min_years = 10,
+                          probs = c(0.1, 0.9))
+  expect_equal(attr(result, "probs"), c(0.1, 0.9))
+})
+
+test_that("pheno_normals() accepts a two-element probs without error", {
+  data(pep_seed, package = "pep725")
+  p <- new_pep(pep_seed)
+  expect_no_error(
+    pheno_normals(p, period = 1990:2015, by = c("genus", "phase_id"),
+                  min_years = 10, probs = c(0.1, 0.9))
+  )
+})
+
 test_that("pheno_normals() errors on invalid input", {
   expect_error(pheno_normals("not a df"), "must be a data.frame")
   data(pep_seed, package = "pep725")

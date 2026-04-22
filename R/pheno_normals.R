@@ -36,7 +36,13 @@
 #'     \item{sd_doy}{Standard deviation}
 #'     \item{iqr_doy}{Interquartile range}
 #'     \item{mad_doy}{Median absolute deviation (robust spread)}
-#'     \item{q05, q10, q25, q75, q90, q95}{Percentiles (or as specified in \code{probs})}
+#'     \item{q05, q10, q25, q75, q90, q95}{Percentiles with the default
+#'       \code{probs}. Custom \code{probs} produce column names derived from
+#'       the actual levels — integer percents pad to two digits
+#'       (e.g., \code{q05}, \code{q10}), fractional percents use an
+#'       underscore in place of the decimal point (e.g., \code{q02_5} for
+#'       the 2.5\% quantile, \code{q97_5} for the 97.5\% quantile).
+#'       The mapping is also stored in \code{attr(result, "q_names")}.}
 #'     \item{period}{Character string describing the reference period}
 #'   }
 #'
@@ -164,9 +170,32 @@ pheno_normals <- function(pep,
   if (!is.numeric(probs) || any(probs < 0) || any(probs > 1)) {
     stop("'probs' must be numeric values between 0 and 1", call. = FALSE)
   }
-  if (length(probs) != 6) {
-    stop("'probs' must have exactly 6 values (mapped to columns q05..q95). ",
-         "Default: c(0.05, 0.10, 0.25, 0.75, 0.90, 0.95)", call. = FALSE)
+  if (length(probs) < 1) {
+    stop("'probs' must contain at least one value", call. = FALSE)
+  }
+  # Derive quantile column names from levels. Integer percents pad to two
+  # digits (q05, q10, q25, q90); fractional percents use '_' for the decimal
+  # point to stay syntactically valid (q02_5, q97_5). Defaults of
+  # c(0.05, 0.10, 0.25, 0.75, 0.90, 0.95) continue to produce q05..q95.
+  .qname <- function(p) {
+    pct <- p * 100
+    if (isTRUE(all.equal(pct, round(pct)))) {
+      sprintf("q%02d", as.integer(round(pct)))
+    } else {
+      # Fractional percent: "q" + zero-padded integer part + "_" + fractional
+      # part (e.g. 2.5 -> "q02_5", 97.5 -> "q97_5").
+      int_part <- floor(pct)
+      frac_str <- sub("^0\\.", "",
+                      formatC(pct - int_part, format = "f", digits = 4))
+      frac_str <- sub("0+$", "", frac_str)
+      if (nchar(frac_str) == 0) frac_str <- "0"
+      sprintf("q%02d_%s", as.integer(int_part), frac_str)
+    }
+  }
+  q_names <- vapply(probs, .qname, character(1))
+  if (anyDuplicated(q_names)) {
+    stop("'probs' generated duplicate column names: ",
+         paste(q_names[duplicated(q_names)], collapse = ", "), call. = FALSE)
   }
 
  # Make a copy to avoid modifying original
@@ -241,42 +270,38 @@ pheno_normals <- function(pep,
     n_yrs <- sum(!is.na(doy_values))
 
     if (n_yrs >= min_years) {
-      # Calculate percentiles
-      quantiles <- quantile(doy_values, probs = probs, na.rm = na.rm)
-
-      list(
-        n_years = n_yrs,
-        n_obs = .N,
-        mean_doy = mean(doy_values, na.rm = na.rm),
-        median_doy = median(doy_values, na.rm = na.rm),
-        sd_doy = sd(doy_values, na.rm = na.rm),
-        iqr_doy = IQR(doy_values, na.rm = na.rm),
-        mad_doy = mad(doy_values, na.rm = na.rm),
-        q05 = quantiles[1],
-        q10 = quantiles[2],
-        q25 = quantiles[3],
-        q75 = quantiles[4],
-        q90 = quantiles[5],
-        q95 = quantiles[6],
-        period = period_label
+      quantiles <- stats::quantile(doy_values, probs = probs, na.rm = na.rm)
+      q_cols <- stats::setNames(as.list(quantiles), q_names)
+      c(
+        list(
+          n_years = n_yrs,
+          n_obs = .N,
+          mean_doy = mean(doy_values, na.rm = na.rm),
+          median_doy = stats::median(doy_values, na.rm = na.rm),
+          sd_doy = stats::sd(doy_values, na.rm = na.rm),
+          iqr_doy = stats::IQR(doy_values, na.rm = na.rm),
+          mad_doy = stats::mad(doy_values, na.rm = na.rm)
+        ),
+        q_cols,
+        list(period = period_label)
       )
     } else {
-      # Return NA for groups with insufficient data
-      list(
-        n_years = n_yrs,
-        n_obs = .N,
-        mean_doy = NA_real_,
-        median_doy = NA_real_,
-        sd_doy = NA_real_,
-        iqr_doy = NA_real_,
-        mad_doy = NA_real_,
-        q05 = NA_real_,
-        q10 = NA_real_,
-        q25 = NA_real_,
-        q75 = NA_real_,
-        q90 = NA_real_,
-        q95 = NA_real_,
-        period = period_label
+      q_cols <- stats::setNames(
+        as.list(rep(NA_real_, length(q_names))),
+        q_names
+      )
+      c(
+        list(
+          n_years = n_yrs,
+          n_obs = .N,
+          mean_doy = NA_real_,
+          median_doy = NA_real_,
+          sd_doy = NA_real_,
+          iqr_doy = NA_real_,
+          mad_doy = NA_real_
+        ),
+        q_cols,
+        list(period = period_label)
       )
     }
   }, by = by]
@@ -301,6 +326,8 @@ pheno_normals <- function(pep,
   attr(result, "min_years") <- min_years
   attr(result, "species_filter") <- species
   attr(result, "phase_filter") <- phase_id
+  attr(result, "probs") <- probs
+  attr(result, "q_names") <- q_names
 
   result
 }
@@ -349,9 +376,13 @@ print.pheno_normals <- function(x, n = 10, ...) {
   dt <- as.data.table(x)
 
   # Identify grouping columns (non-statistic columns)
+  q_cols_attr <- attr(x, "q_names")
+  if (is.null(q_cols_attr)) {
+    # Legacy objects without q_names attribute: fall back to default names.
+    q_cols_attr <- c("q05", "q10", "q25", "q75", "q90", "q95")
+  }
   stat_cols <- c("n_years", "n_obs", "mean_doy", "median_doy", "sd_doy",
-                 "iqr_doy", "mad_doy", "q05", "q10", "q25", "q75", "q90",
-                 "q95", "period")
+                 "iqr_doy", "mad_doy", q_cols_attr, "period")
   group_cols <- setdiff(names(dt), stat_cols)
 
   # Sort so that rows with NA in grouping columns appear last
@@ -456,9 +487,13 @@ plot.pheno_normals <- function(x, which = c("dotplot", "bar"), ...) {
   }
 
   # Identify grouping columns
+  q_cols_attr <- attr(x, "q_names")
+  if (is.null(q_cols_attr)) {
+    # Legacy objects without q_names attribute: fall back to default names.
+    q_cols_attr <- c("q05", "q10", "q25", "q75", "q90", "q95")
+  }
   stat_cols <- c("n_years", "n_obs", "mean_doy", "median_doy", "sd_doy",
-                 "iqr_doy", "mad_doy", "q05", "q10", "q25", "q75", "q90",
-                 "q95", "period")
+                 "iqr_doy", "mad_doy", q_cols_attr, "period")
   group_cols <- setdiff(names(plot_data), stat_cols)
 
   # Build human-readable group label
@@ -485,12 +520,36 @@ plot.pheno_normals <- function(x, which = c("dotplot", "bar"), ...) {
     sprintf("n groups: %d", nrow(plot_data))
   }
 
+  # Pick a lower/upper quantile pair for the IQR-style bar. Default probs
+  # include 0.25/0.75; custom probs may not. Fall back to the widest
+  # available pair that spans the median.
+  probs_used <- attr(x, "probs")
+  if (is.null(probs_used)) probs_used <- c(0.05, 0.10, 0.25, 0.75, 0.90, 0.95)
+  lower_idx <- which(probs_used >= 0.20 & probs_used <= 0.30)
+  upper_idx <- which(probs_used >= 0.70 & probs_used <= 0.80)
+  if (length(lower_idx) == 0) lower_idx <- which.max(probs_used[probs_used < 0.5])
+  if (length(upper_idx) == 0) upper_idx <- length(probs_used) -
+    which.min(rev(probs_used)[rev(probs_used) > 0.5]) + 1
+  # Resolve to actual column names in the result.
+  q_lo <- q_cols_attr[lower_idx[1]]
+  q_hi <- q_cols_attr[upper_idx[1]]
+  has_band <- !is.null(q_lo) && !is.null(q_hi) &&
+    !is.na(q_lo) && !is.na(q_hi) &&
+    q_lo %in% names(plot_data) && q_hi %in% names(plot_data)
+
   if (which == "dotplot") {
     p <- ggplot2::ggplot(plot_data,
                          ggplot2::aes(x = median_doy,
-                                      y = stats::reorder(group_label, median_doy),
-                                      xmin = q25, xmax = q75)) +
-      ggplot2::geom_pointrange(color = "steelblue") +
+                                      y = stats::reorder(group_label, median_doy)))
+    if (has_band) {
+      p <- p + ggplot2::geom_pointrange(
+        ggplot2::aes(xmin = .data[[q_lo]], xmax = .data[[q_hi]]),
+        color = "steelblue"
+      )
+    } else {
+      p <- p + ggplot2::geom_point(color = "steelblue", size = 2)
+    }
+    p <- p +
       ggplot2::labs(x = "Day of Year", y = NULL,
                     title = "Phenological Normals",
                     subtitle = subtitle) +
@@ -499,9 +558,14 @@ plot.pheno_normals <- function(x, which = c("dotplot", "bar"), ...) {
     p <- ggplot2::ggplot(plot_data,
                          ggplot2::aes(x = stats::reorder(group_label, median_doy),
                                       y = median_doy)) +
-      ggplot2::geom_col(fill = "steelblue", width = 0.7) +
-      ggplot2::geom_errorbar(ggplot2::aes(ymin = q25, ymax = q75),
-                             width = 0.25) +
+      ggplot2::geom_col(fill = "steelblue", width = 0.7)
+    if (has_band) {
+      p <- p + ggplot2::geom_errorbar(
+        ggplot2::aes(ymin = .data[[q_lo]], ymax = .data[[q_hi]]),
+        width = 0.25
+      )
+    }
+    p <- p +
       ggplot2::labs(x = NULL, y = "Day of Year",
                     title = "Phenological Normals",
                     subtitle = subtitle) +
