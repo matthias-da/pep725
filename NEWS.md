@@ -1,3 +1,13 @@
+# pep725 1.1.0 (in development)
+
+## Bug fixes
+
+* *(pending — scientific-correctness fixes planned for this release)*
+
+## New features and improvements
+
+* *(pending — see improvement audit 2026-04-22)*
+
 # pep725 1.0.2
 
 * Reduced example sizes for `pep_simulate()` and `pep_coverage()` to avoid
