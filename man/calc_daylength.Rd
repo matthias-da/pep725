@@ -4,13 +4,26 @@
 \alias{calc_daylength}
 \title{Calculate Daylength (Photoperiod)}
 \usage{
-calc_daylength(doy, lat)
+calc_daylength(doy, lat, method = c("brock", "cbm"))
 }
 \arguments{
 \item{doy}{Integer or numeric vector. Day of year (1-365/366).}
 
 \item{lat}{Numeric. Latitude in decimal degrees. Positive for Northern
 Hemisphere, negative for Southern Hemisphere.}
+
+\item{method}{Character. Daylength model:
+\describe{
+\item{\code{"brock"}}{(Default) Brock (1981) / Spencer (1971)
+simple declination model: \eqn{\delta = 23.45^\circ \cdot
+      \sin(2\pi(284 + \mathrm{DOY})/365)}. Fast and adequate at
+mid-latitudes; differs from CBM by up to a few minutes/day
+near the poles.}
+\item{\code{"cbm"}}{Forsythe et al. (1995) Climate-Budget-Model
+formulation. Includes the eccentricity correction of the Earth's
+orbit and is generally the most accurate of the four models
+Forsythe et al. compared.}
+}}
 }
 \value{
 A list with components:
@@ -26,13 +39,12 @@ day of year and latitude. Photoperiod is an important environmental
 driver of plant phenology.
 }
 \details{
-The calculation uses standard astronomical formulas based on the
-solar declination angle. The formula assumes a "flat horizon" and
-does not account for atmospheric refraction, elevation, or local
-topography.
+Both methods assume a "flat horizon" (sunrise/sunset when the geometric
+centre of the sun crosses the horizon) and do not account for
+atmospheric refraction, elevation, or local topography.
 
-At polar latitudes (|lat| > 66.5), continuous daylight or darkness
-may occur around solstices.
+At polar latitudes (\eqn{|lat| > 66.5^\circ}), continuous daylight or
+darkness may occur around solstices.
 }
 \section{Phenological Relevance}{
 
@@ -59,11 +71,19 @@ plot(yearly$doy, yearly$daylength, type = "l",
 
 }
 \references{
+Spencer, J. W. (1971). Fourier series representation of the position of
+the sun. \emph{Search} 2(5):172. (Declination formula used by the
+\code{"brock"} method.)
+
+Brock, T. D. (1981). Calculating solar radiation for ecological studies.
+\emph{Ecological Modelling} 14(1-2):1-19.
+\doi{10.1016/0304-3800(81)90011-9}
+
 Forsythe, W. C., Rykiel, E. J., Stahl, R. S., Wu, H., and
 Schoolfield, R. M. (1995). A model comparison for daylength as a
-function of latitude and day of year.
-\emph{Ecological Modelling}, 80(1), 87--95.
-\doi{10.1016/0304-3800(94)00034-F}
+function of latitude and day of year. \emph{Ecological Modelling}
+80(1):87-95. \doi{10.1016/0304-3800(94)00034-F}
+(CBM daylength model used by the \code{"cbm"} method.)
 }
 \author{
 Matthias Templ

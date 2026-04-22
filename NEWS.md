@@ -5,6 +5,15 @@
 * `pheno_plot_timeseries()` no longer mutates the caller's data. Previously
   a `setDT(data)` call would convert a caller-supplied `data.frame` into a
   `data.table` by reference.
+* `calc_daylength()` gains a `method` argument. The default `"brock"` matches
+  pep725 <= 1.0.2 (Brock 1981 / Spencer 1971 simple declination formula).
+  A new `"cbm"` option implements the Forsythe et al. (1995) Climate-Budget-
+  Model formulation, which includes the orbital-eccentricity correction
+  and is typically more accurate near the poles (up to ~15 min/day
+  difference at mid-latitudes). The references section now correctly
+  attributes the default formula to Brock / Spencer; the Forsythe citation
+  is retained for the optional CBM method.
+
 * `calc_thermal_units(method = "single_sine")` now implements the correct
   Baskerville-Emin (1969) single-sine formula. Previous versions multiplied
   the day-above-base width factor incorrectly and returned GDD values that

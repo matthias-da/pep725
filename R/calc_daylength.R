@@ -7,6 +7,18 @@
 #' @param doy Integer or numeric vector. Day of year (1-365/366).
 #' @param lat Numeric. Latitude in decimal degrees. Positive for Northern
 #'   Hemisphere, negative for Southern Hemisphere.
+#' @param method Character. Daylength model:
+#'   \describe{
+#'     \item{\code{"brock"}}{(Default) Brock (1981) / Spencer (1971)
+#'       simple declination model: \eqn{\delta = 23.45^\circ \cdot
+#'       \sin(2\pi(284 + \mathrm{DOY})/365)}. Fast and adequate at
+#'       mid-latitudes; differs from CBM by up to a few minutes/day
+#'       near the poles.}
+#'     \item{\code{"cbm"}}{Forsythe et al. (1995) Climate-Budget-Model
+#'       formulation. Includes the eccentricity correction of the Earth's
+#'       orbit and is generally the most accurate of the four models
+#'       Forsythe et al. compared.}
+#'   }
 #'
 #' @return A list with components:
 #'   \describe{
@@ -16,13 +28,12 @@
 #'   If \code{doy} is a vector, returns a data.frame with these columns.
 #'
 #' @details
-#' The calculation uses standard astronomical formulas based on the
-#' solar declination angle. The formula assumes a "flat horizon" and
-#' does not account for atmospheric refraction, elevation, or local
-#' topography.
+#' Both methods assume a "flat horizon" (sunrise/sunset when the geometric
+#' centre of the sun crosses the horizon) and do not account for
+#' atmospheric refraction, elevation, or local topography.
 #'
-#' At polar latitudes (|lat| > 66.5), continuous daylight or darkness
-#' may occur around solstices.
+#' At polar latitudes (\eqn{|lat| > 66.5^\circ}), continuous daylight or
+#' darkness may occur around solstices.
 #'
 #' @section Phenological Relevance:
 #' Many phenological events are triggered by photoperiod thresholds:
@@ -46,15 +57,24 @@
 #'      xlab = "Day of Year", ylab = "Daylength (hours)")
 #'
 #' @references
+#' Spencer, J. W. (1971). Fourier series representation of the position of
+#' the sun. \emph{Search} 2(5):172. (Declination formula used by the
+#' \code{"brock"} method.)
+#'
+#' Brock, T. D. (1981). Calculating solar radiation for ecological studies.
+#' \emph{Ecological Modelling} 14(1-2):1-19.
+#' \doi{10.1016/0304-3800(81)90011-9}
+#'
 #' Forsythe, W. C., Rykiel, E. J., Stahl, R. S., Wu, H., and
 #' Schoolfield, R. M. (1995). A model comparison for daylength as a
-#' function of latitude and day of year.
-#' \emph{Ecological Modelling}, 80(1), 87--95.
-#' \doi{10.1016/0304-3800(94)00034-F}
+#' function of latitude and day of year. \emph{Ecological Modelling}
+#' 80(1):87-95. \doi{10.1016/0304-3800(94)00034-F}
+#' (CBM daylength model used by the \code{"cbm"} method.)
 #'
 #' @author Matthias Templ
 #' @export
-calc_daylength <- function(doy, lat) {
+calc_daylength <- function(doy, lat, method = c("brock", "cbm")) {
+  method <- match.arg(method)
   # Input validation
   if (!is.numeric(doy) || !is.numeric(lat)) {
     stop("'doy' and 'lat' must be numeric", call. = FALSE)
@@ -68,15 +88,24 @@ calc_daylength <- function(doy, lat) {
     stop("Latitude must be between -90 and 90 degrees", call. = FALSE)
   }
 
+  # Solar declination (radians)
+  if (method == "brock") {
+    # Brock (1981) / Spencer (1971): delta = 23.45° * sin(2π(284+DOY)/365)
+    declination_rad <- 23.45 * pi / 180 * sin(2 * pi * (284 + doy) / 365)
+  } else {
+    # Forsythe et al. (1995) CBM model: revolution-angle correction for
+    # the Earth's elliptic orbit.
+    #   theta = 0.2163108 + 2 * atan(0.9671396 * tan(0.00860 * (J - 186)))
+    #   delta = asin(0.39795 * cos(theta))
+    theta <- 0.2163108 +
+      2 * atan(0.9671396 * tan(0.00860 * (doy - 186)))
+    declination_rad <- asin(0.39795 * cos(theta))
+  }
+
   # Convert latitude to radians
   lat_rad <- lat * pi / 180
 
-  # Solar declination angle (radians)
-  # Using simplified formula: delta = 23.45 * sin(2*pi*(284+doy)/365)
-  declination_rad <- 23.45 * pi / 180 * sin(2 * pi * (284 + doy) / 365)
-
-  # Hour angle at sunrise/sunset
-  # cos(hour_angle) = -tan(lat) * tan(declination)
+  # Hour angle at sunrise/sunset: cos(H) = -tan(lat) * tan(delta)
   cos_hour_angle <- -tan(lat_rad) * tan(declination_rad)
 
   # Handle polar day/night and NA cases
