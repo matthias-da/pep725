@@ -60,8 +60,8 @@ pheno_plot_timeseries <- function(
     year_min = 1961,
     title = "Phenological time series of flowering (BBCH 65)"
 ) {
-  # ensure data.table and filter by year
-  setDT(data)
+  # local data.table copy (avoid mutating the caller's object)
+  data <- as.data.table(data)
   data <- data[year >= year_min]
 
   # --- base plot ---

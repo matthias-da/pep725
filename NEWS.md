@@ -2,7 +2,9 @@
 
 ## Bug fixes
 
-* *(pending — scientific-correctness fixes planned for this release)*
+* `pheno_plot_timeseries()` no longer mutates the caller's data. Previously
+  a `setDT(data)` call would convert a caller-supplied `data.frame` into a
+  `data.table` by reference.
 
 ## New features and improvements
 
