@@ -57,6 +57,18 @@
 
 ## New features and improvements
 
+* `pep_flag_outliers()` gains a model-based detection method:
+  `method = "gam_residual"`. For each group (typically species × phase),
+  fits a GAM of DOY on year, altitude, latitude, and a station random
+  intercept (customisable via the new `formula` argument) and flags
+  observations whose robust-z-scored residual exceeds `threshold`
+  (default 3.5). Detects covariate-inconsistent anomalies — e.g. a
+  lowland station reporting a high-altitude DOY, or a station-year
+  report inconsistent with the global climate trend — that the
+  univariate 30-day rule misses. Falls back to `"30day"` for groups
+  smaller than the new `min_n_per_group` argument (default 50) or
+  when the GAM fails to converge, with an informative message.
+
 * New `mann_kendall_z()` function — the correctly named replacement for
   `kendall_tau()`. Adds a tie correction to `Var(S)` (so tied DOY values do
   not inflate the statistic) and the continuity correction

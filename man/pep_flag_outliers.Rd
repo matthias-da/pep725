@@ -7,10 +7,12 @@
 pep_flag_outliers(
   pep,
   by = c("s_id", "genus", "species", "phase_id"),
-  method = c("30day", "mad", "iqr", "zscore"),
+  method = c("30day", "mad", "iqr", "zscore", "gam_residual"),
   threshold = NULL,
   center = c("median", "mean"),
   min_obs = 5,
+  formula = day ~ s(year) + s(alt) + s(lat) + s(s_id, bs = "re"),
+  min_n_per_group = 50,
   flag_only = TRUE
 )
 }
@@ -30,6 +32,14 @@ The classic Schaber-Badeck approach for phenological data.}
 where k is set by \code{threshold}.}
 \item{"iqr"}{Use Interquartile Range. Flag if outside (Q1 - k\emph{IQR, Q3 + k}IQR).}
 \item{"zscore"}{Flag if |z-score| > threshold (default 3).}
+\item{"gam_residual"}{Fit a GAM (via \code{mgcv::gam()}) per group
+using the supplied \code{formula} — by default accounting for year
+trend, elevation, latitude, and a station random intercept — and
+flag observations whose robust-z-scored residual exceeds
+\code{threshold}. Detects covariate-inconsistent anomalies that
+the within-group \code{"30day"} rule misses. Falls back to
+\code{"30day"} on groups with fewer than \code{min_n_per_group}
+observations or when the model fails to converge.}
 }}
 
 \item{threshold}{Numeric. Threshold for outlier detection.
@@ -38,6 +48,7 @@ where k is set by \code{threshold}.}
 \item{For "mad":}{Number of MADs. Default 3 (~2.5 SD equivalent).}
 \item{For "iqr":}{IQR multiplier. Default 1.5 (standard Tukey rule).}
 \item{For "zscore":}{Z-score threshold. Default 3.}
+\item{For "gam_residual":}{Robust-z threshold on residuals. Default 3.5.}
 }}
 
 \item{center}{Character. Central tendency measure: \code{"median"} (default,
@@ -45,6 +56,16 @@ more robust) or \code{"mean"}.}
 
 \item{min_obs}{Integer. Minimum observations per group required for outlier
 detection. Groups with fewer observations are skipped. Default 5.}
+
+\item{formula}{Optional \code{formula} for \code{method = "gam_residual"}.
+Default is
+\code{day ~ s(year) + s(alt) + s(lat) + s(s_id, bs = "re")}; any
+smooth term referencing a column missing from \code{pep} is silently
+dropped.}
+
+\item{min_n_per_group}{Integer. Minimum group size required before fitting
+the GAM in \code{method = "gam_residual"}. Groups below this threshold
+fall back to the \code{"30day"} rule. Default 50.}
 
 \item{flag_only}{Logical. If \code{TRUE} (default), adds outlier flag columns
 to data. If \code{FALSE}, removes flagged outliers from data.}

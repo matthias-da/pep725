@@ -22,6 +22,14 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #'       where k is set by \code{threshold}.}
 #'     \item{"iqr"}{Use Interquartile Range. Flag if outside (Q1 - k*IQR, Q3 + k*IQR).}
 #'     \item{"zscore"}{Flag if |z-score| > threshold (default 3).}
+#'     \item{"gam_residual"}{Fit a GAM (via \code{mgcv::gam()}) per group
+#'       using the supplied \code{formula} — by default accounting for year
+#'       trend, elevation, latitude, and a station random intercept — and
+#'       flag observations whose robust-z-scored residual exceeds
+#'       \code{threshold}. Detects covariate-inconsistent anomalies that
+#'       the within-group \code{"30day"} rule misses. Falls back to
+#'       \code{"30day"} on groups with fewer than \code{min_n_per_group}
+#'       observations or when the model fails to converge.}
 #'   }
 #' @param threshold Numeric. Threshold for outlier detection.
 #'   \describe{
@@ -29,11 +37,20 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #'     \item{For "mad":}{Number of MADs. Default 3 (~2.5 SD equivalent).}
 #'     \item{For "iqr":}{IQR multiplier. Default 1.5 (standard Tukey rule).}
 #'     \item{For "zscore":}{Z-score threshold. Default 3.}
+#'     \item{For "gam_residual":}{Robust-z threshold on residuals. Default 3.5.}
 #'   }
 #' @param center Character. Central tendency measure: \code{"median"} (default,
 #'   more robust) or \code{"mean"}.
 #' @param min_obs Integer. Minimum observations per group required for outlier
 #'   detection. Groups with fewer observations are skipped. Default 5.
+#' @param formula Optional \code{formula} for \code{method = "gam_residual"}.
+#'   Default is
+#'   \code{day ~ s(year) + s(alt) + s(lat) + s(s_id, bs = "re")}; any
+#'   smooth term referencing a column missing from \code{pep} is silently
+#'   dropped.
+#' @param min_n_per_group Integer. Minimum group size required before fitting
+#'   the GAM in \code{method = "gam_residual"}. Groups below this threshold
+#'   fall back to the \code{"30day"} rule. Default 50.
 #' @param flag_only Logical. If \code{TRUE} (default), adds outlier flag columns
 #'   to data. If \code{FALSE}, removes flagged outliers from data.
 #'
@@ -96,10 +113,14 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #' @export
 pep_flag_outliers <- function(pep,
                            by = c("s_id", "genus", "species", "phase_id"),
-                           method = c("30day", "mad", "iqr", "zscore"),
+                           method = c("30day", "mad", "iqr", "zscore",
+                                      "gam_residual"),
                            threshold = NULL,
                            center = c("median", "mean"),
                            min_obs = 5,
+                           formula = day ~ s(year) + s(alt) + s(lat) +
+                             s(s_id, bs = "re"),
+                           min_n_per_group = 50,
                            flag_only = TRUE) {
 
   method <- match.arg(method)
@@ -111,7 +132,8 @@ pep_flag_outliers <- function(pep,
                         "30day" = 30,
                         "mad" = 3,
                         "iqr" = 1.5,
-                        "zscore" = 3)
+                        "zscore" = 3,
+                        "gam_residual" = 3.5)
   }
 
   # Input validation
@@ -207,8 +229,82 @@ pep_flag_outliers <- function(pep,
     )
   }
 
-  # Apply outlier detection
-  if (is.null(by) || length(by) == 0) {
+  # GAM-residual detection operates on whole groups (with all covariates
+  # visible at once), so we can't use the scalar detect_in_group() helper.
+  # Dispatch here; other methods use the per-group univariate path below.
+  if (method == "gam_residual") {
+    if (!requireNamespace("mgcv", quietly = TRUE)) {
+      stop("Package 'mgcv' is required for method = 'gam_residual'. ",
+           "Install it with: install.packages('mgcv').",
+           call. = FALSE)
+    }
+    .fit_group_gam <- function(sub, threshold, min_n_per_group, formula) {
+      n_sub <- nrow(sub)
+      fallback <- function() {
+        center_val <- stats::median(sub$day, na.rm = TRUE)
+        dev <- sub$day - center_val
+        list(is_outlier = abs(dev) > 30,
+             deviation  = dev,
+             expected   = rep(center_val, n_sub))
+      }
+      if (n_sub < min_n_per_group) return(fallback())
+      # Drop smooth terms referencing absent columns so the caller can
+      # pass a generic default formula even when e.g. alt is missing.
+      vars_needed <- all.vars(formula)
+      missing_vars <- setdiff(vars_needed, names(sub))
+      if (length(missing_vars) > 0) {
+        f_terms <- attr(stats::terms(formula), "term.labels")
+        keep <- vapply(f_terms,
+                       function(tm) !any(missing_vars %in% all.vars(str2lang(tm))),
+                       logical(1))
+        f_kept <- paste(f_terms[keep], collapse = " + ")
+        if (nchar(f_kept) == 0) return(fallback())
+        formula <- stats::as.formula(paste("day ~", f_kept))
+      }
+      # s_id must be a factor for the random-intercept smooth term; silent
+      # coercion is safe because it's not used as numeric elsewhere here.
+      if ("s_id" %in% names(sub)) {
+        sub$s_id <- factor(sub$s_id)
+      }
+      fit <- tryCatch(
+        suppressWarnings(mgcv::gam(formula, data = sub, method = "REML")),
+        error = function(e) NULL
+      )
+      if (is.null(fit)) return(fallback())
+      res   <- as.numeric(stats::residuals(fit, type = "response"))
+      fitted_vals <- as.numeric(stats::fitted(fit))
+      scale <- stats::mad(res, constant = 1.4826)
+      if (is.na(scale) || scale == 0) return(fallback())
+      z <- res / scale
+      list(is_outlier = abs(z) > threshold,
+           deviation  = res,
+           expected   = fitted_vals)
+    }
+
+    if (is.null(by) || length(by) == 0) {
+      g <- .fit_group_gam(dt, threshold, min_n_per_group, formula)
+      dt[, is_outlier := g$is_outlier]
+      dt[, deviation := g$deviation]
+      dt[, expected_doy := g$expected]
+    } else {
+      n_fallback <- 0L
+      total_groups <- 0L
+      dt[, c("is_outlier", "deviation", "expected_doy") := {
+        total_groups <<- total_groups + 1L
+        res_g <- .fit_group_gam(.SD, threshold, min_n_per_group, formula)
+        if (.N < min_n_per_group) n_fallback <<- n_fallback + 1L
+        list(res_g$is_outlier, res_g$deviation, res_g$expected)
+      }, by = by]
+      if (n_fallback > 0L) {
+        message(sprintf(
+          paste0("pep_flag_outliers(method = 'gam_residual'): %d of %d ",
+                 "group(s) had fewer than min_n_per_group = %d observations ",
+                 "and fell back to the 30-day rule."),
+          n_fallback, total_groups, min_n_per_group
+        ))
+      }
+    }
+  } else if (is.null(by) || length(by) == 0) {
     # Single group
     result <- detect_in_group(dt$day)
     dt[, is_outlier := result$is_outlier]
@@ -360,7 +456,7 @@ plot.pep_outliers <- function(x, type = c("histogram", "scatter", "timeline"), .
   if (type == "histogram") {
     # Deviation distribution
     p <- ggplot2::ggplot(x, ggplot2::aes(x = deviation, fill = is_outlier)) +
-      ggplot2::geom_histogram(bins = 50, alpha = 0.7, position = "identity") +
+      ggplot2::geom_histogram(bins = 50, alpha = 0.9, position = "stack") +
       ggplot2::scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "red"),
                                   labels = c("Normal", "Outlier"),
                                   na.value = "gray50") +
