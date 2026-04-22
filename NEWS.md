@@ -5,6 +5,16 @@
 * `pheno_plot_timeseries()` no longer mutates the caller's data. Previously
   a `setDT(data)` call would convert a caller-supplied `data.frame` into a
   `data.table` by reference.
+* `calc_thermal_units(method = "single_sine")` now implements the correct
+  Baskerville-Emin (1969) single-sine formula. Previous versions multiplied
+  the day-above-base width factor incorrectly and returned GDD values that
+  were roughly double the textbook reference for the symmetric-around-base
+  case (e.g., `tmin=0, tmax=10, tbase=5` produced 3.18 where the textbook
+  value is 1.59). Analyses that used the single-sine method on PEP725 data
+  in pep725 <= 1.0.2 are affected and should be re-run. New pinned-numeric
+  tests lock the formula against Snyder (1985) and Baskerville-Emin (1969)
+  reference values, plus the `single_sine <= modified` invariant.
+
 * `pheno_normals()` now derives quantile column names from the supplied
   `probs` levels. Previously custom `probs` were rejected unless exactly six
   values were supplied, and even then the output columns were hard-coded to

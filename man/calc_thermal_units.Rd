@@ -69,8 +69,15 @@ Most common method, used by many agricultural agencies.}
 \item{modified}{Like average, but Tmin and Tmax are first bounded to
 the range from Tbase to Tcap before averaging. Prevents negative contributions.}
 \item{single_sine}{Approximates the daily temperature curve as a sine
-wave, computing the area above Tbase. More accurate when temperatures
-cross the base threshold during the day.}
+wave, computing the mean excess over Tbase. More accurate when
+temperatures cross the base threshold during the day. Implements the
+Baskerville-Emin (1969) / Snyder (1985) single-sine formula: with
+\eqn{T_{avg} = (T_{min} + T_{max})/2}, \eqn{T_{amp} = (T_{max} - T_{min})/2},
+and \eqn{\theta = \mathrm{acos}\left((T_{base} - T_{avg})/T_{amp}\right)},
+the daily GDD in the mixed case
+(\eqn{T_{min} < T_{base} < T_{max}}) is
+\eqn{\mathrm{GDD} = \frac{1}{\pi}\left[(T_{avg} - T_{base})\,\theta +
+      T_{amp}\,\sin(\theta)\right]}.}
 }
 }
 
@@ -95,7 +102,13 @@ calc_thermal_units(tmean, t_base = 10)
 }
 \references{
 McMaster, G.S., Wilhelm, W.W. (1997). Growing degree-days: one equation,
-two interpretations. Agricultural and Forest Meteorology 87:291-300.
+two interpretations. \emph{Agricultural and Forest Meteorology} 87:291-300.
+
+Baskerville, G.L., Emin, P. (1969). Rapid estimation of heat accumulation
+from maximum and minimum temperatures. \emph{Ecology} 50:514-517.
+
+Snyder, R.L. (1985). Hand calculating degree days. \emph{Agricultural and
+Forest Meteorology} 35:353-358.
 }
 \seealso{
 \code{\link{calc_thermal_sum}} for computing thermal sum at
