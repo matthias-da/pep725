@@ -30,6 +30,24 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #'       the within-group \code{"30day"} rule misses. Falls back to
 #'       \code{"30day"} on groups with fewer than \code{min_n_per_group}
 #'       observations or when the model fails to converge.}
+#'     \item{"mahalanobis"}{Treat each station-year as a vector of DOYs
+#'       across phases and flag station-years whose **robust** Mahalanobis
+#'       distance exceeds the \code{threshold}. The centre and covariance
+#'       are estimated by the Minimum Covariance Determinant (MCD)
+#'       estimator of Rousseeuw (1984), via
+#'       \code{robustbase::covMcd()} — using the classical, non-robust
+#'       covariance here would let the outliers contaminate the
+#'       estimate and mask themselves. Under MCD the squared distance is
+#'       still approximately \eqn{\chi^2_p}, so the default threshold
+#'       is \eqn{\sqrt{\chi^2_{0.975, p}}}, where \eqn{p} is the number
+#'       of phases present in the group. Detects station-years whose
+#'       pattern across phases is jointly inconsistent (e.g.\ BBCH 60
+#'       and 65 impossibly close) even when each marginal DOY looks
+#'       fine. All rows within a flagged station-year are marked; the
+#'       \code{deviation} column stores the robust Mahalanobis distance.
+#'       Groups with too few complete station-years (fewer than
+#'       \eqn{\max(p + 5, 15)}) or a singular MCD fit fall back to the
+#'       30-day rule.}
 #'   }
 #' @param threshold Numeric. Threshold for outlier detection.
 #'   \describe{
@@ -106,6 +124,11 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 #' Schaber J, Badeck F-W (2002). Evaluation of methods for the combination of
 #' phenological time series and outlier detection. Tree Physiology 22:973-982.
 #'
+#' Rousseeuw P J (1984). Least median of squares regression.
+#' \emph{Journal of the American Statistical Association} 79(388):871-880.
+#' (Minimum Covariance Determinant estimator used by
+#' \code{method = "mahalanobis"}.)
+#'
 #' @seealso \code{\link{pep_quality}} for comprehensive quality assessment,
 #'   \code{\link{pheno_combine}} which uses residuals for outlier detection
 #'
@@ -114,7 +137,7 @@ utils::globalVariables(c("day", "year", "s_id", "expected_doy", "deviation",
 pep_flag_outliers <- function(pep,
                            by = c("s_id", "genus", "species", "phase_id"),
                            method = c("30day", "mad", "iqr", "zscore",
-                                      "gam_residual"),
+                                      "gam_residual", "mahalanobis"),
                            threshold = NULL,
                            center = c("median", "mean"),
                            min_obs = 5,
@@ -133,7 +156,10 @@ pep_flag_outliers <- function(pep,
                         "mad" = 3,
                         "iqr" = 1.5,
                         "zscore" = 3,
-                        "gam_residual" = 3.5)
+                        "gam_residual" = 3.5,
+                        # Mahalanobis default: set per-group based on the
+                        # number of phases found in the data; handled below.
+                        "mahalanobis" = NA_real_)
   }
 
   # Input validation
@@ -303,6 +329,83 @@ pep_flag_outliers <- function(pep,
           n_fallback, total_groups, min_n_per_group
         ))
       }
+    }
+  } else if (method == "mahalanobis") {
+    if (!requireNamespace("robustbase", quietly = TRUE)) {
+      stop("Package 'robustbase' is required for method = 'mahalanobis'. ",
+           "Install it with: install.packages('robustbase').",
+           call. = FALSE)
+    }
+    if (!all(c("s_id", "year", "phase_id") %in% names(dt))) {
+      stop("method = 'mahalanobis' requires 's_id', 'year', 'phase_id', ",
+           "and 'day' columns in pep.",
+           call. = FALSE)
+    }
+
+    .fit_group_mahalanobis <- function(sub, threshold) {
+      n_sub <- nrow(sub)
+      fallback <- function() {
+        center_val <- stats::median(sub$day, na.rm = TRUE)
+        dev <- sub$day - center_val
+        list(is_outlier = abs(dev) > 30,
+             deviation  = dev,
+             expected   = rep(center_val, n_sub))
+      }
+      # Pivot to a (station-year) x phase wide matrix. Rows with any NA
+      # phase are dropped from the covariance fit but still returned in
+      # the long-format output (with NA MD).
+      wide <- data.table::dcast(
+        data.table::as.data.table(sub),
+        s_id + year ~ phase_id,
+        value.var = "day",
+        fun.aggregate = mean, na.rm = TRUE
+      )
+      phase_cols <- setdiff(names(wide), c("s_id", "year"))
+      phase_cols <- phase_cols[!grepl("^V[0-9]+$", phase_cols)]
+      p <- length(phase_cols)
+      if (p < 2) return(fallback())
+      M <- as.matrix(wide[, phase_cols, with = FALSE])
+      M[is.nan(M)] <- NA_real_
+      complete <- stats::complete.cases(M)
+      if (sum(complete) < max(p + 5, 15)) return(fallback())
+      if (is.na(threshold)) {
+        threshold <- sqrt(stats::qchisq(0.975, df = p))
+      }
+      fit <- tryCatch(
+        robustbase::covMcd(M[complete, , drop = FALSE]),
+        error = function(e) NULL
+      )
+      if (is.null(fit) || any(!is.finite(diag(fit$cov)))) {
+        return(fallback())
+      }
+      diffs <- sweep(M, 2, fit$center, "-")
+      inv_cov <- tryCatch(solve(fit$cov), error = function(e) NULL)
+      if (is.null(inv_cov)) return(fallback())
+      md <- sqrt(rowSums((diffs %*% inv_cov) * diffs))
+      wide[, md := md]
+      # Join the (s_id, year) MD back onto the long-format sub.
+      long <- merge(
+        data.table::as.data.table(sub)[, .I, by = .(s_id, year)],
+        wide[, .(s_id, year, md)],
+        by = c("s_id", "year"),
+        all.x = TRUE
+      )
+      long <- long[order(I)]
+      list(is_outlier = !is.na(long$md) & long$md > threshold,
+           deviation  = long$md,
+           expected   = rep(NA_real_, n_sub))
+    }
+
+    if (is.null(by) || length(by) == 0) {
+      g <- .fit_group_mahalanobis(dt, threshold)
+      dt[, is_outlier := g$is_outlier]
+      dt[, deviation := g$deviation]
+      dt[, expected_doy := g$expected]
+    } else {
+      dt[, c("is_outlier", "deviation", "expected_doy") := {
+        res_g <- .fit_group_mahalanobis(.SD, threshold)
+        list(res_g$is_outlier, res_g$deviation, res_g$expected)
+      }, by = by]
     }
   } else if (is.null(by) || length(by) == 0) {
     # Single group

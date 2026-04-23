@@ -57,6 +57,16 @@
 
 ## New features and improvements
 
+* `pep_flag_outliers()` gains a multivariate detection method:
+  `method = "mahalanobis"`. Treats each station-year as a vector of DOYs
+  across phases and flags station-years whose **robust** Mahalanobis
+  distance (MCD estimator via `robustbase::covMcd()`) exceeds a χ²-based
+  cut-off (default `sqrt(qchisq(0.975, df = p))`). Catches joint
+  inconsistencies across phases — e.g. a BBCH 60 and 65 reported only one
+  day apart — that slip past every univariate detector because each
+  marginal DOY looks fine. Falls back to the 30-day rule for small or
+  singular groups.
+
 * `pep_flag_outliers()` gains a model-based detection method:
   `method = "gam_residual"`. For each group (typically species × phase),
   fits a GAM of DOY on year, altitude, latitude, and a station random
