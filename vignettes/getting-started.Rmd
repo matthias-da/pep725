@@ -41,7 +41,7 @@ These phenological phases are strongly temperature-dependent and respond sensiti
 
 ## The PEP725 Database
 
-The [PEP725 Pan European Phenology Database](http://www.pep725.eu/) is one of
+The [PEP725 Pan European Phenology Database](https://pep725.eu/) is one of
 the world's most comprehensive collections of plant phenological observations. It brings together long-term records from national phenological monitoring networks across Europe into a harmonized and openly accessible research infrastructure.
 Key characteristics of PEP725 include [@templ2018; @templ2026]:
 
@@ -192,7 +192,7 @@ data sharing restrictions.
 
 For actual research and publications, you'll want real data. Here's the process:
 
-1. **Register** at [pep725.eu](http://www.pep725.eu/) (free for research)
+1. **Register** at [pep725.eu](https://pep725.eu/) (free for research)
 2. **Download** data for your species/regions of interest
 3. **Import** using `pep_import()`
 
@@ -253,7 +253,7 @@ my_pep <- as.pep(my_data)
 > are realistic but not actual scientific observations.
 >
 > **For publishable research, always use real PEP725 data!** After registering
-> at [pep725.eu](http://www.pep725.eu/), simply replace `pep_download()` with
+> at [pep725.eu](https://pep725.eu/), simply replace `pep_download()` with
 > `pep_import("your/data/path/")`. All the analysis techniques work identically.
 
 

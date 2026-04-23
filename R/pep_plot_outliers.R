@@ -6,7 +6,11 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
                          "outlier_category", "..density..",
                          "mean_deviation", "total_outliers",
                          "alt", "theoretical", "sample", "max_abs_dev",
-                         "abs_dev"))
+                         "abs_dev",
+                         # diagnostic (Mahalanobis branch)
+                         "md", "flagged", "mean_md", "max_md", "z",
+                         # profile
+                         "sy_flagged", "sy_key", "phase_f"))
 
 #' Visualize Phenological Outliers for Inspection
 #'
