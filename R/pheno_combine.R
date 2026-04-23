@@ -618,8 +618,11 @@ print.pheno_combined <- function(x, ...) {
                     x$connectivity$n_sets))
       }
 
-      cat("\nCombined time series:\n")
-      print(x$combined)
+      cat("\nCombined time series (first 10 rows):\n")
+      print(utils::head(x$combined, 10))
+      if (nrow(x$combined) > 10) {
+        cat(sprintf("  ... %d more rows\n", nrow(x$combined) - 10))
+      }
 
       cat("\nStation effects (first 10):\n")
       print(head(x$station_effects[order(-abs(station_effect))], 10))
