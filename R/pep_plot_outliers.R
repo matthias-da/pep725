@@ -206,84 +206,150 @@ pep_plot_outliers <- function(x,
 
 #' @keywords internal
 pep_plot_outliers_diagnostic <- function(dt, method, threshold) {
-  # A paper-ready 4-panel diagnostic for an outlier-detection fit. Works
-  # for any method; uses the `deviation` column as the model residual.
+  # Paper-ready 4-panel diagnostic. For the Mahalanobis method the
+  # `deviation` column holds unitless distances (not residuals in days)
+  # and `expected_doy` is NA, so the residual/fitted/Q-Q axes don't
+  # apply — we replace them with panels tailored to the MD output.
+  is_mahal <- identical(method, "mahalanobis")
   dt <- data.table::copy(dt)
   dt[, abs_dev := abs(deviation)]
 
-  # Panel A: residual vs fitted (expected DOY). For gam_residual this is
-  # the classic residual-vs-fitted plot; for univariate methods it's
-  # residual vs group-median.
-  if (all(!is.na(dt$expected_doy))) {
-    pA <- ggplot(dt, aes(x = expected_doy, y = deviation)) +
-      geom_point(aes(color = is_outlier), alpha = 0.35, size = 0.8) +
-      geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
-      ggplot2::geom_smooth(method = "loess", se = FALSE,
-                           color = "steelblue", linewidth = 0.6) +
-      scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
-                         labels = c("Normal", "Flagged"),
+  if (is_mahal) {
+    # --- Mahalanobis-specific diagnostic ---------------------------------
+    # Panel A: sorted MD with the chi-square-based threshold highlighted.
+    sy <- dt[, .(md = deviation[1],
+                 flagged = any(is_outlier, na.rm = TRUE)),
+             by = .(s_id, year)]
+    sy <- sy[order(md)]
+    sy[, rank := seq_len(.N)]
+    pA <- ggplot(sy, aes(x = rank, y = md, color = flagged)) +
+      geom_point(alpha = 0.6, size = 0.8) +
+      geom_hline(yintercept = threshold, linetype = "dashed",
+                 color = "red", linewidth = 0.5) +
+      scale_color_manual(values = c(`TRUE` = "red", `FALSE` = "gray50"),
                          na.value = "gray80") +
-      labs(x = "Fitted / expected DOY", y = "Residual (days)",
-           color = NULL,
-           title = "A. Residuals vs fitted") +
+      labs(x = "Station-year rank (sorted)",
+           y = "Robust Mahalanobis distance",
+           title = "A. Sorted MD with chi-sq threshold") +
       theme_minimal(base_size = 10) +
       theme(legend.position = "none",
             plot.title = element_text(face = "bold", size = 10))
-  } else {
-    pA <- ggplot() + theme_void() +
-      labs(title = "A. Residuals vs fitted: not available")
-  }
 
-  # Panel B: Q-Q plot of standardised residuals against Normal.
-  dev_std <- (dt$deviation - stats::median(dt$deviation, na.rm = TRUE)) /
-    stats::mad(dt$deviation, na.rm = TRUE)
-  qq_df <- data.frame(z = sort(dev_std[is.finite(dev_std)]))
-  qq_df$theoretical <- stats::qnorm(stats::ppoints(nrow(qq_df)))
-  pB <- ggplot(qq_df, aes(x = theoretical, y = z)) +
-    geom_point(alpha = 0.3, size = 0.7, color = "steelblue") +
-    geom_abline(slope = 1, intercept = 0,
-                linetype = "dashed", color = "gray40") +
-    labs(x = "Theoretical N(0,1) quantiles",
-         y = "Robust-z of residuals",
-         title = "B. Q-Q: residual tail behaviour") +
-    theme_minimal(base_size = 10) +
-    theme(plot.title = element_text(face = "bold", size = 10))
-
-  # Panel C: |residual| vs altitude (if present) or year (fallback).
-  covariate <- if ("alt" %in% names(dt) && any(!is.na(dt$alt))) "alt" else
-    if ("year" %in% names(dt)) "year" else NULL
-  if (!is.null(covariate)) {
-    pC <- ggplot(dt, aes(x = .data[[covariate]], y = abs_dev)) +
-      geom_point(aes(color = is_outlier), alpha = 0.3, size = 0.7) +
-      ggplot2::geom_smooth(method = "loess", se = FALSE,
-                           color = "steelblue", linewidth = 0.6) +
-      scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
-                         na.value = "gray80") +
-      labs(x = switch(covariate,
-                      alt = "Altitude (m)",
-                      year = "Year"),
-           y = "|Residual| (days)",
-           title = sprintf("C. |residual| vs %s",
-                           switch(covariate, alt = "altitude", year = "year"))) +
+    # Panel B: MD^2 vs chi-square quantiles (Q-Q plot of squared MD).
+    # Under multivariate normality MD^2 ~ chi^2_p. We don't know p for
+    # sure here; infer it from the number of distinct phases.
+    p_dim <- data.table::uniqueN(dt$phase_id)
+    md_sq <- sort(sy$md[is.finite(sy$md)]^2)
+    qq_df <- data.frame(
+      sample = md_sq,
+      theoretical = stats::qchisq(stats::ppoints(length(md_sq)), df = p_dim)
+    )
+    pB <- ggplot(qq_df, aes(x = theoretical, y = sample)) +
+      geom_point(alpha = 0.4, size = 0.7, color = "steelblue") +
+      geom_abline(slope = 1, intercept = 0,
+                  linetype = "dashed", color = "gray40") +
+      labs(x = sprintf("Theoretical chi^2_%d quantiles", p_dim),
+           y = "Observed MD^2",
+           title = sprintf("B. Q-Q against chi^2_%d", p_dim)) +
       theme_minimal(base_size = 10) +
-      theme(legend.position = "none",
-            plot.title = element_text(face = "bold", size = 10))
+      theme(plot.title = element_text(face = "bold", size = 10))
+
+    # Panel C: MD over time, aggregated to per-year mean (highlights
+    # epochs with anomalous observations across the network).
+    if ("year" %in% names(dt)) {
+      yr <- sy[, .(mean_md = mean(md, na.rm = TRUE),
+                   max_md  = max(md, na.rm = TRUE),
+                   n_flag  = sum(flagged)), by = year][order(year)]
+      pC <- ggplot(yr, aes(x = year)) +
+        geom_line(aes(y = mean_md), color = "steelblue", linewidth = 0.6) +
+        geom_line(aes(y = max_md),  color = "red",
+                  linewidth = 0.4, linetype = "dotted") +
+        geom_hline(yintercept = threshold, linetype = "dashed",
+                   color = "red", linewidth = 0.3) +
+        labs(x = "Year", y = "MD (mean / max per year)",
+             title = "C. Mean and max MD over time") +
+        theme_minimal(base_size = 10) +
+        theme(plot.title = element_text(face = "bold", size = 10))
+    } else {
+      pC <- ggplot() + theme_void() + labs(title = "C. year unavailable")
+    }
   } else {
-    pC <- ggplot() + theme_void() +
-      labs(title = "C. covariate unavailable")
+    # --- Residual-based methods (default path) --------------------------
+    # Panel A: residual vs fitted (expected DOY).
+    if (all(!is.na(dt$expected_doy))) {
+      pA <- ggplot(dt, aes(x = expected_doy, y = deviation)) +
+        geom_point(aes(color = is_outlier), alpha = 0.35, size = 0.8) +
+        geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+        ggplot2::geom_smooth(method = "loess", se = FALSE,
+                             color = "steelblue", linewidth = 0.6) +
+        scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
+                           labels = c("Normal", "Flagged"),
+                           na.value = "gray80") +
+        labs(x = "Fitted / expected DOY", y = "Residual (days)",
+             color = NULL,
+             title = "A. Residuals vs fitted") +
+        theme_minimal(base_size = 10) +
+        theme(legend.position = "none",
+              plot.title = element_text(face = "bold", size = 10))
+    } else {
+      pA <- ggplot() + theme_void() +
+        labs(title = "A. Residuals vs fitted: not available")
+    }
+
+    # Panel B: Q-Q plot of standardised residuals against Normal.
+    dev_std <- (dt$deviation - stats::median(dt$deviation, na.rm = TRUE)) /
+      stats::mad(dt$deviation, na.rm = TRUE)
+    qq_df <- data.frame(z = sort(dev_std[is.finite(dev_std)]))
+    qq_df$theoretical <- stats::qnorm(stats::ppoints(nrow(qq_df)))
+    pB <- ggplot(qq_df, aes(x = theoretical, y = z)) +
+      geom_point(alpha = 0.3, size = 0.7, color = "steelblue") +
+      geom_abline(slope = 1, intercept = 0,
+                  linetype = "dashed", color = "gray40") +
+      labs(x = "Theoretical N(0,1) quantiles",
+           y = "Robust-z of residuals",
+           title = "B. Q-Q: residual tail behaviour") +
+      theme_minimal(base_size = 10) +
+      theme(plot.title = element_text(face = "bold", size = 10))
+
+    # Panel C: |residual| vs altitude (if present) or year (fallback).
+    covariate <- if ("alt" %in% names(dt) && any(!is.na(dt$alt))) "alt" else
+      if ("year" %in% names(dt)) "year" else NULL
+    if (!is.null(covariate)) {
+      pC <- ggplot(dt, aes(x = .data[[covariate]], y = abs_dev)) +
+        geom_point(aes(color = is_outlier), alpha = 0.3, size = 0.7) +
+        ggplot2::geom_smooth(method = "loess", se = FALSE,
+                             color = "steelblue", linewidth = 0.6) +
+        scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
+                           na.value = "gray80") +
+        labs(x = switch(covariate,
+                        alt = "Altitude (m)",
+                        year = "Year"),
+             y = "|Residual| (days)",
+             title = sprintf("C. |residual| vs %s",
+                             switch(covariate, alt = "altitude", year = "year"))) +
+        theme_minimal(base_size = 10) +
+        theme(legend.position = "none",
+              plot.title = element_text(face = "bold", size = 10))
+    } else {
+      pC <- ggplot() + theme_void() +
+        labs(title = "C. covariate unavailable")
+    }
   }
 
-  # Panel D: spatial map of max |residual| per station (if lon/lat).
+  # Panel D: spatial map of max |residual| (or max MD) per station.
+  d_label <- if (is_mahal) "Max robust MD" else "Max |residual|"
+  d_title <- if (is_mahal) "D. Per-station worst-case MD"
+             else         "D. Per-station worst-case residual"
   if (all(c("lon", "lat") %in% names(dt))) {
     station_max <- dt[, .(max_abs_dev = max(abs_dev, na.rm = TRUE),
                           lon = lon[1], lat = lat[1]), by = s_id]
     pD <- ggplot(station_max, aes(x = lon, y = lat)) +
       geom_point(aes(color = max_abs_dev), size = 1.6, alpha = 0.7) +
       ggplot2::scale_color_viridis_c(option = "magma", direction = -1,
-                                     name = "Max |residual|") +
+                                     name = d_label) +
       coord_quickmap() +
       labs(x = "Longitude", y = "Latitude",
-           title = "D. Per-station worst-case residual") +
+           title = d_title) +
       theme_minimal(base_size = 10) +
       theme(plot.title = element_text(face = "bold", size = 10),
             legend.position = "right")
