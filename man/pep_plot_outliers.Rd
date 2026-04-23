@@ -6,7 +6,8 @@
 \usage{
 pep_plot_outliers(
   x,
-  type = c("overview", "seasonal", "map", "detail", "station", "doy_context"),
+  type = c("overview", "seasonal", "map", "detail", "station", "doy_context",
+    "diagnostic"),
   phase_id = NULL,
   outlier_only = NULL,
   late_threshold = 250,
@@ -28,6 +29,12 @@ detecting second flowering (late-season outliers for spring phases).}
 \item{"station"}{Station-level outlier patterns over time.}
 \item{"doy_context"}{Shows outliers in context of full DOY distribution
 per phase, highlighting potential second events.}
+\item{"diagnostic"}{Paper- and vignette-ready 4-panel figure of
+model fit quality: (A) residuals vs fitted; (B) Q-Q plot of
+residuals; (C) |residual| vs altitude (if available) or year;
+(D) spatial map of maximum |residual| per station. Designed to
+accompany \code{method = "gam_residual"} but usable for every
+method (uses the \code{deviation} column as the residual).}
 }}
 
 \item{phase_id}{Optional integer vector to filter specific phases for plotting.}

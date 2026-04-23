@@ -7,10 +7,12 @@
 pep_flag_outliers(
   pep,
   by = c("s_id", "genus", "species", "phase_id"),
-  method = c("30day", "mad", "iqr", "zscore"),
+  method = c("30day", "mad", "iqr", "zscore", "gam_residual", "mahalanobis"),
   threshold = NULL,
   center = c("median", "mean"),
   min_obs = 5,
+  formula = day ~ s(year) + s(alt) + s(lat) + s(s_id, bs = "re"),
+  min_n_per_group = 50,
   flag_only = TRUE
 )
 }
@@ -30,6 +32,32 @@ The classic Schaber-Badeck approach for phenological data.}
 where k is set by \code{threshold}.}
 \item{"iqr"}{Use Interquartile Range. Flag if outside (Q1 - k\emph{IQR, Q3 + k}IQR).}
 \item{"zscore"}{Flag if |z-score| > threshold (default 3).}
+\item{"gam_residual"}{Fit a GAM (via \code{mgcv::gam()}) per group
+using the supplied \code{formula} — by default accounting for year
+trend, elevation, latitude, and a station random intercept — and
+flag observations whose robust-z-scored residual exceeds
+\code{threshold}. Detects covariate-inconsistent anomalies that
+the within-group \code{"30day"} rule misses. Falls back to
+\code{"30day"} on groups with fewer than \code{min_n_per_group}
+observations or when the model fails to converge.}
+\item{"mahalanobis"}{Treat each station-year as a vector of DOYs
+across phases and flag station-years whose \strong{robust} Mahalanobis
+distance exceeds the \code{threshold}. The centre and covariance
+are estimated by the Minimum Covariance Determinant (MCD)
+estimator of Rousseeuw (1984), via
+\code{robustbase::covMcd()} — using the classical, non-robust
+covariance here would let the outliers contaminate the
+estimate and mask themselves. Under MCD the squared distance is
+still approximately \eqn{\chi^2_p}, so the default threshold
+is \eqn{\sqrt{\chi^2_{0.975, p}}}, where \eqn{p} is the number
+of phases present in the group. Detects station-years whose
+pattern across phases is jointly inconsistent (e.g.\ BBCH 60
+and 65 impossibly close) even when each marginal DOY looks
+fine. All rows within a flagged station-year are marked; the
+\code{deviation} column stores the robust Mahalanobis distance.
+Groups with too few complete station-years (fewer than
+\eqn{\max(p + 5, 15)}) or a singular MCD fit fall back to the
+30-day rule.}
 }}
 
 \item{threshold}{Numeric. Threshold for outlier detection.
@@ -38,6 +66,7 @@ where k is set by \code{threshold}.}
 \item{For "mad":}{Number of MADs. Default 3 (~2.5 SD equivalent).}
 \item{For "iqr":}{IQR multiplier. Default 1.5 (standard Tukey rule).}
 \item{For "zscore":}{Z-score threshold. Default 3.}
+\item{For "gam_residual":}{Robust-z threshold on residuals. Default 3.5.}
 }}
 
 \item{center}{Character. Central tendency measure: \code{"median"} (default,
@@ -45,6 +74,16 @@ more robust) or \code{"mean"}.}
 
 \item{min_obs}{Integer. Minimum observations per group required for outlier
 detection. Groups with fewer observations are skipped. Default 5.}
+
+\item{formula}{Optional \code{formula} for \code{method = "gam_residual"}.
+Default is
+\code{day ~ s(year) + s(alt) + s(lat) + s(s_id, bs = "re")}; any
+smooth term referencing a column missing from \code{pep} is silently
+dropped.}
+
+\item{min_n_per_group}{Integer. Minimum group size required before fitting
+the GAM in \code{method = "gam_residual"}. Groups below this threshold
+fall back to the \code{"30day"} rule. Default 50.}
 
 \item{flag_only}{Logical. If \code{TRUE} (default), adds outlier flag columns
 to data. If \code{FALSE}, removes flagged outliers from data.}
@@ -109,6 +148,11 @@ pep_flagged <- pep_flag_outliers(pep_seed,
 \references{
 Schaber J, Badeck F-W (2002). Evaluation of methods for the combination of
 phenological time series and outlier detection. Tree Physiology 22:973-982.
+
+Rousseeuw P J (1984). Least median of squares regression.
+\emph{Journal of the American Statistical Association} 79(388):871-880.
+(Minimum Covariance Determinant estimator used by
+\code{method = "mahalanobis"}.)
 }
 \seealso{
 \code{\link{pep_quality}} for comprehensive quality assessment,
