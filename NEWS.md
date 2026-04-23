@@ -57,6 +57,18 @@
 
 ## New features and improvements
 
+* `pep_plot_outliers(type = "diagnostic")` — paper/vignette-ready 4-panel
+  diagnostic figure (residuals vs fitted, Q-Q, |residual| vs covariate,
+  per-station max-residual map). Works for any detection method.
+
+* `pep_outliers_leaflet()` — new function. Interactive Leaflet visualisation
+  of a `pep_outliers` object: stations as circle markers sized by number
+  of flagged observations and coloured by their maximum absolute
+  residual (or robust Mahalanobis distance for `method = "mahalanobis"`).
+  Per-station popups list the top-N worst offenders. Complements
+  `pheno_leaflet()` (which is a selection gadget); this is a
+  visualisation you can embed in knitr reports.
+
 * `pep_flag_outliers()` gains a multivariate detection method:
   `method = "mahalanobis"`. Treats each station-year as a vector of DOYs
   across phases and flags station-years whose **robust** Mahalanobis
