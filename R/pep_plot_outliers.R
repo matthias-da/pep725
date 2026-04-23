@@ -4,7 +4,9 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
                          "phase_id", "genus", "species", "month", "season",
                          "n_outliers", "pct_outliers", "n_obs", "country",
                          "outlier_category", "..density..",
-                         "mean_deviation", "total_outliers"))
+                         "mean_deviation", "total_outliers",
+                         "alt", "theoretical", "sample", "max_abs_dev",
+                         "abs_dev"))
 
 #' Visualize Phenological Outliers for Inspection
 #'
@@ -24,6 +26,12 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #'     \item{"station"}{Station-level outlier patterns over time.}
 #'     \item{"doy_context"}{Shows outliers in context of full DOY distribution
 #'       per phase, highlighting potential second events.}
+#'     \item{"diagnostic"}{Paper- and vignette-ready 4-panel figure of
+#'       model fit quality: (A) residuals vs fitted; (B) Q-Q plot of
+#'       residuals; (C) |residual| vs altitude (if available) or year;
+#'       (D) spatial map of maximum |residual| per station. Designed to
+#'       accompany \code{method = "gam_residual"} but usable for every
+#'       method (uses the \code{deviation} column as the residual).}
 #'   }
 #' @param phase_id Optional integer vector to filter specific phases for plotting.
 #' @param outlier_only Logical. If TRUE (default for some types), show only
@@ -88,7 +96,7 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #' @import ggplot2
 pep_plot_outliers <- function(x,
                           type = c("overview", "seasonal", "map", "detail",
-                                   "station", "doy_context"),
+                                   "station", "doy_context", "diagnostic"),
                           phase_id = NULL,
                           outlier_only = NULL,
                           late_threshold = 250,
@@ -186,6 +194,116 @@ pep_plot_outliers <- function(x,
   if (type == "doy_context") {
     return(pep_plot_outliers_doy_context(dt, late_threshold))
   }
+
+  # ============================================================
+  # Plot type: DIAGNOSTIC (paper/vignette figure)
+  # ============================================================
+  if (type == "diagnostic") {
+    return(pep_plot_outliers_diagnostic(dt, method, threshold))
+  }
+}
+
+
+#' @keywords internal
+pep_plot_outliers_diagnostic <- function(dt, method, threshold) {
+  # A paper-ready 4-panel diagnostic for an outlier-detection fit. Works
+  # for any method; uses the `deviation` column as the model residual.
+  dt <- data.table::copy(dt)
+  dt[, abs_dev := abs(deviation)]
+
+  # Panel A: residual vs fitted (expected DOY). For gam_residual this is
+  # the classic residual-vs-fitted plot; for univariate methods it's
+  # residual vs group-median.
+  if (all(!is.na(dt$expected_doy))) {
+    pA <- ggplot(dt, aes(x = expected_doy, y = deviation)) +
+      geom_point(aes(color = is_outlier), alpha = 0.35, size = 0.8) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+      ggplot2::geom_smooth(method = "loess", se = FALSE,
+                           color = "steelblue", linewidth = 0.6) +
+      scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
+                         labels = c("Normal", "Flagged"),
+                         na.value = "gray80") +
+      labs(x = "Fitted / expected DOY", y = "Residual (days)",
+           color = NULL,
+           title = "A. Residuals vs fitted") +
+      theme_minimal(base_size = 10) +
+      theme(legend.position = "none",
+            plot.title = element_text(face = "bold", size = 10))
+  } else {
+    pA <- ggplot() + theme_void() +
+      labs(title = "A. Residuals vs fitted: not available")
+  }
+
+  # Panel B: Q-Q plot of standardised residuals against Normal.
+  dev_std <- (dt$deviation - stats::median(dt$deviation, na.rm = TRUE)) /
+    stats::mad(dt$deviation, na.rm = TRUE)
+  qq_df <- data.frame(z = sort(dev_std[is.finite(dev_std)]))
+  qq_df$theoretical <- stats::qnorm(stats::ppoints(nrow(qq_df)))
+  pB <- ggplot(qq_df, aes(x = theoretical, y = z)) +
+    geom_point(alpha = 0.3, size = 0.7, color = "steelblue") +
+    geom_abline(slope = 1, intercept = 0,
+                linetype = "dashed", color = "gray40") +
+    labs(x = "Theoretical N(0,1) quantiles",
+         y = "Robust-z of residuals",
+         title = "B. Q-Q: residual tail behaviour") +
+    theme_minimal(base_size = 10) +
+    theme(plot.title = element_text(face = "bold", size = 10))
+
+  # Panel C: |residual| vs altitude (if present) or year (fallback).
+  covariate <- if ("alt" %in% names(dt) && any(!is.na(dt$alt))) "alt" else
+    if ("year" %in% names(dt)) "year" else NULL
+  if (!is.null(covariate)) {
+    pC <- ggplot(dt, aes(x = .data[[covariate]], y = abs_dev)) +
+      geom_point(aes(color = is_outlier), alpha = 0.3, size = 0.7) +
+      ggplot2::geom_smooth(method = "loess", se = FALSE,
+                           color = "steelblue", linewidth = 0.6) +
+      scale_color_manual(values = c("FALSE" = "gray50", "TRUE" = "red"),
+                         na.value = "gray80") +
+      labs(x = switch(covariate,
+                      alt = "Altitude (m)",
+                      year = "Year"),
+           y = "|Residual| (days)",
+           title = sprintf("C. |residual| vs %s",
+                           switch(covariate, alt = "altitude", year = "year"))) +
+      theme_minimal(base_size = 10) +
+      theme(legend.position = "none",
+            plot.title = element_text(face = "bold", size = 10))
+  } else {
+    pC <- ggplot() + theme_void() +
+      labs(title = "C. covariate unavailable")
+  }
+
+  # Panel D: spatial map of max |residual| per station (if lon/lat).
+  if (all(c("lon", "lat") %in% names(dt))) {
+    station_max <- dt[, .(max_abs_dev = max(abs_dev, na.rm = TRUE),
+                          lon = lon[1], lat = lat[1]), by = s_id]
+    pD <- ggplot(station_max, aes(x = lon, y = lat)) +
+      geom_point(aes(color = max_abs_dev), size = 1.6, alpha = 0.7) +
+      ggplot2::scale_color_viridis_c(option = "magma", direction = -1,
+                                     name = "Max |residual|") +
+      coord_quickmap() +
+      labs(x = "Longitude", y = "Latitude",
+           title = "D. Per-station worst-case residual") +
+      theme_minimal(base_size = 10) +
+      theme(plot.title = element_text(face = "bold", size = 10),
+            legend.position = "right")
+  } else {
+    pD <- ggplot() + theme_void() +
+      labs(title = "D. spatial map unavailable (no lon/lat)")
+  }
+
+  subtitle <- sprintf("method = %s, threshold = %s",
+                      method, format(threshold, digits = 3))
+  combined <- patchwork::wrap_plots(pA, pB, pC, pD, ncol = 2) +
+    patchwork::plot_annotation(
+      title = "Outlier-detection diagnostic",
+      subtitle = subtitle,
+      theme = ggplot2::theme(
+        plot.title = ggplot2::element_text(face = "bold", size = 12),
+        plot.subtitle = ggplot2::element_text(color = "gray30", size = 9)
+      )
+    )
+  combined
 }
 
 
