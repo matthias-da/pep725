@@ -194,14 +194,91 @@ outliers_zscore <- pep_flag_outliers(flowering, method = "zscore", threshold = 3
 has many outliers, they will inflate the standard deviation, making the z-score
 threshold less effective at detecting them.
 
+### Method 5: GAM Residual - Model-based, Covariate-aware
+
+The four methods above are all **univariate within a group** — they compare
+each observation to the central tendency of its own station-species-phase
+combination. That misses three realistic outlier patterns:
+
+1. **Year-effect outliers.** In a year where most of central Europe bloomed
+   8 days earlier, a station that flowered on its 30-year median looks
+   "late" only because the reference ignores the shared weather signal.
+2. **Covariate-inconsistent reports.** A lowland station that reports a
+   DOY typical of a mountain station is invisible to a within-station
+   detector because the station's own history may be short.
+3. **Trend-inconsistent reports.** A station whose DOY is constant while
+   every other station in the network has a trend is anomalous only in
+   relation to the trend.
+
+`method = "gam_residual"` tackles all three. For each group (typically
+species × phase), it fits a GAM of DOY on year, altitude, latitude, and a
+station random intercept (customisable via `formula =`) and flags
+observations whose residual — standardised by a robust MAD scale — exceeds
+the threshold:
+
+```{r gam-method, eval=FALSE}
+# Model-based detection across the whole species x phase group.
+outliers_gam <- pep_flag_outliers(
+  apple_flowering,
+  by = c("genus", "species", "phase_id"),
+  method = "gam_residual",
+  threshold = 3.5
+)
+```
+
+The `deviation` column now holds GAM residuals in days (not deviations
+from a within-station median), and `expected_doy` holds the fitted
+values — so the station-year whose residual is 20 days above the fit is
+flagged whether or not its station's history made that value look
+"normal".
+
+Groups with fewer observations than `min_n_per_group` (default 50) or
+where the GAM fails to converge silently fall back to the 30-day rule.
+
+### Method 6: Mahalanobis - Multivariate, Robust (MCD)
+
+All methods above flag observations one at a time. A station-year could
+have an entirely reasonable BBCH 60 date and an entirely reasonable BBCH
+65 date, but only **one day apart** — biologically impossible, because
+first flowering precedes full flowering by ~10 days.
+
+`method = "mahalanobis"` catches this by treating each station-year as
+a *vector* across phases and computing the **robust Mahalanobis
+distance** of that vector from the centre of the rest of the network.
+"Robust" matters: the classical Mahalanobis distance uses the sample
+mean and covariance, which are themselves pulled by outliers
+(masking). We use the **Minimum Covariance Determinant** estimator
+(Rousseeuw 1984, `robustbase::covMcd()`) which gives a high-breakdown
+robust centre and scatter, so the outliers stay *outside* the robust
+ellipsoid instead of contaminating it:
+
+```{r mahalanobis-method, eval=FALSE}
+# Multivariate detection on the phase profile per station-year.
+# by = c("genus", "species") pools across phases so the covariance
+# is estimated from the joint (BBCH 60, BBCH 65, BBCH 89) distribution.
+outliers_mahal <- pep_flag_outliers(
+  apple,
+  by = c("genus", "species"),
+  method = "mahalanobis"
+)
+```
+
+The default threshold is `sqrt(qchisq(0.975, df = p))` where *p* is the
+number of phases — the standard chi-square containment cut-off under
+multivariate normality. Flagged station-years get all their phase rows
+marked; `deviation` stores the robust MD (not a day-count, so it is
+unitless).
+
 ### Choosing a Method
 
 | Method | Best For | Threshold Meaning |
 |--------|----------|-------------------|
 | `30day` | Simple, interpretable threshold | Absolute days from median |
-| `mad` | Most situations (recommended) | Number of MADs from median |
+| `mad` | Most situations (recommended for single-phase) | Number of MADs from median |
 | `iqr` | Familiar boxplot-style detection | IQR multiplier |
 | `zscore` | Clean data, normal distribution | Standard deviations |
+| `gam_residual` | Year / elevation / station covariates available | Robust z on GAM residuals |
+| `mahalanobis` | Multiple phases per station-year | `sqrt(chi^2_{0.975, p})` default |
 
 ### Summary Statistics
 
@@ -236,7 +313,9 @@ if (nrow(vine_flowering) > 0) {
 ## Visualizing Outliers
 
 Visual inspection is essential for understanding outlier patterns. The
-`pep_plot_outliers()` function provides four visualization types:
+`pep_plot_outliers()` function provides several visualization types —
+four for the univariate methods plus two targeted at the model-based
+and multivariate methods:
 
 ### 1. Overview Plot
 
@@ -297,6 +376,83 @@ pep_plot_outliers(outliers, type = "map")
 - Clustered outliers in one region? Might indicate local data quality issues
 - Outliers at network edges? Might be at environmental limits
 - Random scatter? Suggests individual observation errors
+
+### 5. Model Diagnostic (for `gam_residual` / `mahalanobis`)
+
+`type = "diagnostic"` produces a paper-ready 4-panel figure tailored to
+the detection method. For `gam_residual` the panels are classical GAM
+diagnostics — residuals vs fitted, Q-Q against Normal, |residual| vs
+altitude, and a per-station worst-case-residual map. For `mahalanobis`
+the panels switch automatically to MD-specific diagnostics: sorted MD
+with the chi-square threshold line, Q-Q of MD² against χ²_*p*,
+mean/max MD over time (exposes network-wide anomalous epochs), and
+the per-station worst-case MD map.
+
+```{r plot-diagnostic-gam, eval=FALSE}
+# For gam_residual: classical model diagnostics
+outliers_gam <- pep_flag_outliers(
+  apple_flowering,
+  by = c("genus", "species", "phase_id"),
+  method = "gam_residual"
+)
+pep_plot_outliers(outliers_gam, type = "diagnostic")
+```
+
+![GAM-residual diagnostic on a synthetic fixture with one injected contamination at station 1, year 2000. Panel A: residuals vs fitted; the injected point appears at residual ≈ +50 days. Panel B: Q-Q against N(0,1); the right-tail departure corresponds to the outlier. Panel C: |residual| vs altitude, showing the model has no altitude bias away from the outlier. Panel D: per-station worst-case residual map.](figures/gam_diagnostic.png)
+
+```{r plot-diagnostic-mahal, eval=FALSE}
+# For mahalanobis: MD-specific diagnostics
+outliers_mahal <- pep_flag_outliers(
+  apple,
+  by = c("genus", "species"),
+  method = "mahalanobis"
+)
+pep_plot_outliers(outliers_mahal, type = "diagnostic")
+```
+
+![Mahalanobis-specific diagnostic on the same synthetic fixture. Panel A: sorted robust Mahalanobis distances across all station-years, with the $\sqrt{\chi^2_{0.975,\,3}} \approx 3.06$ threshold as a red dashed line; flagged points are red. Panel B: Q-Q of observed $\mathrm{MD}^2$ against $\chi^2_3$ — upper-tail departure identifies the outlier mass. Panel C: mean (blue) and max (red dotted) MD per year — the spike at year 2000 coincides with the injected anomaly. Panel D: per-station worst-case MD map.](figures/mahalanobis_diagnostic.png)
+
+**What to look for:**
+
+- **Residuals vs fitted (GAM)**: a level trend with no structure is
+  ideal; a funnel or curve signals model misspecification, not outliers.
+- **Q-Q (GAM)**: heavy-tailed deviations in the corners are the real
+  outlier signal — light tails mean the threshold is picking up noise.
+- **Sorted MD with threshold (Mahalanobis)**: the steep rise at the
+  right-hand end is where flagged station-years sit; a long flat
+  "knee" across the threshold means the threshold is arguably too
+  loose or too strict.
+- **Mean / max MD over time (Mahalanobis)**: spikes in the max line
+  identify *years* in which many stations reported biologically
+  inconsistent phase sequences — useful for correlating with known
+  data-collection or instrumental events.
+
+### 6. Phase-profile Plot (primary Mahalanobis figure)
+
+The MD detector flags station-years whose *shape* across phases is
+atypical, even when each marginal DOY looks fine. `type = "profile"`
+plots the phase profile as parallel coordinates — one line per
+station-year, flagged ones in red, with the robust median profile
+overlaid in black as a reference:
+
+```{r plot-profile, eval=FALSE}
+# Phase-profile parallel coordinates (primary Mahalanobis figure).
+pep_plot_outliers(outliers_mahal, type = "profile")
+```
+
+![Phase-profile parallel-coordinates plot. Each line is one station-year; the grey envelope shows the natural variability of the network, the red lines are station-years flagged by the robust Mahalanobis detector, and the thick black line is the MCD robust per-phase median profile. Red lines that cross the phases at atypical angles — not just at unusual absolute DOYs — are the classic Mahalanobis flags.](figures/mahalanobis_profile.png)
+
+**How to read it:**
+
+- Every grey line is a "normal-looking" station-year; together they
+  form the envelope of the robust ellipsoid.
+- Red lines are flagged. Look where they bend oddly: a station-year
+  whose BBCH 60 → 65 slope is much flatter or steeper than the
+  reference is the classic MD flag.
+- The black reference profile is the robust (MCD) per-phase median —
+  the centre of the ellipsoid. Anything strongly parallel to this is
+  safe; anything that crosses multiple phases at unusual angles is
+  suspect.
 
 ---
 

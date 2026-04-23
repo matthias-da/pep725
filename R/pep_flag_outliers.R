@@ -407,6 +407,14 @@ pep_flag_outliers <- function(pep,
         list(res_g$is_outlier, res_g$deviation, res_g$expected)
       }, by = by]
     }
+    # Record a representative threshold on the attribute (the chi-square
+    # default depends on the number of phases; if user passed an explicit
+    # threshold keep that, otherwise use the default for the actual
+    # number of phases in the data).
+    if (is.na(threshold)) {
+      p_phases <- data.table::uniqueN(dt$phase_id)
+      threshold <- sqrt(stats::qchisq(0.975, df = p_phases))
+    }
   } else if (is.null(by) || length(by) == 0) {
     # Single group
     result <- detect_in_group(dt$day)

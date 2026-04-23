@@ -1,4 +1,4 @@
-# pep725 1.1.0 (in development)
+# pep725 1.1.0
 
 ## Bug fixes
 

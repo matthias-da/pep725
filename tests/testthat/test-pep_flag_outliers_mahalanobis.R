@@ -105,3 +105,46 @@ test_that("mahalanobis respects flag_only = FALSE", {
   expect_lt(nrow(cleaned), n_before)
   expect_false("is_outlier" %in% names(cleaned))
 })
+
+test_that("pep_plot_outliers(type = 'profile') renders a ggplot for Mahalanobis", {
+  skip_if_not_installed("robustbase")
+  dat <- make_multiphase_fixture(seed = 7)
+  res <- pep_flag_outliers(
+    dat,
+    by = c("genus", "species"),
+    method = "mahalanobis"
+  )
+  p <- pep_plot_outliers(res, type = "profile")
+  expect_s3_class(p, "ggplot")
+})
+
+test_that("pep_plot_outliers(type = 'diagnostic') handles Mahalanobis without expected_doy", {
+  skip_if_not_installed("robustbase")
+  dat <- make_multiphase_fixture(seed = 8)
+  res <- pep_flag_outliers(
+    dat,
+    by = c("genus", "species"),
+    method = "mahalanobis"
+  )
+  # Must not error even though expected_doy is all NA.
+  expect_no_error(p <- pep_plot_outliers(res, type = "diagnostic"))
+  # The diagnostic is a patchwork composition.
+  expect_s3_class(p, "patchwork")
+})
+
+test_that("attr(result, 'threshold') is populated for Mahalanobis", {
+  skip_if_not_installed("robustbase")
+  dat <- make_multiphase_fixture(seed = 9)
+  res <- pep_flag_outliers(
+    dat,
+    by = c("genus", "species"),
+    method = "mahalanobis"
+  )
+  expect_true(is.finite(attr(res, "threshold")))
+  # With 3 phases, the default cut-off is sqrt(qchisq(0.975, df = 3)).
+  expect_equal(
+    attr(res, "threshold"),
+    sqrt(qchisq(0.975, df = 3)),
+    tolerance = 1e-6
+  )
+})

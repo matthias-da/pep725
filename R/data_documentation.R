@@ -33,7 +33,7 @@
 #' pre-generated synthetic data from the package repository.
 #'
 #' @source
-#' Derived from PEP725 Pan European Phenology Database \url{http://www.pep725.eu/}
+#' Derived from PEP725 Pan European Phenology Database \url{https://pep725.eu/}
 #'
 #' @examples
 #' # Load the seed dataset

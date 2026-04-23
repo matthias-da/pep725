@@ -20,7 +20,7 @@ A data.table with 1,319 rows and 10 variables:
 }
 }
 \source{
-Derived from PEP725 Pan European Phenology Database \url{http://www.pep725.eu/}
+Derived from PEP725 Pan European Phenology Database \url{https://pep725.eu/}
 }
 \description{
 A small subset of phenological data suitable for use with \code{\link{pep_simulate}}
