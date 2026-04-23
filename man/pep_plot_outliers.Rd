@@ -7,7 +7,7 @@
 pep_plot_outliers(
   x,
   type = c("overview", "seasonal", "map", "detail", "station", "doy_context",
-    "diagnostic"),
+    "diagnostic", "profile"),
   phase_id = NULL,
   outlier_only = NULL,
   late_threshold = 250,
@@ -34,7 +34,18 @@ model fit quality: (A) residuals vs fitted; (B) Q-Q plot of
 residuals; (C) |residual| vs altitude (if available) or year;
 (D) spatial map of maximum |residual| per station. Designed to
 accompany \code{method = "gam_residual"} but usable for every
-method (uses the \code{deviation} column as the residual).}
+method (uses the \code{deviation} column as the residual). For
+\code{method = "mahalanobis"} the panels automatically switch
+to MD-specific diagnostics (sorted MD with chi-square
+threshold; Q-Q against \eqn{\chi^2_p}; mean / max MD over time;
+per-station worst-case MD map).}
+\item{"profile"}{Parallel-coordinates plot of the phase profile
+(one line per station-year across phases), with flagged
+station-years highlighted and the robust central profile
+overlaid. Designed for \code{method = "mahalanobis"} where the
+outlierness lives in the \emph{shape} of a station-year across
+phases, not in any single DOY. The primary paper figure for
+the multivariate method.}
 }}
 
 \item{phase_id}{Optional integer vector to filter specific phases for plotting.}

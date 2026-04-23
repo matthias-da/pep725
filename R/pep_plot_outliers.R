@@ -31,7 +31,18 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #'       residuals; (C) |residual| vs altitude (if available) or year;
 #'       (D) spatial map of maximum |residual| per station. Designed to
 #'       accompany \code{method = "gam_residual"} but usable for every
-#'       method (uses the \code{deviation} column as the residual).}
+#'       method (uses the \code{deviation} column as the residual). For
+#'       \code{method = "mahalanobis"} the panels automatically switch
+#'       to MD-specific diagnostics (sorted MD with chi-square
+#'       threshold; Q-Q against \eqn{\chi^2_p}; mean / max MD over time;
+#'       per-station worst-case MD map).}
+#'     \item{"profile"}{Parallel-coordinates plot of the phase profile
+#'       (one line per station-year across phases), with flagged
+#'       station-years highlighted and the robust central profile
+#'       overlaid. Designed for \code{method = "mahalanobis"} where the
+#'       outlierness lives in the *shape* of a station-year across
+#'       phases, not in any single DOY. The primary paper figure for
+#'       the multivariate method.}
 #'   }
 #' @param phase_id Optional integer vector to filter specific phases for plotting.
 #' @param outlier_only Logical. If TRUE (default for some types), show only
@@ -96,7 +107,8 @@ utils::globalVariables(c("day", "year", "s_id", "is_outlier", "deviation",
 #' @import ggplot2
 pep_plot_outliers <- function(x,
                           type = c("overview", "seasonal", "map", "detail",
-                                   "station", "doy_context", "diagnostic"),
+                                   "station", "doy_context", "diagnostic",
+                                   "profile"),
                           phase_id = NULL,
                           outlier_only = NULL,
                           late_threshold = 250,
@@ -201,6 +213,83 @@ pep_plot_outliers <- function(x,
   if (type == "diagnostic") {
     return(pep_plot_outliers_diagnostic(dt, method, threshold))
   }
+
+  # ============================================================
+  # Plot type: PROFILE (phase-profile parallel coordinates)
+  # ============================================================
+  if (type == "profile") {
+    return(pep_plot_outliers_profile(dt, method, threshold))
+  }
+}
+
+
+#' @keywords internal
+pep_plot_outliers_profile <- function(dt, method, threshold) {
+  # Parallel-coordinates plot of phase profiles. Each station-year
+  # contributes one line across the BBCH phases; flagged station-years
+  # (by any detector, but this plot is designed for Mahalanobis) are
+  # highlighted in red.
+  if (!all(c("phase_id", "day", "s_id", "year") %in% names(dt))) {
+    stop("Profile plot requires 's_id', 'year', 'phase_id', 'day' columns.",
+         call. = FALSE)
+  }
+
+  dt <- data.table::copy(data.table::as.data.table(dt))
+  # is_outlier may be NA for rows the detector didn't reach; treat as FALSE
+  # for the plot (we want a single flag per station-year).
+  dt[is.na(is_outlier), is_outlier := FALSE]
+
+  # Per station-year: flagged if ANY phase row is flagged.
+  dt[, sy_flagged := any(is_outlier), by = .(s_id, year)]
+  dt[, sy_key := paste(s_id, year, sep = "_")]
+  dt[, phase_f := factor(phase_id)]
+
+  # Robust per-phase centre (median across all station-years) as reference
+  # — this is what the MCD estimator is (approximately) targeting for the
+  # centre of the ellipsoid.
+  ref <- dt[, .(day = stats::median(day, na.rm = TRUE)), by = phase_f]
+  ref[, sy_key := "__reference__"]
+  ref[, sy_flagged := FALSE]
+  ref[, is_outlier := FALSE]
+
+  # Draw flagged on top of non-flagged; reference as a thick black line.
+  non_flag <- dt[sy_flagged == FALSE]
+  flag     <- dt[sy_flagged == TRUE]
+
+  p <- ggplot(non_flag,
+              aes(x = phase_f, y = day, group = sy_key)) +
+    geom_line(color = "gray70", alpha = 0.35, linewidth = 0.3) +
+    geom_line(data = flag,
+              aes(x = phase_f, y = day, group = sy_key),
+              color = "red", alpha = 0.8, linewidth = 0.7) +
+    geom_line(data = ref,
+              aes(x = phase_f, y = day, group = sy_key),
+              color = "black", linewidth = 1.2, alpha = 0.9) +
+    geom_point(data = ref,
+               aes(x = phase_f, y = day),
+               color = "black", size = 2.5) +
+    labs(
+      x = "BBCH phase",
+      y = "Day of year (DOY)",
+      title = "Phase-profile parallel coordinates",
+      subtitle = sprintf(
+        paste0("%d station-years (red = flagged%s; black = robust ",
+               "median profile)"),
+        data.table::uniqueN(dt[, .(s_id, year)]),
+        if (identical(method, "mahalanobis"))
+          sprintf(", MD threshold = %s",
+                  format(threshold, digits = 3)) else "")
+    ) +
+    theme_minimal(base_size = 11) +
+    theme(plot.title = element_text(face = "bold"),
+          plot.subtitle = element_text(color = "gray30", size = 9))
+
+  # Facet by species if available and > 1 species.
+  if ("species" %in% names(dt) &&
+      data.table::uniqueN(dt$species) > 1) {
+    p <- p + facet_wrap(~species, scales = "free_y")
+  }
+  p
 }
 
 
