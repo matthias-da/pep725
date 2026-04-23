@@ -388,7 +388,7 @@ with the chi-square threshold line, Q-Q of MD² against χ²_*p*,
 mean/max MD over time (exposes network-wide anomalous epochs), and
 the per-station worst-case MD map.
 
-```{r plot-diagnostic-gam, eval=FALSE, fig.height=6}
+```{r plot-diagnostic-gam, eval=FALSE}
 # For gam_residual: classical model diagnostics
 outliers_gam <- pep_flag_outliers(
   apple_flowering,
@@ -398,7 +398,9 @@ outliers_gam <- pep_flag_outliers(
 pep_plot_outliers(outliers_gam, type = "diagnostic")
 ```
 
-```{r plot-diagnostic-mahal, eval=FALSE, fig.height=6}
+![GAM-residual diagnostic on a synthetic fixture with one injected contamination at station 1, year 2000. Panel A: residuals vs fitted; the injected point appears at residual ≈ +50 days. Panel B: Q-Q against N(0,1); the right-tail departure corresponds to the outlier. Panel C: |residual| vs altitude, showing the model has no altitude bias away from the outlier. Panel D: per-station worst-case residual map.](figures/gam_diagnostic.png)
+
+```{r plot-diagnostic-mahal, eval=FALSE}
 # For mahalanobis: MD-specific diagnostics
 outliers_mahal <- pep_flag_outliers(
   apple,
@@ -407,6 +409,8 @@ outliers_mahal <- pep_flag_outliers(
 )
 pep_plot_outliers(outliers_mahal, type = "diagnostic")
 ```
+
+![Mahalanobis-specific diagnostic on the same synthetic fixture. Panel A: sorted robust Mahalanobis distances across all station-years, with the $\sqrt{\chi^2_{0.975,\,3}} \approx 3.06$ threshold as a red dashed line; flagged points are red. Panel B: Q-Q of observed $\mathrm{MD}^2$ against $\chi^2_3$ — upper-tail departure identifies the outlier mass. Panel C: mean (blue) and max (red dotted) MD per year — the spike at year 2000 coincides with the injected anomaly. Panel D: per-station worst-case MD map.](figures/mahalanobis_diagnostic.png)
 
 **What to look for:**
 
@@ -431,10 +435,12 @@ plots the phase profile as parallel coordinates — one line per
 station-year, flagged ones in red, with the robust median profile
 overlaid in black as a reference:
 
-```{r plot-profile, eval=FALSE, fig.height=5}
+```{r plot-profile, eval=FALSE}
 # Phase-profile parallel coordinates (primary Mahalanobis figure).
 pep_plot_outliers(outliers_mahal, type = "profile")
 ```
+
+![Phase-profile parallel-coordinates plot. Each line is one station-year; the grey envelope shows the natural variability of the network, the red lines are station-years flagged by the robust Mahalanobis detector, and the thick black line is the MCD robust per-phase median profile. Red lines that cross the phases at atypical angles — not just at unusual absolute DOYs — are the classic Mahalanobis flags.](figures/mahalanobis_profile.png)
 
 **How to read it:**
 
