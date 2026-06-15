@@ -27,7 +27,8 @@ trend, \eqn{E[t_i] = i(i-1)/4} and \eqn{\mathrm{Var}[t_i] = i(i-1)(2i+5)/72}.
 The progressive statistic is
 \eqn{u(t_i) = (t_i - E[t_i])/\sqrt{\mathrm{Var}[t_i]}}.
 The retrograde \eqn{u'(t)} is the same procedure applied to the
-reversed series, then reversed and negated so both curves fluctuate
+reversed series, then reversed (re-indexed to the original time order)
+so both curves fluctuate
 around zero under stationarity.
 
 A turning point is flagged where the sign of \eqn{u - u'} changes
