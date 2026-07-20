@@ -65,6 +65,7 @@ Let's load the package and prepare our data:
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(pep725)
+library(data.table)
 
 # Download the synthetic dataset
 pep <- pep_download()

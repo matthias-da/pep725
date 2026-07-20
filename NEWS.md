@@ -1,3 +1,20 @@
+# pep725 1.1.1
+
+## Packaging
+
+* `data.table` and `ggplot2` moved from `Depends` to `Imports`. Loading
+  pep725 no longer attaches these packages to the search path. Package
+  functionality is unchanged: `pep` objects still support `data.table`
+  syntax (`[`, `.N`, `:=`) and plot methods still return `ggplot` objects.
+  Code that relied on `data.table` or `ggplot2` being attached as a side
+  effect of `library(pep725)` should now attach them explicitly.
+
+## Documentation
+
+* The deprecated `kendall_tau()` alias now carries the `internal` keyword, so
+  it no longer appears in the `help(package = "pep725")` index. The function
+  is still exported and `?kendall_tau` still works; use `mann_kendall_z()`.
+
 # pep725 1.1.0
 
 ## Bug fixes

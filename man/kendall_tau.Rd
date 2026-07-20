@@ -33,3 +33,4 @@ suppressWarnings(kendall_tau(c(120, 118, 115, 112, 110, 108, 105)))
 \author{
 Matthias Templ
 }
+\keyword{internal}

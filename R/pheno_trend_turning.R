@@ -408,6 +408,7 @@ mann_kendall_z <- function(x) {
 #'
 #' @seealso \code{\link{mann_kendall_z}}
 #' @author Matthias Templ
+#' @keywords internal
 #' @export
 kendall_tau <- function(x) {
   .Deprecated(

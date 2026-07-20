@@ -91,6 +91,7 @@ Once installed, load the package at the start of your R session:
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(pep725)
+library(data.table)
 ```
 
 When the package loads, you'll see a startup message with tips on how to get

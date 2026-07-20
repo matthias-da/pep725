@@ -1,6 +1,6 @@
 Package: pep725
 Title: Pan-European Phenological Data Analysis
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: 
     c(person("Matthias", "Templ", , "matthias.templ@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8638-5276")),
@@ -25,8 +25,8 @@ Description: Provides a framework for quality-aware analysis of ground-based
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.1), data.table, ggplot2
-Imports: dplyr, mgcv, methods, patchwork, purrr, robustbase, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
+Depends: R (>= 4.1)
+Imports: data.table, dplyr, ggplot2, mgcv, methods, patchwork, purrr, robustbase, stats, tibble, tidyr, tidyselect, utils, rnaturalearth, sf
 Suggests: ggmap, Kendall, knitr, leaflet, miniUI, nlme, quantreg, rmarkdown, rnaturalearthdata, pls, shiny, sp, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
